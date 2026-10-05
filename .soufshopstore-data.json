@@ -1,0 +1,1648 @@
+{
+  "users": {
+    "T3uSwiLalRSmmSNfEaVaUVX7H2Z2": {
+      "uid": "T3uSwiLalRSmmSNfEaVaUVX7H2Z2",
+      "email": "soufyane2035@gmail.com",
+      "role": "admin",
+      "savedProductIds": [],
+      "createdAt": "2026-10-04T06:49:57.812Z",
+      "lastLoginAt": "2026-10-04T07:20:34.033Z"
+    }
+  },
+  "categories": {
+    "electronics": {
+      "slug": "electronics",
+      "name": {
+        "ar": "إلكترونيات",
+        "en": "Electronics"
+      },
+      "icon": "📱",
+      "order": 1,
+      "sortOrder": 1,
+      "isActive": true,
+      "createdAt": "2026-10-05T13:34:07.047Z",
+      "updatedAt": "2026-10-05T13:34:07.047Z"
+    },
+    "home": {
+      "slug": "home",
+      "name": {
+        "ar": "المنزل والمطبخ",
+        "en": "Home & Kitchen"
+      },
+      "icon": "🏠",
+      "order": 2,
+      "sortOrder": 2,
+      "isActive": true,
+      "createdAt": "2026-10-05T13:34:07.047Z",
+      "updatedAt": "2026-10-05T13:34:07.047Z"
+    },
+    "health": {
+      "slug": "health",
+      "name": {
+        "ar": "الصحة والعناية",
+        "en": "Health & Personal Care"
+      },
+      "icon": "🩺",
+      "order": 3,
+      "sortOrder": 3,
+      "isActive": true,
+      "createdAt": "2026-10-05T13:34:07.047Z",
+      "updatedAt": "2026-10-05T13:34:07.047Z"
+    },
+    "sports": {
+      "slug": "sports",
+      "name": {
+        "ar": "الرياضة واللياقة",
+        "en": "Sports & Outdoors"
+      },
+      "icon": "⚽",
+      "order": 4,
+      "sortOrder": 4,
+      "isActive": true,
+      "createdAt": "2026-10-05T13:34:07.047Z",
+      "updatedAt": "2026-10-05T13:34:07.047Z"
+    },
+    "fashion": {
+      "slug": "fashion",
+      "name": {
+        "ar": "الموضة والأزياء",
+        "en": "Fashion & Apparel"
+      },
+      "icon": "👕",
+      "order": 5,
+      "sortOrder": 5,
+      "isActive": true,
+      "createdAt": "2026-10-05T13:34:07.047Z",
+      "updatedAt": "2026-10-05T13:34:07.047Z"
+    }
+  },
+  "sources": {},
+  "products": {
+    "24oz-slim-insulated-water-bottle-straw-amazon": {
+      "categoryName": {
+        "en": "General",
+        "ar": "عام"
+      },
+      "categoryId": "general",
+      "slug": "24oz-slim-insulated-water-bottle-straw-amazon",
+      "categorySlug": "general",
+      "description": {
+        "ar": "زجاجة مياه ستانلس ستيل مع عزل مزدوج، تحافظ على برودة المشروبات حتى 24 ساعة وتناسب حامل أكواب السيارة",
+        "en": "Slim 24oz insulated stainless steel bottle with straw, leakproof design and cup-holder fit, keeping drinks cold for up to 24 hours."
+      },
+      "id": "24oz-slim-insulated-water-bottle-straw-amazon",
+      "videoUrl": "https://youtube.com/shorts/6paX0gqrlpw?si=b0vJoS2o7UznCcOe",
+      "soldCount": 211,
+      "sourceId": "amazon",
+      "discount": 5,
+      "status": "published",
+      "createdAt": "2026-10-04T15:35:53.726Z",
+      "whatToConsider": {
+        "ar": "لسعة 24 أونصة مناسبة للاستخدام اليومي لكنها قد لا تكفي لمن يفضل زجاجات كبيرة، كما يُنصح بالغسل اليدوي",
+        "en": "The 24oz capacity may feel small for heavy drinkers, and the bottle is recommended for hand washing rather than dishwasher cleaning."
+      },
+      "stars": 4.7,
+      "priceCurrency": "USD",
+      "whyWePickedIt": {
+        "ar": "تجمع بين التصميم النحيف وسعة 24 أونصة، ما يجعلها عملية للرياضة والعمل والسفر. العزل المزدوج يحافظ على البرودة حتى 24 ساعة، مع غطاء مانع للتسرب ومقبض علوي وحجم مناسب لمعظم حوامل أكواب السيارات.",
+        "en": "Its slim 24oz design is convenient for workouts, commuting, school and travel. Double-wall insulation keeps drinks cold for up to 24 hours, while the leakproof lid, top handle and cup-holder-friendly shape improve everyday portability."
+      },
+      "tags": [
+        "زجاجة مياه حرارية",
+        "زجاجة ستانلس ستيل",
+        "water bottle",
+        "insulated bottle",
+        "24oz water bottle",
+        "زجاجة رياضية",
+        "leakproof bottle",
+        "travel water bottle"
+      ],
+      "oldPrice": 14.99,
+      "updatedAt": "2026-10-04T17:56:17.801Z",
+      "discountPercent": 5,
+      "sourceDisclosure": {
+        "ar": "بصفتنا شريكاً في برنامج Amazon Associates، فإننا نكسب من عمليات الشراء المؤهلة.",
+        "en": "As an Amazon Associate I earn from qualifying purchases."
+      },
+      "priceUpdatedAt": "2026-10-04T17:56:17.801Z",
+      "title": {
+        "en": "24oz Slim Insulated Water Bottle with Straw",
+        "ar": "زجاجة مياه حرارية 24 أونصة بغطاء ماصة"
+      },
+      "images": [
+        {
+          "alt": {
+            "en": "24oz Slim Insulated Water Bottle with Straw",
+            "ar": "زجاجة مياه حرارية 24 أونصة بغطاء ماصة"
+          },
+          "height": 600,
+          "width": 800,
+          "url": "https://m.media-amazon.com/images/I/6195eTgirnL._AC_SL1500_.jpg"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/71gge+UzfDL._AC_SL1500_.jpg",
+          "width": 800,
+          "height": 600,
+          "alt": {
+            "ar": "زجاجة مياه حرارية 24 أونصة بغطاء ماصة",
+            "en": "24oz Slim Insulated Water Bottle with Straw"
+          }
+        },
+        {
+          "alt": {
+            "ar": "زجاجة مياه حرارية 24 أونصة بغطاء ماصة",
+            "en": "24oz Slim Insulated Water Bottle with Straw"
+          },
+          "width": 800,
+          "url": "https://m.media-amazon.com/images/I/718zzVd+-PL._AC_SL1500_.jpg",
+          "height": 600
+        },
+        {
+          "height": 600,
+          "alt": {
+            "en": "24oz Slim Insulated Water Bottle with Straw",
+            "ar": "زجاجة مياه حرارية 24 أونصة بغطاء ماصة"
+          },
+          "width": 800,
+          "url": "https://m.media-amazon.com/images/I/71tWHC4mRJL._AC_SL1500_.jpg"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/713I36E-+NL._AC_SL1500_.jpg",
+          "width": 800,
+          "height": 600,
+          "alt": {
+            "ar": "زجاجة مياه حرارية 24 أونصة بغطاء ماصة",
+            "en": "24oz Slim Insulated Water Bottle with Straw"
+          }
+        },
+        {
+          "alt": {
+            "en": "24oz Slim Insulated Water Bottle with Straw",
+            "ar": "زجاجة مياه حرارية 24 أونصة بغطاء ماصة"
+          },
+          "height": 600,
+          "url": "https://m.media-amazon.com/images/I/71+BugaIZlL._AC_SL1500_.jpg",
+          "width": 800
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/71grGWaLDHL._AC_SL1500_.jpg",
+          "height": 600,
+          "width": 800,
+          "alt": {
+            "ar": "زجاجة مياه حرارية 24 أونصة بغطاء ماصة",
+            "en": "24oz Slim Insulated Water Bottle with Straw"
+          }
+        }
+      ],
+      "badge": "توفير",
+      "isFeatured": false,
+      "priceDisplayPolicy": "show_with_timestamp",
+      "priceAmount": 14,
+      "clicksCount": 10,
+      "sourceSlug": "amazon",
+      "shortSummary": {
+        "en": "Slim 24oz insulated stainless steel bottle with straw, leakproof design and cup-holder fit, keeping drinks cold for up to 24 hours.",
+        "ar": "زجاجة مياه ستانلس ستيل مع عزل مزدوج، تحافظ على برودة المشروبات حتى 24 ساعة وتناسب حامل أكواب السيارة"
+      },
+      "sourceName": {
+        "ar": "Amazon",
+        "en": "Amazon"
+      },
+      "affiliateUrl": "https://link.amazon/B08io3WAR"
+    },
+    "basics-6-quart-digital-air-fryer-with-easy-view-window-8-preset-menus-digital-touch-panel-amazon": {
+      "description": {
+        "en": "About this item\nFAMILY SIZE CAPACITY: 6-quart basket size perfect for serving 4-6 people, ideal for family meals and entertaining\nDIGITAL CONTROLS: Large touch panel features 8 preset menus, keep warm function, and smart shake reminder for precise cooking control\nVERSATILE COOKING: 360-degree hot air circulation with removable crisper plate creates tender interior and crispy exterior with little to no oil\nEFFECTIVE HEAT: Distributes heat evenly and efficiently with adjustable temperature from 140℉-400℉\nVIEWING WINDOW: Monitor cooking progress without opening the basket, plus non-slip feet for stability\nPREMIUM DESIGN: Features durable ceramic nonstick coating for easy food release and dishwasher-safe parts for effortless cleaning\nCOOKING GUIDANCE: Includes full-color recipe book featuring 20 delicious home recipes with pictures created by in-house chefs combined with quick start guide and cooking charts\n› See more product details",
+        "ar": "عن هذه السلعة\nسعة حجم العائلة: سلة بسعة 6 كوارت مثالية لخدمة 4-6 أشخاص، مثالية للوجبات العائلية والترفيه\nعناصر تحكم رقمية: تتميز لوحة اللمس الكبيرة بـ 8 قوائم مضبوطة مسبقًا، ووظيفة الحفاظ على الدفء، وتذكير ذكي بالاهتزاز للتحكم الدقيق في الطهي\nطهي متعدد الاستخدامات: دوران الهواء الساخن بزاوية 360 درجة مع طبق مقرمش قابل للإزالة يخلق الجزء الداخلي الرقيق والجزء الخارجي المقرمش مع القليل من الزيت أو بدون زيت\nحرارة فعالة: يوزع الحرارة بالتساوي وكفاءة مع درجة حرارة قابلة للتعديل من 140 درجة فهرنهايت إلى 400 درجة فهرنهايت\nنافذة الرؤية: راقب تقدم الطهي دون فتح السلة، بالإضافة إلى أقدام غير قابلة للانزلاق من أجل الثبات\nتصميم فاخر: يتميز بطلاء سيراميك متين مانع للالتصاق لسهولة إخراج الطعام وأجزاء آمنة للغسل في غسالة الصحون لتنظيف سهل\nإرشادات الطبخ: يتضمن كتاب وصفات بالألوان الكاملة يضم 20 وصفة منزلية لذيذة مع صور تم إنشاؤها بواسطة الطهاة الداخليين جنبًا إلى جنب مع دليل البدء السريع ومخططات الطبخ"
+      },
+      "stars": 4.4,
+      "shortSummary": {
+        "en": "Basics 6-Quart Digital Air Fryer with Easy View Window, 8 Preset Menus, Digital Touch Panel, Ceramic Nonstick Coating, 140°F-400°F Temperature Range, 1550W, Black",
+        "ar": "مقلاة هوائية رقمية سعة 6 كوارت مع نافذة رؤية سهلة، 8 قوائم مضبوطة مسبقًا، لوحة لمس رقمية، طلاء سيراميك غير لاصق، نطاق درجة حرارة 140-400 درجة فهرنهايت، 1550 واط، اسود"
+      },
+      "affiliateUrl": "https://link.amazon/B0gIihVKB",
+      "priceUpdatedAt": "2026-10-04T13:46:59.741Z",
+      "sourceId": "amazon",
+      "isFeatured": false,
+      "soldCount": 400,
+      "createdAt": "2026-10-04T13:46:59.741Z",
+      "discount": 15,
+      "whyWePickedIt": {
+        "en": "Special Feature\tIncludes Printed Recipe Book and Quick Start Guide, Temperature Control, Timer\nProduct Dimensions\t13.78\"D x 10.63\"W x 11.02\"H\nColor\tBlack\nMaterial\tPlastic\nRecommended Uses For Product\tBake, Dehydrate, Reheat, Roast",
+        "ar": "ميزة خاصة\tالتحكم في درجة الحرارة, مؤقت, يتضمن كتاب وصفات مطبوع ودليل البدء السريع\nأبعاد المنتج\t35العمق x 27العرض x 28الارتفاع سم\nاللون\tاسود\nالمادة\tبلاستيك\nالاستخدامات الموصى بها للمنتج\tإعادة التسخين, التحميص, تجفيف, خبز"
+      },
+      "images": [
+        {
+          "height": 600,
+          "url": "https://m.media-amazon.com/images/I/71HN0QLZI9L._AC_SL1500_.jpg",
+          "width": 800,
+          "alt": {
+            "ar": "مقلاة هوائية رقمية سعة 6 كوارت مع نافذة رؤية سهلة، 8 قوائم مضبوطة مسبقًا، لوحة لمس رقمية، طلاء سيراميك غير لاصق، نطاق درجة حرارة 140-400 درجة فهرنهايت، 1550 واط، اسود",
+            "en": "Basics 6-Quart Digital Air Fryer with Easy View Window, 8 Preset Menus, Digital Touch Panel, Ceramic Nonstick Coating, 140°F-400°F Temperature Range, 1550W, Black"
+          }
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/61a1WjnxFRL._AC_SL1500_.jpg",
+          "height": 600,
+          "width": 800,
+          "alt": {
+            "ar": "مقلاة هوائية رقمية سعة 6 كوارت مع نافذة رؤية سهلة، 8 قوائم مضبوطة مسبقًا، لوحة لمس رقمية، طلاء سيراميك غير لاصق، نطاق درجة حرارة 140-400 درجة فهرنهايت، 1550 واط، اسود",
+            "en": "Basics 6-Quart Digital Air Fryer with Easy View Window, 8 Preset Menus, Digital Touch Panel, Ceramic Nonstick Coating, 140°F-400°F Temperature Range, 1550W, Black"
+          }
+        },
+        {
+          "height": 600,
+          "alt": {
+            "en": "Basics 6-Quart Digital Air Fryer with Easy View Window, 8 Preset Menus, Digital Touch Panel, Ceramic Nonstick Coating, 140°F-400°F Temperature Range, 1550W, Black",
+            "ar": "مقلاة هوائية رقمية سعة 6 كوارت مع نافذة رؤية سهلة، 8 قوائم مضبوطة مسبقًا، لوحة لمس رقمية، طلاء سيراميك غير لاصق، نطاق درجة حرارة 140-400 درجة فهرنهايت، 1550 واط، اسود"
+          },
+          "width": 800,
+          "url": "https://m.media-amazon.com/images/I/71V8W2csQWL._AC_SL1500_.jpg"
+        },
+        {
+          "alt": {
+            "ar": "مقلاة هوائية رقمية سعة 6 كوارت مع نافذة رؤية سهلة، 8 قوائم مضبوطة مسبقًا، لوحة لمس رقمية، طلاء سيراميك غير لاصق، نطاق درجة حرارة 140-400 درجة فهرنهايت، 1550 واط، اسود",
+            "en": "Basics 6-Quart Digital Air Fryer with Easy View Window, 8 Preset Menus, Digital Touch Panel, Ceramic Nonstick Coating, 140°F-400°F Temperature Range, 1550W, Black"
+          },
+          "height": 600,
+          "url": "https://m.media-amazon.com/images/I/71X6onPx-uL._AC_SL1500_.jpg",
+          "width": 800
+        },
+        {
+          "height": 600,
+          "alt": {
+            "ar": "مقلاة هوائية رقمية سعة 6 كوارت مع نافذة رؤية سهلة، 8 قوائم مضبوطة مسبقًا، لوحة لمس رقمية، طلاء سيراميك غير لاصق، نطاق درجة حرارة 140-400 درجة فهرنهايت، 1550 واط، اسود",
+            "en": "Basics 6-Quart Digital Air Fryer with Easy View Window, 8 Preset Menus, Digital Touch Panel, Ceramic Nonstick Coating, 140°F-400°F Temperature Range, 1550W, Black"
+          },
+          "width": 800,
+          "url": "https://m.media-amazon.com/images/I/61dQiml3LRL._AC_SL1500_.jpg"
+        }
+      ],
+      "priceCurrency": "USD",
+      "sourceSlug": "amazon",
+      "sourceName": {
+        "en": "Amazon",
+        "ar": "Amazon"
+      },
+      "oldPrice": 66.59,
+      "categoryId": "general",
+      "status": "published",
+      "updatedAt": "2026-10-04T13:46:59.741Z",
+      "slug": "basics-6-quart-digital-air-fryer-with-easy-view-window-8-preset-menus-digital-touch-panel-amazon",
+      "sourceDisclosure": {
+        "ar": "بصفتنا شريكاً في برنامج Amazon Associates، فإننا نكسب من عمليات الشراء المؤهلة.",
+        "en": "As an Amazon Associate I earn from qualifying purchases."
+      },
+      "whatToConsider": {
+        "ar": "لجهد الكهربائي للمنتج: 120\nهذا المنتج متوافق مع المنافذ التي تدعم الجهود الكهربية البالغة 120 فولت وقد يتطلب محولًا عند استخدامه خارج الولايات المتحدة الأمريكية.",
+        "en": "Product voltage: 120\nThis product is compatible with outlets that support 120 volts and might require a converter when used outside of the United States."
+      },
+      "categorySlug": "general",
+      "categoryName": {
+        "en": "General",
+        "ar": "عام"
+      },
+      "clicksCount": 5,
+      "id": "basics-6-quart-digital-air-fryer-with-easy-view-window-8-preset-menus-digital-touch-panel-amazon",
+      "priceAmount": 56,
+      "title": {
+        "en": "Basics 6-Quart Digital Air Fryer with Easy View Window, 8 Preset Menus, Digital Touch Panel, Ceramic Nonstick Coating, 140°F-400°F Temperature Range, 1550W, Black",
+        "ar": "مقلاة هوائية رقمية سعة 6 كوارت مع نافذة رؤية سهلة، 8 قوائم مضبوطة مسبقًا، لوحة لمس رقمية، طلاء سيراميك غير لاصق، نطاق درجة حرارة 140-400 درجة فهرنهايت، 1550 واط، اسود"
+      },
+      "priceDisplayPolicy": "show_with_timestamp"
+    },
+    "compression-socks-neuropathy-support-amazon": {
+      "oldPrice": null,
+      "priceUpdatedAt": "2026-10-05T15:56:02.896Z",
+      "clicksCount": 0,
+      "priceAmount": 19.99,
+      "discount": 1,
+      "isFeatured": false,
+      "priceCurrency": "USD",
+      "badge": "توفير",
+      "sourceId": "amazon",
+      "images": [
+        {
+          "alt": {
+            "ar": "صورة المنتج",
+            "en": "Product image"
+          },
+          "height": 600,
+          "width": 800,
+          "url": "https://m.media-amazon.com/images/I/81Wut+aw6WL._SL1500_.jpg"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/71zE8u7Ym9L._SL1500_.jpg",
+          "height": 600,
+          "width": 800,
+          "alt": {
+            "ar": "صورة المنتج",
+            "en": "Product image"
+          }
+        },
+        {
+          "height": 600,
+          "alt": {
+            "en": "Product image",
+            "ar": "صورة المنتج"
+          },
+          "url": "https://m.media-amazon.com/images/I/713ASZm+uKL._SL1500_.jpg",
+          "width": 800
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/716nPqKCwCL._SL1500_.jpg",
+          "alt": {
+            "en": "Product image",
+            "ar": "صورة المنتج"
+          },
+          "height": 600,
+          "width": 800
+        },
+        {
+          "alt": {
+            "ar": "صورة المنتج",
+            "en": "Product image"
+          },
+          "url": "https://m.media-amazon.com/images/I/7181+CsDclL._SL1500_.jpg",
+          "height": 600,
+          "width": 800
+        },
+        {
+          "width": 800,
+          "alt": {
+            "ar": "صورة المنتج",
+            "en": "Product image"
+          },
+          "url": "https://m.media-amazon.com/images/I/71peol9H38L._SL1500_.jpg",
+          "height": 600
+        },
+        {
+          "height": 600,
+          "url": "https://m.media-amazon.com/images/I/71JGl+xML9L._SL1500_.jpg",
+          "alt": {
+            "ar": "صورة المنتج",
+            "en": "Product image"
+          },
+          "width": 800
+        }
+      ],
+      "updatedAt": "2026-10-05T15:56:02.896Z",
+      "title": {
+        "ar": "جوارب ضغط مريحة لدعم القدمين والساقين",
+        "en": "Comfort Compression Socks for Foot & Leg Support"
+      },
+      "categoryName": {
+        "en": "Sports & Outdoors",
+        "ar": "الرياضة واللياقة"
+      },
+      "categorySlug": "sports",
+      "sourceSlug": "amazon",
+      "sourceName": {
+        "en": "Amazon",
+        "ar": "Amazon"
+      },
+      "whyWePickedIt": {
+        "ar": "يوفر تصميم الضغط المتدرج دعمًا يبدأ عند الكاحل ويخف تدريجيًا نحو الساق، وقد يساعد على تحسين عودة الدم وتقليل الشعور بالثقل أو التورم لدى بعض المستخدمين. كما أن الخامة القابلة للتهوية والتصميم المريح يجعلانها مناسبة للاستخدام اليومي",
+        "en": "Graduated compression provides stronger support around the ankle and gradually decreases up the leg, which may help support blood flow and reduce feelings of heaviness or swelling for some users. Breathable materials and a comfortable fit make this style practical for everyday wea"
+      },
+      "categoryId": "sports",
+      "id": "compression-socks-neuropathy-support-amazon",
+      "tags": [
+        "جوارب ضغط، دعم القدمين، دعم الكاحل، دعم"
+      ],
+      "createdAt": "2026-10-05T09:59:36.057Z",
+      "shortSummary": {
+        "ar": "جوارب ضغط مريحة بتصميم داعم للقدم والكاحل، مناسبة للاستخدام اليومي ولمن يبحث عن دعم أفضل أثناء الوقوف والمشي.",
+        "en": "Comfortable compression socks designed to support the feet and ankles during daily activities, walking, standing, and extended wear."
+      },
+      "affiliateUrl": "https://link.amazon/B0gHHnzVU",
+      "stars": 4.4,
+      "status": "published",
+      "discountPercent": 1,
+      "priceDisplayPolicy": "show_with_timestamp",
+      "description": {
+        "ar": "جوارب الضغط المريحة خيار عملي لمن يبحث عن دعم القدمين والكاحلين والساقين خلال ساعات الوقوف أو المشي أو الجلوس الطويل. يعتمد تصميم جوارب الضغط المتدرج على ضغط أقوى نسبيًا حول الكاحل ثم يقل تدريجيًا باتجاه الساق، وهو أسلوب يُستخدم لدعم عودة الدم وتقليل الإحساس بالثقل والتورم في بعض الحالات. تتوفر بعض التصاميم بخامات ناعمة وقابلة للتهوية تساعد على إبقاء القدم أكثر جفافًا وراحة، مع حياكة تقلل الاحتكاك والضغط غير المريح. لذلك يمكن استخدامها ضمن الروتين اليومي، في العمل أو السفر أو أثناء النشاط الخفيف. وهي مناسبة لمن يبحث عن جوارب ضغط للقدمين، جوارب دعم للكاحل، جوارب ضغط للساقين، أو جوارب مريحة للاستخدام اليومي.",
+        "en": "These comfortable compression socks are a practical choice for people who want extra support for their feet, ankles, and lower legs during long periods of standing, walking, sitting, work, or travel. Graduated compression is designed to provide stronger pressure around the ankle and gradually reduce pressure higher up the leg, helping support venous return and potentially easing feelings of heaviness or swelling in some users. Many designs also use breathable, moisture-managing fabrics for improved comfort during extended wear, while smooth or seamless construction can help reduce friction around sensitive areas. They can become a useful part of an everyday comfort routine for active days, office work, travel, or light walking. Ideal for searches such as compression socks for feet, ankle support socks, leg compression socks, and comfortable everyday compression socks"
+      },
+      "sourceDisclosure": {
+        "ar": "بصفتنا شريكاً في برنامج Amazon Associates، فإننا نكسب من عمليات الشراء المؤهلة.",
+        "en": "As an Amazon Associate I earn from qualifying purchases."
+      },
+      "soldCount": 2300,
+      "whatToConsider": {
+        "en": "Compression level is not suitable for everyone, especially with certain circulation conditions, diabetes, or neuropathy, so proper sizing and professional guidance may be importan",
+        "ar": "لا تناسب درجة الضغط نفسها الجميع، خصوصًا مع بعض مشاكل الدورة الدموية أو السكري والاعتلال العصبي؛ من الأفضل اختيار المقاس ودرجة الضغط بعناية واستشارة مختص عند الحاجة"
+      },
+      "slug": "compression-socks-neuropathy-support-amazon"
+    },
+    "ergonomic-lumbar-support-pillow-office-car-amazon": {
+      "images": [
+        {
+          "url": "https://m.media-amazon.com/images/I/81Qm1-Fja2L._AC_SX679_.jpg",
+          "width": 800,
+          "alt": {
+            "en": "Ergonomic Lumbar Support Pillow for Office & Car",
+            "ar": "وسادة دعم أسفل الظهر للمكتب والسيارة"
+          },
+          "height": 600
+        },
+        {
+          "width": 800,
+          "alt": {
+            "en": "Ergonomic Lumbar Support Pillow for Office & Car",
+            "ar": "وسادة دعم أسفل الظهر للمكتب والسيارة"
+          },
+          "url": "https://m.media-amazon.com/images/I/71zU5ljf2VL._AC_SL1500_.jpg",
+          "height": 600
+        },
+        {
+          "alt": {
+            "ar": "وسادة دعم أسفل الظهر للمكتب والسيارة",
+            "en": "Ergonomic Lumbar Support Pillow for Office & Car"
+          },
+          "width": 800,
+          "height": 600,
+          "url": "https://m.media-amazon.com/images/I/71bMjyW-r4L._AC_SL1500_.jpg"
+        },
+        {
+          "width": 800,
+          "url": "https://m.media-amazon.com/images/I/71NrzObpRRL._AC_SL1500_.jpg",
+          "alt": {
+            "en": "Ergonomic Lumbar Support Pillow for Office & Car",
+            "ar": "وسادة دعم أسفل الظهر للمكتب والسيارة"
+          },
+          "height": 600
+        },
+        {
+          "width": 800,
+          "height": 600,
+          "url": "https://m.media-amazon.com/images/I/71iq9uYlwjL._AC_SL1500_.jpg",
+          "alt": {
+            "en": "Ergonomic Lumbar Support Pillow for Office & Car",
+            "ar": "وسادة دعم أسفل الظهر للمكتب والسيارة"
+          }
+        },
+        {
+          "width": 800,
+          "alt": {
+            "ar": "وسادة دعم أسفل الظهر للمكتب والسيارة",
+            "en": "Ergonomic Lumbar Support Pillow for Office & Car"
+          },
+          "height": 600,
+          "url": "https://m.media-amazon.com/images/I/71Qd69SkWcL._AC_SL1500_.jpg"
+        },
+        {
+          "alt": {
+            "en": "Ergonomic Lumbar Support Pillow for Office & Car",
+            "ar": "وسادة دعم أسفل الظهر للمكتب والسيارة"
+          },
+          "width": 800,
+          "height": 600,
+          "url": "https://m.media-amazon.com/images/I/71CkiQ3zE-L._AC_SL1500_.jpg"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/81yp5Ta3XXL._AC_SL1500_.jpg",
+          "width": 800,
+          "alt": {
+            "ar": "وسادة دعم أسفل الظهر للمكتب والسيارة",
+            "en": "Ergonomic Lumbar Support Pillow for Office & Car"
+          },
+          "height": 600
+        }
+      ],
+      "slug": "ergonomic-lumbar-support-pillow-office-car-amazon",
+      "categoryId": "general",
+      "shortSummary": {
+        "en": "Ergonomic lumbar pillow for office chairs and car seats, designed to support your lower back during long periods of sitting.",
+        "ar": "سادة مريحة لدعم أسفل الظهر أثناء الجلوس الطويل في المكتب أو السيارة، بتصميم مريح يساعد على تحسين وضعية الجلوس."
+      },
+      "affiliateUrl": "https://link.amazon/B06cGb86W",
+      "tags": [
+        "وسادة الظهر، دعم أسفل الظهر، مسند قطني،"
+      ],
+      "stars": 4.1,
+      "description": {
+        "en": "This ergonomic lumbar support pillow is designed to provide extra comfort and support during long periods of sitting at the office or in the car. Its contoured shape follows the natural curve of the lower back, helping create a more supported and comfortable sitting position. It is a practical choice for anyone searching for a lumbar pillow for office chairs, a car seat back support, or a lower back cushion for long sitting. Depending on the design, memory foam can adapt to the body’s contours while providing a balanced combination of cushioning and support. Breathable covers may also improve airflow during extended use. Lightweight and portable, this type of lumbar cushion can easily be moved between an office chair, car seat, home chair, or travel seat.",
+        "ar": "وسادة دعم أسفل الظهر مصممة لتوفير راحة إضافية أثناء الجلوس لفترات طويلة في المكتب أو السيارة. يساعد شكلها الهندسي على ملاءمة منحنيات منطقة أسفل الظهر وتوفير دعم أكثر ثباتًا أثناء العمل أو القيادة. وتُعد خيارًا عمليًا لمن يبحث عن وسادة ظهر للمكتب، مسند قطني للسيارة أو وسادة مريحة للجلوس الطويل. بعض التصاميم تعتمد على رغوة الذاكرة التي تتكيف مع شكل الجسم وتوفر إحساسًا متوازنًا بين الدعم والراحة، بينما تساعد الأقمشة المسامية في تحسين التهوية أثناء الاستخدام. كما يمكن نقلها بسهولة بين كرسي المكتب ومقعد السيارة، مما يجعلها مناسبة للاستخدام اليومي في المنزل والعمل والسفر."
+      },
+      "whatToConsider": {
+        "en": "Comfort varies from person to person, and the pillow may need repositioning to find the most suitable level of support",
+        "ar": "الإحساس بالراحة يختلف من شخص لآخر، وقد يحتاج المستخدم إلى تعديل موضع الوسادة حتى يجد مستوى الدعم المناسب له."
+      },
+      "priceDisplayPolicy": "show_with_timestamp",
+      "updatedAt": "2026-10-05T10:26:09.958Z",
+      "discountPercent": 31,
+      "priceUpdatedAt": "2026-10-05T10:26:09.958Z",
+      "discount": 31,
+      "sourceDisclosure": {
+        "en": "As an Amazon Associate I earn from qualifying purchases.",
+        "ar": "بصفتنا شريكاً في برنامج Amazon Associates، فإننا نكسب من عمليات الشراء المؤهلة."
+      },
+      "priceAmount": 26.99,
+      "clicksCount": 0,
+      "id": "ergonomic-lumbar-support-pillow-office-car-amazon",
+      "badge": "توفير",
+      "createdAt": "2026-10-05T09:44:07.577Z",
+      "oldPrice": 38.99,
+      "sourceSlug": "amazon",
+      "categorySlug": "general",
+      "sourceName": {
+        "ar": "Amazon",
+        "en": "Amazon"
+      },
+      "title": {
+        "en": "Ergonomic Lumbar Support Pillow for Office & Car",
+        "ar": "وسادة دعم أسفل الظهر للمكتب والسيارة"
+      },
+      "categoryName": {
+        "en": "General",
+        "ar": "عام"
+      },
+      "status": "published",
+      "soldCount": 10290,
+      "priceCurrency": "USD",
+      "whyWePickedIt": {
+        "ar": "تساعد الوسادة على دعم المنطقة القطنية والحفاظ على انحناء الظهر الطبيعي أثناء الجلوس لفترات طويلة. كما أن تصميمها المريح وإمكانية استخدامها في المكتب أو السيارة تجعلها عملية للاستخدام اليومي",
+        "en": "The pillow provides targeted lumbar support to help maintain the natural curve of the lower back during extended sitting. Its ergonomic design makes it practical for both office chairs and car seats."
+      },
+      "videoUrl": "https://www.amazon.com/vdp/046a954cc9ea45b08f32d75c76fc71d3?aci=amzn1.ive.seller.video.046a954cc9ea45b08f32d75c76fc71d3&product=B074C9F45S&ref=cm_sw_cp_r_ib_dt_flEQMQhV2gFq0",
+      "isFeatured": false,
+      "sourceId": "amazon"
+    },
+    "memory-foam-knee-pillow-side-sleepers-amazon": {
+      "description": {
+        "en": "This memory foam knee pillow is a practical choice for side sleepers looking for comfortable support between the legs. Its contoured shape is designed to keep the knees and legs comfortably separated, helping reduce direct contact and pressure caused by the legs resting against each other during sleep. Responsive memory foam adapts to the body while providing a balanced combination of cushioning and support. A side sleeper knee pillow can help maintain a more comfortable leg position throughout the night and provide support around the knees and hips. Some versions also feature a removable, washable cover for easier maintenance and everyday hygiene. It is ideal for shoppers searching for a knee pillow for side sleeping, memory foam leg pillow, pillow between knees, side sleeper support pillow, or ergonomic knee cushion.",
+        "ar": "وسادة الركبة المصنوعة من رغوة الذاكرة هي خيار عملي للأشخاص الذين يفضلون النوم على الجانب ويرغبون في دعم أفضل بين الساقين. يأتي تصميمها بشكل منحني ليساعد على إبقاء الركبتين والساقين في وضع مريح، مع تقليل التلامس المباشر والضغط الناتج عن احتكاك الساقين أثناء النوم. تتكيف رغوة الذاكرة مع شكل الجسم وتوفر إحساسًا متوازنًا بين النعومة والثبات. ويمكن استخدام وسادة الركبة للنوم الجانبي لدعم الركبتين والوركين والحفاظ على وضعية أكثر راحة أثناء الليل. بعض التصاميم تتوفر أيضًا بغطاء قابل للإزالة والغسل، ما يسهل المحافظة على النظافة. مناسبة لمن يبحث عن وسادة بين الركبتين، وسادة ميموري فوم للنوم، دعم الساقين أثناء النوم، أو وسادة للنوم على الجانب"
+      },
+      "categorySlug": "health",
+      "sourceSlug": "amazon",
+      "categoryName": {
+        "en": "Health & Personal Care",
+        "ar": "الصحة والعناية"
+      },
+      "priceUpdatedAt": "2026-10-05T15:55:27.447Z",
+      "priceDisplayPolicy": "show_with_timestamp",
+      "stars": 4.6,
+      "sourceName": {
+        "ar": "Amazon",
+        "en": "Amazon"
+      },
+      "sourceId": "amazon",
+      "discountPercent": 25,
+      "soldCount": 2300,
+      "createdAt": "2026-10-05T09:17:09.865Z",
+      "isFeatured": false,
+      "discount": 25,
+      "status": "published",
+      "oldPrice": 39.99,
+      "images": [
+        {
+          "alt": {
+            "en": "Memory Foam Knee Pillow for Side Sleepers",
+            "ar": "وسادة ركبة ميموري فوم للنوم الجانبي"
+          },
+          "height": 600,
+          "width": 800,
+          "url": "https://m.media-amazon.com/images/I/711SA413BxL._AC_SL1500_.jpg"
+        },
+        {
+          "width": 800,
+          "height": 600,
+          "url": "https://m.media-amazon.com/images/I/71AZacxjGIL._AC_SL1500_.jpg",
+          "alt": {
+            "ar": "وسادة ركبة ميموري فوم للنوم الجانبي",
+            "en": "Memory Foam Knee Pillow for Side Sleepers"
+          }
+        },
+        {
+          "width": 800,
+          "alt": {
+            "en": "Memory Foam Knee Pillow for Side Sleepers",
+            "ar": "وسادة ركبة ميموري فوم للنوم الجانبي"
+          },
+          "height": 600,
+          "url": "https://m.media-amazon.com/images/I/71ZSwa2KCDL._AC_SL1500_.jpg"
+        },
+        {
+          "width": 800,
+          "url": "https://m.media-amazon.com/images/I/71paQKyTMrL._AC_SL1500_.jpg",
+          "height": 600,
+          "alt": {
+            "ar": "وسادة ركبة ميموري فوم للنوم الجانبي",
+            "en": "Memory Foam Knee Pillow for Side Sleepers"
+          }
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/713T9l9sD-L._AC_SL1500_.jpg",
+          "height": 600,
+          "width": 800,
+          "alt": {
+            "en": "Memory Foam Knee Pillow for Side Sleepers",
+            "ar": "وسادة ركبة ميموري فوم للنوم الجانبي"
+          }
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/71wpK4mwEXL._AC_SL1500_.jpg",
+          "alt": {
+            "en": "Memory Foam Knee Pillow for Side Sleepers",
+            "ar": "وسادة ركبة ميموري فوم للنوم الجانبي"
+          },
+          "height": 600,
+          "width": 800
+        },
+        {
+          "height": 600,
+          "url": "https://m.media-amazon.com/images/I/81OQkIeI8gL._AC_SL1500_.jpg",
+          "alt": {
+            "en": "Memory Foam Knee Pillow for Side Sleepers",
+            "ar": "وسادة ركبة ميموري فوم للنوم الجانبي"
+          },
+          "width": 800
+        }
+      ],
+      "updatedAt": "2026-10-05T15:55:27.447Z",
+      "priceCurrency": "USD",
+      "id": "memory-foam-knee-pillow-side-sleepers-amazon",
+      "sourceDisclosure": {
+        "ar": "بصفتنا شريكاً في برنامج Amazon Associates، فإننا نكسب من عمليات الشراء المؤهلة.",
+        "en": "As an Amazon Associate I earn from qualifying purchases."
+      },
+      "whyWePickedIt": {
+        "en": "Its side-sleeper design helps keep the legs comfortably separated and reduces direct knee-to-knee contact. Memory foam adapts to the body, while the contoured shape provides stable support throughout the night.",
+        "ar": "تصميمها المخصص للنوم على الجانب يساعد على إبقاء الساقين في وضع أكثر راحة وتقليل الاحتكاك بين الركبتين. رغوة الذاكرة تتكيف مع شكل الجسم، بينما يساعد التصميم المنحني على توفير دعم ثابت أثناء النوم"
+      },
+      "slug": "memory-foam-knee-pillow-side-sleepers-amazon",
+      "tags": [
+        "وسادة الركبة، وسادة النوم الجانبي، ميمور"
+      ],
+      "categoryId": "health",
+      "badge": "توفير",
+      "whatToConsider": {
+        "ar": "قد تحتاج إلى بعض الوقت للتعود على حجم وشكل الوسادة، كما أن درجة الراحة والصلابة تختلف حسب وضعية النوم وتفضيلات كل شخص.",
+        "en": "The shape and firmness may take some time to get used to, and comfort can vary depending on sleeping position and personal preference."
+      },
+      "shortSummary": {
+        "en": "Contoured memory foam knee pillow designed to separate the legs and support the knees and hips during side sleeping.",
+        "ar": "وسادة ركبة من رغوة الذاكرة بتصميم مريح تفصل بين الساقين وتساعد على دعم الركبتين والوركين أثناء النوم الجانبي."
+      },
+      "priceAmount": 29,
+      "affiliateUrl": "https://link.amazon/B05CD3MDy",
+      "clicksCount": 0,
+      "title": {
+        "en": "Memory Foam Knee Pillow for Side Sleepers",
+        "ar": "وسادة ركبة ميموري فوم للنوم الجانبي"
+      }
+    },
+    "small-hand-vertical-ergonomic-mouse-amazon": {
+      "badge": null,
+      "tags": [
+        "فأرة عمودية، أيدي صغيرة، ماوس مريح، فأرة"
+      ],
+      "createdAt": "2026-10-05T10:38:15.048Z",
+      "isFeatured": false,
+      "status": "published",
+      "oldPrice": 12.47,
+      "title": {
+        "ar": "فأرة عمودية مريحة للأيدي الصغيرة",
+        "en": "Ergonomic Vertical Mouse for Small Hands"
+      },
+      "categoryName": {
+        "en": "General",
+        "ar": "عام"
+      },
+      "discount": 20,
+      "categorySlug": "general",
+      "priceCurrency": "DH",
+      "sourceSlug": "amazon",
+      "whatToConsider": {
+        "en": "A vertical mouse can take some time to get used to, and comfort depends on your hand size and preferred grip.",
+        "ar": "قد تحتاج وضعية الفأرة العمودية إلى فترة قصيرة للتعود عليها، كما أن ملاءمتها تعتمد على حجم اليد وطريقة الإمساك المفضلة لديك."
+      },
+      "sourceId": "amazon",
+      "sourceName": {
+        "en": "Amazon",
+        "ar": "Amazon"
+      },
+      "soldCount": 114,
+      "slug": "small-hand-vertical-ergonomic-mouse-amazon",
+      "description": {
+        "en": "The ergonomic vertical mouse for small hands combines a compact profile with a vertical shape designed for a more natural hand position during long work or study sessions. Its smaller form can make control easier for users with small to medium hands, while the upright design supports a more neutral wrist position than a traditional flat mouse. Depending on the version, features may include 2.4G wireless and Bluetooth connectivity, quiet buttons, multiple DPI settings, and a rechargeable USB-C battery. These features make it suitable for office work, browsing, studying, and everyday computer use. It is a practical choice for shoppers searching for a vertical mouse for small hands, ergonomic office mouse, compact wireless mouse, or comfortable mouse for long work sessions.",
+        "ar": "الفأرة العمودية المريحة المخصصة للأيدي الصغيرة تجمع بين التصميم المدمج والوضعية العمودية لتوفير تجربة استخدام أكثر راحة خلال ساعات العمل أو الدراسة. يساعد الشكل العمودي على وضع اليد والمعصم بزاوية طبيعية مقارنة بالتصميم التقليدي، بينما يجعل الحجم الصغير التحكم بالفأرة أسهل لمن لديهم أيدٍ صغيرة أو متوسطة. تتوفر بعض الإصدارات باتصال لاسلكي عبر 2.4G وBluetooth، مع نقرات هادئة ومستويات DPI متعددة للتحكم بسرعة المؤشر وفق المهمة. كما توجد نماذج مزودة ببطارية قابلة لإعادة الشحن عبر USB-C. وهي خيار مناسب لمن يبحث عن فأرة عمودية للأيدي الصغيرة، ماوس مريح للمكتب، فأرة لاسلكية مريحة، أو ergonomic mouse للعمل الطويل."
+      },
+      "whyWePickedIt": {
+        "ar": "صُممت هذه الفأرة بحجم مدمج يناسب الأيدي الصغيرة والمتوسطة، مع وضعية عمودية تساعد على إبقاء اليد والمعصم في وضع أكثر طبيعية أثناء الاستخدام. وتتميز بعض الإصدارات باتصال لاسلكي مزدوج، ونقرات هادئة، ومستويات DPI قابلة للتعديل للاستخدام المكتبي اليومي",
+        "en": "This mouse uses a compact vertical design suited to small and medium hands, helping keep the hand and wrist in a more natural position. Available versions can offer dual wireless connectivity, quiet clicks, and adjustable DPI for everyday office use"
+      },
+      "clicksCount": 0,
+      "priceAmount": 9.98,
+      "id": "small-hand-vertical-ergonomic-mouse-amazon",
+      "discountPercent": 20,
+      "priceUpdatedAt": "2026-10-05T10:38:15.048Z",
+      "categoryId": "general",
+      "shortSummary": {
+        "ar": "فأرة عمودية مدمجة للأيدي الصغيرة، بتصميم مريح واتصال لاسلكي ونقر هادئ لتوفير تحكم أكثر راحة أثناء العمل والدراسة.",
+        "en": "Compact vertical mouse for small hands with ergonomic support, wireless connectivity, and quiet clicks for comfortable daily use."
+      },
+      "affiliateUrl": "https://link.amazon/B0fU0jSW7",
+      "updatedAt": "2026-10-05T10:38:15.048Z",
+      "sourceDisclosure": {
+        "ar": "بصفتنا شريكاً في برنامج Amazon Associates، فإننا نكسب من عمليات الشراء المؤهلة.",
+        "en": "As an Amazon Associate I earn from qualifying purchases."
+      },
+      "images": [
+        {
+          "url": "https://m.media-amazon.com/images/I/61HyGQAny8L._AC_SL1500_.jpg",
+          "alt": {
+            "en": "Ergonomic Vertical Mouse for Small Hands",
+            "ar": "فأرة عمودية مريحة للأيدي الصغيرة"
+          },
+          "height": 600,
+          "width": 800
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/71wW2nTIhKL._AC_SL1500_.jpg",
+          "height": 600,
+          "alt": {
+            "ar": "فأرة عمودية مريحة للأيدي الصغيرة",
+            "en": "Ergonomic Vertical Mouse for Small Hands"
+          },
+          "width": 800
+        },
+        {
+          "alt": {
+            "en": "Ergonomic Vertical Mouse for Small Hands",
+            "ar": "فأرة عمودية مريحة للأيدي الصغيرة"
+          },
+          "url": "https://m.media-amazon.com/images/I/81R3JPpksDL._AC_SL1500_.jpg",
+          "height": 600,
+          "width": 800
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/81TxhDT8fnL._AC_SL1500_.jpg",
+          "height": 600,
+          "width": 800,
+          "alt": {
+            "en": "Ergonomic Vertical Mouse for Small Hands",
+            "ar": "فأرة عمودية مريحة للأيدي الصغيرة"
+          }
+        },
+        {
+          "alt": {
+            "ar": "فأرة عمودية مريحة للأيدي الصغيرة",
+            "en": "Ergonomic Vertical Mouse for Small Hands"
+          },
+          "width": 800,
+          "height": 600,
+          "url": "https://m.media-amazon.com/images/I/81mk4ybIIzL._AC_SL1500_.jpg"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/714bdi0ZmJL._AC_SL1500_.jpg",
+          "width": 800,
+          "alt": {
+            "en": "Ergonomic Vertical Mouse for Small Hands",
+            "ar": "فأرة عمودية مريحة للأيدي الصغيرة"
+          },
+          "height": 600
+        },
+        {
+          "height": 600,
+          "url": "https://m.media-amazon.com/images/I/613tFU62p+L._AC_SX679_.jpg",
+          "width": 800,
+          "alt": {
+            "ar": "فأرة عمودية مريحة للأيدي الصغيرة",
+            "en": "Ergonomic Vertical Mouse for Small Hands"
+          }
+        },
+        {
+          "alt": {
+            "en": "Ergonomic Vertical Mouse for Small Hands",
+            "ar": "فأرة عمودية مريحة للأيدي الصغيرة"
+          },
+          "width": 800,
+          "height": 600,
+          "url": "https://m.media-amazon.com/images/I/71iRgAsdNGL._AC_SL1500_.jpg"
+        }
+      ],
+      "priceDisplayPolicy": "show_with_timestamp",
+      "stars": 3.7
+    },
+    "smart-posture-corrector-back-shoulder-amazon": {
+      "priceUpdatedAt": "2026-10-05T10:12:59.158Z",
+      "categoryName": {
+        "ar": "عام",
+        "en": "General"
+      },
+      "categorySlug": "general",
+      "discountPercent": null,
+      "badge": null,
+      "title": {
+        "ar": "مشد الظهر والأكتاف الذكي لتصحيح الوضعية",
+        "en": "Smart Back & Shoulder Posture Corrector"
+      },
+      "description": {
+        "en": "The Smart Back & Shoulder Posture Corrector is a practical solution for people who spend long hours working at a desk, studying, driving, or using a computer. Its built-in sensor monitors upper-back posture and provides a gentle vibration reminder when slouching is detected, helping you become more aware of your sitting or standing position. The adjustable elastic straps make it easier to achieve a comfortable fit, while the lightweight construction is suitable for everyday use. A rechargeable USB battery adds convenience and eliminates the need for disposable batteries. It is a useful option for shoppers searching for a smart posture corrector, back posture brace, shoulder posture support, slouch reminder, or ergonomic posture trainer",
+        "ar": "مشد وتصحيح وضعية الظهر والأكتاف الذكي هو حل عملي للأشخاص الذين يقضون ساعات طويلة أمام الكمبيوتر أو أثناء الدراسة والقيادة. يحتوي على مستشعر ذكي يراقب وضعية الجزء العلوي من الظهر، وعند اكتشاف الانحناء يرسل اهتزازًا لطيفًا لتذكيرك بالعودة إلى وضعية أكثر استقامة. يتميز بتصميم قابل للتعديل يساعد على ملاءمة الجسم، مع أحزمة مرنة وخفيفة للارتداء اليومي. كما يعمل عبر بطارية قابلة لإعادة الشحن باستخدام USB، مما يجعله مناسبًا للاستخدام في المنزل والمكتب والسفر. يُعد خيارًا مناسبًا لمن يبحث عن مصحح وضعية الظهر، مشد الأكتاف، حزام تقويم الظهر الذكي، أو جهاز تنبيه لانحناء الظهر."
+      },
+      "categoryId": "general",
+      "whyWePickedIt": {
+        "ar": "يتميز بمستشعر يراقب انحناء الجزء العلوي من الظهر ويصدر تنبيهًا بالاهتزاز عند اكتشاف وضعية سيئة. كما أن الحزام القابل للتعديل والتصميم الخفيف والشحن عبر USB يجعله عمليًا للعمل والدراسة والاستخدام اليومي",
+        "en": "It uses a sensor to detect slouching and provides a gentle vibration reminder when your posture changes. The adjustable, lightweight design and USB rechargeable battery make it practical for work, studying, driving, and daily use."
+      },
+      "priceCurrency": "USD",
+      "status": "published",
+      "updatedAt": "2026-10-05T10:12:59.158Z",
+      "sourceDisclosure": {
+        "en": "As an Amazon Associate I earn from qualifying purchases.",
+        "ar": "بصفتنا شريكاً في برنامج Amazon Associates، فإننا نكسب من عمليات الشراء المؤهلة."
+      },
+      "images": [
+        {
+          "url": "https://m.media-amazon.com/images/I/71bepJGCbfL._SL1500_.jpg",
+          "width": 800,
+          "alt": {
+            "en": "Smart Back & Shoulder Posture Corrector",
+            "ar": "مشد الظهر والأكتاف الذكي لتصحيح الوضعية"
+          },
+          "height": 600
+        },
+        {
+          "width": 800,
+          "alt": {
+            "en": "Smart Back & Shoulder Posture Corrector",
+            "ar": "مشد الظهر والأكتاف الذكي لتصحيح الوضعية"
+          },
+          "height": 600,
+          "url": "https://m.media-amazon.com/images/I/61E3IWo778L._SL1500_.jpg"
+        },
+        {
+          "alt": {
+            "ar": "مشد الظهر والأكتاف الذكي لتصحيح الوضعية",
+            "en": "Smart Back & Shoulder Posture Corrector"
+          },
+          "height": 600,
+          "width": 800,
+          "url": "https://m.media-amazon.com/images/I/61Z9IBGjU6L._SL1500_.jpg"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/715kFrNFAQL._SL1500_.jpg",
+          "width": 800,
+          "height": 600,
+          "alt": {
+            "en": "Smart Back & Shoulder Posture Corrector",
+            "ar": "مشد الظهر والأكتاف الذكي لتصحيح الوضعية"
+          }
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/813bsTpz6iL._SL1500_.jpg",
+          "width": 800,
+          "height": 600,
+          "alt": {
+            "en": "Smart Back & Shoulder Posture Corrector",
+            "ar": "مشد الظهر والأكتاف الذكي لتصحيح الوضعية"
+          }
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/71Z6YXWcVDL._SL1500_.jpg",
+          "width": 800,
+          "height": 600,
+          "alt": {
+            "en": "Smart Back & Shoulder Posture Corrector",
+            "ar": "مشد الظهر والأكتاف الذكي لتصحيح الوضعية"
+          }
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/71m8AhKXPEL._SL1500_.jpg",
+          "width": 800,
+          "height": 600,
+          "alt": {
+            "en": "Smart Back & Shoulder Posture Corrector",
+            "ar": "مشد الظهر والأكتاف الذكي لتصحيح الوضعية"
+          }
+        },
+        {
+          "width": 800,
+          "alt": {
+            "ar": "مشد الظهر والأكتاف الذكي لتصحيح الوضعية",
+            "en": "Smart Back & Shoulder Posture Corrector"
+          },
+          "height": 600,
+          "url": "https://m.media-amazon.com/images/I/71QK5QpnuXL._SL1500_.jpg"
+        }
+      ],
+      "tags": [
+        "مصحح الوضعية، مشد الظهر، دعم الأكتاف، تق"
+      ],
+      "discount": null,
+      "createdAt": "2026-10-05T10:12:59.158Z",
+      "sourceSlug": "amazon",
+      "oldPrice": null,
+      "priceDisplayPolicy": "show_with_timestamp",
+      "sourceName": {
+        "en": "Amazon",
+        "ar": "Amazon"
+      },
+      "priceAmount": 24.99,
+      "clicksCount": 0,
+      "stars": 4.9,
+      "soldCount": 200,
+      "sourceId": "amazon",
+      "whatToConsider": {
+        "ar": "هذا المنتج مخصص للتذكير بالوضعية وليس علاجًا طبيًا لمشاكل الظهر، وقد يحتاج المستخدم إلى فترة قصيرة للتعود على ارتدائه وضبطه بشكل مريح.",
+        "en": "This product is designed as a posture reminder, not as a medical treatment for back conditions, and it may take some adjustment to achieve a comfortable fit."
+      },
+      "shortSummary": {
+        "ar": "مشد ذكي للظهر والأكتاف مع مستشعر واهتزاز تنبيهي يساعدك على الانتباه لانحناء الظهر وتحسين وضعية الجلوس والوقوف.",
+        "en": "Smart posture corrector with sensor and vibration reminder to help you notice slouching and maintain a more upright posture."
+      },
+      "id": "smart-posture-corrector-back-shoulder-amazon",
+      "affiliateUrl": "https://link.amazon/B05zgqROS",
+      "isFeatured": false,
+      "slug": "smart-posture-corrector-back-shoulder-amazon"
+    },
+    "waterproof-chair-covers-liquid-resistant-amazon": {
+      "slug": "waterproof-chair-covers-liquid-resistant-amazon",
+      "priceCurrency": "USD",
+      "createdAt": "2026-10-05T13:37:40.963Z",
+      "priceAmount": 23.99,
+      "categorySlug": "general",
+      "clicksCount": 0,
+      "categoryName": {
+        "ar": "عام",
+        "en": "General"
+      },
+      "title": {
+        "en": "Waterproof Chair Covers for Spill Protection",
+        "ar": "أغطية كراسي مقاومة للماء والبقع"
+      },
+      "sourceDisclosure": {
+        "en": "As an Amazon Associate I earn from qualifying purchases.",
+        "ar": "بصفتنا شريكاً في برنامج Amazon Associates، فإننا نكسب من عمليات الشراء المؤهلة."
+      },
+      "discountPercent": 11,
+      "badge": "توفير",
+      "whyWePickedIt": {
+        "en": "The water-resistant layer helps reduce liquid and stain penetration into upholstered chairs, while stretch fabric provides a secure fit on many chair styles. Removable and washable construction also makes everyday cleaning easier",
+        "ar": "تساعد الطبقة المقاومة للماء على الحد من وصول السوائل والبقع إلى تنجيد الكرسي، بينما يوفر القماش المرن ملاءمة ثابتة على العديد من الكراسي. كما أن إمكانية الإزالة والغسل تجعل تنظيفها أسهل للاستخدام اليومي."
+      },
+      "categoryId": "general",
+      "tags": [
+        "أغطية كراسي، مقاوم للماء، ضد السوائل، حم"
+      ],
+      "status": "published",
+      "whatToConsider": {
+        "en": "Check your chair dimensions before buying, as fit varies by model and some covers are designed specifically for armless chairs",
+        "ar": "يجب قياس أبعاد الكرسي قبل الشراء، لأن المقاسات والتصميمات المناسبة تختلف، وبعض الأغطية لا تناسب الكراسي المزودة بمساند جانبية."
+      },
+      "priceDisplayPolicy": "show_with_timestamp",
+      "id": "waterproof-chair-covers-liquid-resistant-amazon",
+      "soldCount": 849,
+      "priceUpdatedAt": "2026-10-05T13:37:40.963Z",
+      "images": [
+        {
+          "alt": {
+            "en": "Waterproof Chair Covers for Spill Protection",
+            "ar": "أغطية كراسي مقاومة للماء والبقع"
+          },
+          "height": 600,
+          "width": 800,
+          "url": "https://m.media-amazon.com/images/I/71lgOR5UBKL._AC_SL1500_.jpg"
+        },
+        {
+          "width": 800,
+          "alt": {
+            "en": "Waterproof Chair Covers for Spill Protection",
+            "ar": "أغطية كراسي مقاومة للماء والبقع"
+          },
+          "url": "https://m.media-amazon.com/images/I/71qPXEBG6UL._AC_SL1500_.jpg",
+          "height": 600
+        },
+        {
+          "height": 600,
+          "alt": {
+            "en": "Waterproof Chair Covers for Spill Protection",
+            "ar": "أغطية كراسي مقاومة للماء والبقع"
+          },
+          "width": 800,
+          "url": "https://m.media-amazon.com/images/I/81YvZtS3tiL._AC_SL1500_.jpg"
+        },
+        {
+          "height": 600,
+          "alt": {
+            "en": "Waterproof Chair Covers for Spill Protection",
+            "ar": "أغطية كراسي مقاومة للماء والبقع"
+          },
+          "url": "https://m.media-amazon.com/images/I/81AwTNAj9vL._AC_SL1500_.jpg",
+          "width": 800
+        },
+        {
+          "alt": {
+            "en": "Waterproof Chair Covers for Spill Protection",
+            "ar": "أغطية كراسي مقاومة للماء والبقع"
+          },
+          "width": 800,
+          "url": "https://m.media-amazon.com/images/I/81GOhuCxHdL._AC_SL1500_.jpg",
+          "height": 600
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/71p+nS-7C7L._AC_SL1500_.jpg",
+          "width": 800,
+          "alt": {
+            "en": "Waterproof Chair Covers for Spill Protection",
+            "ar": "أغطية كراسي مقاومة للماء والبقع"
+          },
+          "height": 600
+        },
+        {
+          "width": 800,
+          "url": "https://m.media-amazon.com/images/I/71CbS0ZfzBL._AC_SL1500_.jpg",
+          "height": 600,
+          "alt": {
+            "en": "Waterproof Chair Covers for Spill Protection",
+            "ar": "أغطية كراسي مقاومة للماء والبقع"
+          }
+        }
+      ],
+      "sourceSlug": "amazon",
+      "sourceId": "amazon",
+      "sourceName": {
+        "en": "Amazon",
+        "ar": "Amazon"
+      },
+      "updatedAt": "2026-10-05T13:37:40.963Z",
+      "stars": null,
+      "discount": 11,
+      "shortSummary": {
+        "en": "Waterproof chair covers that help protect seats from spills and stains, with a stretch fit and washable design for everyday use.",
+        "ar": "أغطية كراسي مقاومة للماء والسوائل تحمي المقاعد من البقع والانسكابات، مع تصميم مرن قابل للإزالة والغسل للاستخدام اليومي."
+      },
+      "description": {
+        "ar": "أغطية الكراسي المقاومة للماء والسوائل هي حل عملي لحماية المقاعد من الانسكابات والبقع والغبار والاستخدام اليومي. تأتي بعض التصاميم بطبقة مقاومة للماء أو غشاء داخلي يساعد على الحد من تسرب السوائل إلى القماش الأصلي للكرسي، مما يجعلها مناسبة لغرف الطعام والمطبخ والمكتب والمساحات كثيرة الاستخدام. ويمنح القماش المرن إمكانية تركيب الغطاء بسهولة مع حواف مطاطية أو أحزمة تثبيت للمساعدة على إبقائه في مكانه وتقليل الانزلاق والتجعد. كما أن التصميم القابل للإزالة والغسل يسهل المحافظة على نظافة الكرسي وتغيير مظهره في الوقت نفسه. وهي مناسبة لمن يبحث عن غطاء كرسي مقاوم للماء، غطاء مقعد ضد السوائل، أغطية كراسي قابلة للغسل، أو واقي كراسي ضد البقع.",
+        "en": "Waterproof chair covers are a practical way to protect upholstered seats from spills, stains, dust, pet messes, and everyday wear. Many designs use a water-resistant coating or waterproof membrane to help reduce liquid penetration into the original chair fabric, making them useful for dining rooms, kitchens, home offices, and other frequently used spaces. Stretch fabrics help the cover fit securely over different chair shapes, while elastic edges, straps, or anti-slip features can improve stability and reduce slipping or bunching. Removable and machine-washable construction also makes regular cleaning much easier. These covers are a useful choice for shoppers searching for waterproof chair covers, liquid-resistant seat covers, washable chair protectors, spill-proof furniture covers, or dining chair slipcovers"
+      },
+      "oldPrice": 26.98,
+      "affiliateUrl": "https://link.amazon/B08ae0ECH",
+      "isFeatured": false
+    },
+    "cluster-travel-pillow-neck-support-amazon": {
+      "description": {
+        "ar": "إذا كنت تبحث عن وسادة سفر مريحة تساعدك على الاسترخاء أثناء الرحلات، فقد تكون وسادة السفر العنقودية الداعمة للرقبة خيارًا عمليًا للاستخدام في الطائرة أو السيارة أو القطار. صُممت وسائد السفر من هذا النوع لتوفير دعم أفضل لمنطقة الرقبة والرأس أثناء الجلوس لفترات طويلة، بينما تمنح الحشوة العنقودية إحساسًا ناعمًا ومرنًا يمكنه التكيف مع حركة المستخدم. وتتميز ألياف الـ Cluster بأنها خفيفة ومرنة وتُستخدم في وسائد مصممة لتوفير الراحة والمتانة مع الاستخدام المتكرر. كما أن التصميم المحمول يجعلها سهلة الحمل داخل حقيبة السفر أو حقيبة اليد. إنها مناسبة للمسافرين الذين يبحثون عن Neck Support Pillow أو Travel Neck Pillow يجمع بين الراحة والعملية في الرحلات اليومية والطويلة.",
+        "en": "The Cluster Travel Pillow for Neck Support is a practical companion for travelers who want greater comfort during long flights, car rides, train journeys, or rest breaks. Designed to provide supportive cushioning around the neck and head, this type of travel pillow can help make seated travel more comfortable while reducing the feeling of fatigue caused by extended sitting. Cluster-style fiber filling is known for offering a soft, flexible, and resilient feel, making it suitable for products designed for repeated everyday use. Its travel-friendly format also makes it easy to carry in a suitcase, backpack, or handbag. For shoppers searching for a Travel Neck Pillow, Neck Support Pillow, or Comfortable Travel Pillow, this model offers a useful combination of portability, softness, and everyday convenience."
+      },
+      "discountPercent": 13,
+      "categoryId": "health",
+      "images": [
+        {
+          "width": 800,
+          "alt": {
+            "en": "Cluster Travel Pillow for Neck Support",
+            "ar": "وسادة سفر عنقودية مريحة لدعم الرقبة"
+          },
+          "height": 600,
+          "url": "https://m.media-amazon.com/images/I/71iYDyZj6dL._AC_SL1000_.jpg"
+        },
+        {
+          "height": 600,
+          "url": "https://m.media-amazon.com/images/I/61xetIFULAL._AC_SL1000_.jpg",
+          "width": 800,
+          "alt": {
+            "en": "Cluster Travel Pillow for Neck Support",
+            "ar": "وسادة سفر عنقودية مريحة لدعم الرقبة"
+          }
+        },
+        {
+          "width": 800,
+          "url": "https://m.media-amazon.com/images/I/619vMRN4n1L._AC_SL1000_.jpg",
+          "height": 600,
+          "alt": {
+            "en": "Cluster Travel Pillow for Neck Support",
+            "ar": "وسادة سفر عنقودية مريحة لدعم الرقبة"
+          }
+        },
+        {
+          "width": 800,
+          "alt": {
+            "en": "Cluster Travel Pillow for Neck Support",
+            "ar": "وسادة سفر عنقودية مريحة لدعم الرقبة"
+          },
+          "height": 600,
+          "url": "https://m.media-amazon.com/images/I/61g5Ye2PIOL._AC_SL1000_.jpg"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/61cLbClwRSL._AC_SL1000_.jpg",
+          "width": 800,
+          "alt": {
+            "ar": "وسادة سفر عنقودية مريحة لدعم الرقبة",
+            "en": "Cluster Travel Pillow for Neck Support"
+          },
+          "height": 600
+        },
+        {
+          "width": 800,
+          "alt": {
+            "en": "Cluster Travel Pillow for Neck Support",
+            "ar": "وسادة سفر عنقودية مريحة لدعم الرقبة"
+          },
+          "url": "https://m.media-amazon.com/images/I/61Y9cOqOm3L._AC_SL1000_.jpg",
+          "height": 600
+        }
+      ],
+      "stars": 4,
+      "categoryName": {
+        "en": "Health & Personal Care",
+        "ar": "الصحة والعناية"
+      },
+      "categorySlug": "health",
+      "sourceDisclosure": {
+        "en": "As an Amazon Associate I earn from qualifying purchases.",
+        "ar": "بصفتنا شريكاً في برنامج Amazon Associates، فإننا نكسب من عمليات الشراء المؤهلة."
+      },
+      "updatedAt": "2026-10-05T15:54:46.978Z",
+      "whatToConsider": {
+        "ar": "راجع المقاسات ونوع الحشوة وتعليمات التنظيف الخاصة بالنسخة المتاحة قبل الطلب، لأن مواصفات وسائد السفر العنقودية قد تختلف حسب الشركة والطراز.",
+        "en": "Check the exact size, filling, and care instructions before ordering, as specifications can vary between cluster travel pillow models and brands."
+      },
+      "isFeatured": false,
+      "discount": 13,
+      "priceUpdatedAt": "2026-10-05T15:54:46.978Z",
+      "createdAt": "2026-10-05T15:54:46.978Z",
+      "title": {
+        "ar": "وسادة سفر عنقودية مريحة لدعم الرقبة",
+        "en": "Cluster Travel Pillow for Neck Support"
+      },
+      "affiliateUrl": "https://link.amazon/B0hq5WAbF",
+      "shortSummary": {
+        "en": "A comfortable cluster travel pillow designed to support your neck and improve comfort during long flights, drives, and journeys.",
+        "ar": "A comfortable cluster travel pillow designed to support your neck and improve comfort during long flights, drives, and journeys."
+      },
+      "oldPrice": 45,
+      "tags": [
+        "وسادة سفر",
+        "وسادة دعم الرقبة",
+        "وسادة الرقبة للسفر",
+        "وسادة طائرة",
+        "وسادة سيارة",
+        "Travel Pillow",
+        "Neck Support Pillow",
+        "U Shaped Travel Pillow",
+        "Travel Neck Pillow",
+        "Comfortable Travel Pillow"
+      ],
+      "badge": "توفير",
+      "status": "published",
+      "id": "cluster-travel-pillow-neck-support-amazon",
+      "whyWePickedIt": {
+        "ar": "اخترنا هذه الوسادة لأنها تجمع بين الراحة والحجم العملي، مع حشوة عنقودية تمنح إحساسًا ناعمًا ومرنًا ومناسبًا للاستخدام أثناء السفر. كما أن هذا النوع من الحشو معروف بقدرته على الحفاظ على مرونته وتحمل الاستخدام المتكرر، ما يجعله خيارًا عمليًا للمسافرين.",
+        "en": "We chose this travel pillow for its practical design, comfortable feel, and portable format. Cluster-style fiber filling can provide a soft, resilient feel while remaining suitable for repeated travel use."
+      },
+      "sourceSlug": "amazon",
+      "soldCount": 3000,
+      "sourceName": {
+        "en": "Amazon",
+        "ar": "Amazon"
+      },
+      "slug": "cluster-travel-pillow-neck-support-amazon",
+      "priceDisplayPolicy": "show_with_timestamp",
+      "sourceId": "amazon",
+      "priceCurrency": "USD",
+      "priceAmount": 39,
+      "clicksCount": 0
+    },
+    "snailax-heated-vibrating-foot-rest-desk-amazon": {
+      "discount": 17,
+      "discountPercent": 17,
+      "soldCount": 59,
+      "oldPrice": 59.99,
+      "description": {
+        "ar": "مسند قدم Snailax تحت المكتب مصمم لتحسين راحة الجلوس أثناء العمل أو الدراسة، ويجمع بين تدفئة القدمين والتدليك بالاهتزاز في تصميم مدمج وخفيف الوزن. يوفر 3 مستويات للحرارة و3 مستويات لشدة الاهتزاز، مع ارتفاعين قابلين للتعديل لمواءمة وضعية القدمين مع ارتفاع الكرسي والمكتب. يعتمد على رغوة الذاكرة لتقديم دعم مريح، بينما يساعد الجزء السفلي المضاد للانزلاق على تثبيت المسند أثناء الاستخدام. كما أن الغطاء القابل للفصل والغسل يسهل المحافظة على النظافة. يناسب المسند المكاتب المنزلية وبيئات العمل والألعاب، ويمكن استخدامه مع أنواع مختلفة من الكراسي. هذه التركيبة تجعله خيارًا عمليًا لمن يبحث عن مسند قدم ساخن للمكتب أو رافع قدم مريح أو حل لتحسين راحة الساقين خلال الجلوس لفترات طويلة. :contentReference[oaicite:0]{index=0}",
+        "en": "The Snailax heated foot rest is designed to make long hours at a desk more comfortable by combining foot warming and vibration massage in a compact, lightweight design. It offers 3 heat levels and 3 vibration intensity levels, while its 2 height settings help position your feet more naturally under different desks and chairs. The memory foam surface provides cushioned support, and the non-slip bottom helps keep the footrest stable during use. Its removable, washable cover also makes everyday maintenance easier. Suitable for home offices, workspaces and gaming setups, this ergonomic under-desk footrest is a practical choice for users who want warmer feet, adjustable support and gentle vibration while sitting. It is especially useful during colder work sessions or extended periods of seated activity. :contentReference[oaicite:1]{index=1}"
+      },
+      "status": "published",
+      "whatToConsider": {
+        "ar": "يحتاج المنتج إلى مصدر كهرباء للاستخدام الكامل، وقد تختلف شدة الإحساس بالحرارة والاهتزاز من شخص لآخر حسب تفضيلات المستخدم.",
+        "en": "The full heating and vibration functions require a power connection, and the perceived heat or vibration level may vary by user preference."
+      },
+      "createdAt": "2026-10-05T16:41:15.974Z",
+      "badge": null,
+      "categoryName": {
+        "ar": "الصحة والعناية",
+        "en": "Health & Personal Care"
+      },
+      "categoryId": "health",
+      "title": {
+        "ar": "مسند قدم ساخن للمكتب مع اهتزاز قابل للتعديل",
+        "en": "Snailax Heated Vibrating Foot Rest for Desk"
+      },
+      "sourceId": "amazon",
+      "categorySlug": "health",
+      "affiliateUrl": "https://link.amazon/B01cCIYrW",
+      "sourceName": {
+        "en": "Amazon",
+        "ar": "Amazon"
+      },
+      "shortSummary": {
+        "en": "Heated under-desk foot rest with 3 heat levels, 3 vibration intensities and 2 adjustable heights for everyday office comfort.",
+        "ar": "مسند قدم ساخن ومريح للمكتب مع 3 مستويات حرارة و3 مستويات اهتزاز وارتفاعين قابلين للتعديل لتجربة جلوس أكثر راحة."
+      },
+      "priceDisplayPolicy": "show_with_timestamp",
+      "stars": 4,
+      "id": "snailax-heated-vibrating-foot-rest-desk-amazon",
+      "sourceSlug": "amazon",
+      "updatedAt": "2026-10-05T16:41:15.974Z",
+      "slug": "snailax-heated-vibrating-foot-rest-desk-amazon",
+      "images": [
+        {
+          "alt": {
+            "ar": "صورة المنتج",
+            "en": "Product image"
+          },
+          "width": 800,
+          "height": 600,
+          "url": "https://m.media-amazon.com/images/I/81v14glpMrL._AC_SL1500_.jpg"
+        },
+        {
+          "width": 800,
+          "alt": {
+            "en": "Product image",
+            "ar": "صورة المنتج"
+          },
+          "height": 600,
+          "url": "https://m.media-amazon.com/images/I/81SKXkHevVL._AC_SL1500_.jpg"
+        },
+        {
+          "width": 800,
+          "alt": {
+            "en": "Product image",
+            "ar": "صورة المنتج"
+          },
+          "url": "https://m.media-amazon.com/images/I/81wws0lU8HL._AC_SL1500_.jpg",
+          "height": 600
+        },
+        {
+          "alt": {
+            "en": "Product image",
+            "ar": "صورة المنتج"
+          },
+          "height": 600,
+          "url": "https://m.media-amazon.com/images/I/81DRsmWNN0L._AC_SL1500_.jpg",
+          "width": 800
+        },
+        {
+          "alt": {
+            "en": "Product image",
+            "ar": "صورة المنتج"
+          },
+          "height": 600,
+          "url": "https://m.media-amazon.com/images/I/812niiFtXcL._AC_SL1500_.jpg",
+          "width": 800
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/81TBUlkd6eL._AC_SL1500_.jpg",
+          "height": 600,
+          "width": 800,
+          "alt": {
+            "ar": "صورة المنتج",
+            "en": "Product image"
+          }
+        },
+        {
+          "width": 800,
+          "url": "https://m.media-amazon.com/images/I/81reIlBNFAL._AC_SL1500_.jpg",
+          "alt": {
+            "ar": "صورة المنتج",
+            "en": "Product image"
+          },
+          "height": 600
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/81cSRXGQvtL._AC_SL1500_.jpg",
+          "height": 600,
+          "alt": {
+            "ar": "صورة المنتج",
+            "en": "Product image"
+          },
+          "width": 800
+        }
+      ],
+      "isFeatured": false,
+      "priceUpdatedAt": "2026-10-05T16:41:15.974Z",
+      "priceCurrency": "USD",
+      "sourceDisclosure": {
+        "ar": "بصفتنا شريكاً في برنامج Amazon Associates، فإننا نكسب من عمليات الشراء المؤهلة.",
+        "en": "As an Amazon Associate I earn from qualifying purchases."
+      },
+      "tags": [
+        "مسند قدم ساخن",
+        "مسند قدم للمكتب",
+        "مسند قدم تحت المكتب",
+        "مدفئ القدمين",
+        "مسند قدم بالاهتزاز",
+        "مسند قدم رغوة الذاكرة",
+        "مسند قدم قابل للتعديل",
+        "مسند قدم مريح",
+        "تدليك القدمين",
+        "إكسسوارات المكتب"
+      ],
+      "priceAmount": 49.99,
+      "clicksCount": 0,
+      "whyWePickedIt": {
+        "en": "This foot rest combines ergonomic support, gentle vibration and adjustable heating in a compact design made for desk use. Memory foam, two height settings, a non-slip base and a washable cover add practical comfort and convenience.",
+        "ar": "يجمع هذا المسند بين دعم القدمين والتدفئة والتدليك بالاهتزاز في تصميم خفيف ومدمج يناسب المكاتب المنزلية وبيئات العمل. توفر رغوة الذاكرة والارتفاعات القابلة للتعديل راحة أفضل أثناء الجلوس لفترات طويلة، مع قاعدة مضادة للانزلاق وغطاء قابل للغسل لسهولة الاستخدام والعناية."
+      }
+    },
+    "stasher-reusable-silicone-food-storage-bags-3-pack-amazon": {
+      "shortSummary": {
+        "ar": "أكياس سيليكون غذائية شفافة قابلة لإعادة الاستخدام، مقاومة للتسرب وآمنة للفريزر والميكروويف والفرن وغسالة الصحون.",
+        "en": "Clear reusable silicone food storage bags with a leak-free seal, safe for the freezer, microwave, oven, and dishwasher."
+      },
+      "sourceDisclosure": {
+        "en": "As an Amazon Associate I earn from qualifying purchases.",
+        "ar": "بصفتنا شريكاً في برنامج Amazon Associates، فإننا نكسب من عمليات الشراء المؤهلة."
+      },
+      "affiliateUrl": "https://link.amazon/B069Kutw4",
+      "description": {
+        "en": "These reusable silicone food storage bags offer a practical way to reduce reliance on single-use plastic bags while keeping everyday food storage organized. The clear 3-piece set includes 1-cup, 2-cup, and 4-cup sizes, making it useful for snacks, leftovers, meal prep, ingredients, and on-the-go storage. Made from platinum food-grade silicone, the bags are free from BPA, BPS, lead, latex, and phthalates. Their Pinch-Loc seal is designed to provide a secure, leak-free closure, while the sturdy construction supports repeated use. They are suitable for the freezer, microwave, dishwasher, and oven up to 425°F, offering convenient storage and reheating without transferring food to another container. The transparent design also makes contents easy to identify at a glance, improving everyday kitchen organization and usability.",
+        "ar": "تمثل أكياس تخزين الطعام السيليكونية القابلة لإعادة الاستخدام خيارًا عمليًا لتقليل الاعتماد على الأكياس البلاستيكية أحادية الاستخدام. تأتي هذه المجموعة الشفافة بثلاث قطع بأحجام مختلفة، تشمل 1 كوب و2 كوب و4 أكواب، لتناسب الوجبات الخفيفة وبقايا الطعام وتحضير الوجبات وحفظ المكونات. تُصنع من سيليكون بلاتيني مخصص لملامسة الطعام، وخالية من BPA وBPS والرصاص واللاتكس والفثالات، مع إغلاق Pinch-Loc مصمم للمساعدة على منع التسرب. ويمكن استخدامها في الفريزر والميكروويف وغسالة الصحون والفرن حتى 425°F، ما يمنحها مرونة كبيرة في التخزين وإعادة التسخين. تصميمها الشفاف يسهل معرفة المحتويات بسرعة، بينما تساعد قابلية إعادة الاستخدام على تقليل استهلاك الأكياس التي تُستخدم مرة واحدة."
+      },
+      "priceUpdatedAt": "2026-10-05T16:50:20.659Z",
+      "updatedAt": "2026-10-05T16:50:20.659Z",
+      "images": [
+        {
+          "url": "https://m.media-amazon.com/images/I/717wE2Q5UpL._AC_SL1500_.jpg",
+          "height": 600,
+          "width": 800,
+          "alt": {
+            "en": "Stasher Reusable Silicone Storage Bags 3-Pack",
+            "ar": "أكياس ستاشر السيليكون القابلة لإعادة الاستخدام 3 قطع"
+          }
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/71YbSGfwB5L._AC_SL1500_.jpg",
+          "height": 600,
+          "width": 800,
+          "alt": {
+            "ar": "أكياس ستاشر السيليكون القابلة لإعادة الاستخدام 3 قطع",
+            "en": "Stasher Reusable Silicone Storage Bags 3-Pack"
+          }
+        },
+        {
+          "height": 600,
+          "alt": {
+            "en": "Stasher Reusable Silicone Storage Bags 3-Pack",
+            "ar": "أكياس ستاشر السيليكون القابلة لإعادة الاستخدام 3 قطع"
+          },
+          "width": 800,
+          "url": "https://m.media-amazon.com/images/I/71C-+SJKeNL._AC_SL1500_.jpg"
+        },
+        {
+          "height": 600,
+          "url": "https://m.media-amazon.com/images/I/61LOdQn9M+L._AC_SL1500_.jpg",
+          "alt": {
+            "ar": "أكياس ستاشر السيليكون القابلة لإعادة الاستخدام 3 قطع",
+            "en": "Stasher Reusable Silicone Storage Bags 3-Pack"
+          },
+          "width": 800
+        },
+        {
+          "width": 800,
+          "height": 600,
+          "alt": {
+            "en": "Stasher Reusable Silicone Storage Bags 3-Pack",
+            "ar": "أكياس ستاشر السيليكون القابلة لإعادة الاستخدام 3 قطع"
+          },
+          "url": "https://m.media-amazon.com/images/I/715MBYe1V4L._AC_SL1200_.jpg"
+        },
+        {
+          "alt": {
+            "ar": "أكياس ستاشر السيليكون القابلة لإعادة الاستخدام 3 قطع",
+            "en": "Stasher Reusable Silicone Storage Bags 3-Pack"
+          },
+          "height": 600,
+          "width": 800,
+          "url": "https://m.media-amazon.com/images/I/810fNr9vQOL._AC_SL1500_.jpg"
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/81Cu-+U6YTL._AC_SL1500_.jpg",
+          "height": 600,
+          "width": 800,
+          "alt": {
+            "ar": "أكياس ستاشر السيليكون القابلة لإعادة الاستخدام 3 قطع",
+            "en": "Stasher Reusable Silicone Storage Bags 3-Pack"
+          }
+        },
+        {
+          "height": 600,
+          "alt": {
+            "en": "Stasher Reusable Silicone Storage Bags 3-Pack",
+            "ar": "أكياس ستاشر السيليكون القابلة لإعادة الاستخدام 3 قطع"
+          },
+          "width": 800,
+          "url": "https://m.media-amazon.com/images/I/81OG1gDbbBL._AC_SL1500_.jpg"
+        }
+      ],
+      "categoryId": "home",
+      "discountPercent": 26,
+      "stars": 4.6,
+      "sourceId": "amazon",
+      "sourceSlug": "amazon",
+      "slug": "stasher-reusable-silicone-food-storage-bags-3-pack-amazon",
+      "soldCount": 500,
+      "title": {
+        "en": "Stasher Reusable Silicone Storage Bags 3-Pack",
+        "ar": "أكياس ستاشر السيليكون القابلة لإعادة الاستخدام 3 قطع"
+      },
+      "badge": null,
+      "sourceName": {
+        "en": "Amazon",
+        "ar": "Amazon"
+      },
+      "whyWePickedIt": {
+        "ar": "اخترناه لأنه يجمع بين السيليكون الغذائي عالي الجودة والتصميم القابل لإعادة الاستخدام مع إغلاق Pinch-Loc محكم للمساعدة على منع التسرب والحفاظ على الطعام. كما أن المجموعة متعددة الاستخدامات وآمنة للغسالة والميكروويف والفرن حتى 425°F، ما يجعلها عملية لتحضير الوجبات والتخزين اليومي.",
+        "en": "We chose it for its durable food-grade platinum silicone and secure Pinch-Loc seal designed to help prevent leaks. The set is versatile, reusable, and suitable for the dishwasher, microwave, freezer, and oven up to 425°F."
+      },
+      "priceCurrency": "USD",
+      "priceDisplayPolicy": "show_with_timestamp",
+      "status": "published",
+      "clicksCount": 0,
+      "oldPrice": 51.99,
+      "whatToConsider": {
+        "ar": "السعر أعلى من بعض البدائل البلاستيكية أو السيليكونية الاقتصادية، كما يجب اتباع تعليمات الاستخدام والتنظيف للحفاظ على سلامة الأكياس وعمرها الطويل.",
+        "en": "The price is higher than many basic alternatives, and following the recommended care instructions is important for maintaining durability and performance."
+      },
+      "priceAmount": 38.49,
+      "isFeatured": false,
+      "tags": [
+        "أكياس تخزين الطعام السيليكونية",
+        "أكياس سيليكون قابلة لإعادة الاستخدام",
+        "أكياس فريزر قابلة لإعادة الاستخدام",
+        "أكياس طعام شفافة",
+        "أكياس تخزين مقاومة للتسرب",
+        "أكياس طعام للميكروويف",
+        "أكياس طعام للفرن",
+        "أكياس طعام لغسالة الصحون",
+        "أكياس تحضير الوجبات",
+        "تخزين الطعام الصديق للبيئة"
+      ],
+      "id": "stasher-reusable-silicone-food-storage-bags-3-pack-amazon",
+      "categorySlug": "home",
+      "createdAt": "2026-10-05T16:50:20.659Z",
+      "categoryName": {
+        "en": "Home & Kitchen",
+        "ar": "المنزل والمطبخ"
+      },
+      "discount": 26
+    },
+    "yicosun-6-in-1-aluminum-monitor-stand-hub-amazon": {
+      "whatToConsider": {
+        "en": "Check your device compatibility before ordering, as actual charging speed depends on the connected device and power adapter.",
+        "ar": "تأكد من توافق منافذ جهازك مع منافذ قاعدة التوصيل، كما قد تختلف سرعة الشحن الفعلية حسب الجهاز ومحول الطاقة المستخدم."
+      },
+      "discount": 65,
+      "soldCount": 1200,
+      "badge": null,
+      "slug": "yicosun-6-in-1-aluminum-monitor-stand-hub-amazon",
+      "sourceSlug": "amazon",
+      "categoryName": {
+        "ar": "إلكترونيات",
+        "en": "Electronics"
+      },
+      "oldPrice": 340,
+      "sourceName": {
+        "en": "Amazon",
+        "ar": "Amazon"
+      },
+      "categorySlug": "electronics",
+      "title": {
+        "ar": "رافع شاشة ألمنيوم 6 في 1 مع شحن لاسلكي",
+        "en": "YICOSUN 6-in-1 Aluminum Monitor Stand Hub"
+      },
+      "tags": [
+        "حامل شاشة ألمنيوم",
+        "رافع شاشة مكتب",
+        "موزع USB 6 في 1",
+        "حامل لابتوب",
+        "USB-C Hub",
+        "HDMI 4K",
+        "شحن PD 100W",
+        "شحن لاسلكي",
+        "منظم مكتب",
+        "ملحقات مكتب ذكية"
+      ],
+      "id": "yicosun-6-in-1-aluminum-monitor-stand-hub-amazon",
+      "createdAt": "2026-10-05T16:29:37.760Z",
+      "images": [
+        {
+          "height": 600,
+          "url": "https://m.media-amazon.com/images/I/81m1UKMOw4L._AC_SL1500_.jpg",
+          "width": 800,
+          "alt": {
+            "ar": "رافع شاشة ألمنيوم 6 في 1 مع شحن لاسلكي",
+            "en": "YICOSUN 6-in-1 Aluminum Monitor Stand Hub"
+          }
+        },
+        {
+          "url": "https://m.media-amazon.com/images/I/71tQit-5R0L._AC_SL1500_.jpg",
+          "height": 600,
+          "alt": {
+            "en": "YICOSUN 6-in-1 Aluminum Monitor Stand Hub",
+            "ar": "رافع شاشة ألمنيوم 6 في 1 مع شحن لاسلكي"
+          },
+          "width": 800
+        },
+        {
+          "alt": {
+            "en": "YICOSUN 6-in-1 Aluminum Monitor Stand Hub",
+            "ar": "رافع شاشة ألمنيوم 6 في 1 مع شحن لاسلكي"
+          },
+          "height": 600,
+          "url": "https://m.media-amazon.com/images/I/81Ymvm+apqL._AC_SL1500_.jpg",
+          "width": 800
+        },
+        {
+          "height": 600,
+          "alt": {
+            "en": "YICOSUN 6-in-1 Aluminum Monitor Stand Hub",
+            "ar": "رافع شاشة ألمنيوم 6 في 1 مع شحن لاسلكي"
+          },
+          "width": 800,
+          "url": "https://m.media-amazon.com/images/I/81IAak4ThWL._AC_SL1500_.jpg"
+        },
+        {
+          "width": 800,
+          "alt": {
+            "ar": "رافع شاشة ألمنيوم 6 في 1 مع شحن لاسلكي",
+            "en": "YICOSUN 6-in-1 Aluminum Monitor Stand Hub"
+          },
+          "height": 600,
+          "url": "https://m.media-amazon.com/images/I/81EBPjokIeL._AC_SL1500_.jpg"
+        },
+        {
+          "width": 800,
+          "alt": {
+            "en": "YICOSUN 6-in-1 Aluminum Monitor Stand Hub",
+            "ar": "رافع شاشة ألمنيوم 6 في 1 مع شحن لاسلكي"
+          },
+          "url": "https://m.media-amazon.com/images/I/81eUu52NryL._AC_SL1500_.jpg",
+          "height": 600
+        },
+        {
+          "height": 600,
+          "alt": {
+            "ar": "رافع شاشة ألمنيوم 6 في 1 مع شحن لاسلكي",
+            "en": "YICOSUN 6-in-1 Aluminum Monitor Stand Hub"
+          },
+          "url": "https://m.media-amazon.com/images/I/71UKqkB-FZL._AC_SL1500_.jpg",
+          "width": 800
+        },
+        {
+          "height": 600,
+          "alt": {
+            "en": "YICOSUN 6-in-1 Aluminum Monitor Stand Hub",
+            "ar": "رافع شاشة ألمنيوم 6 في 1 مع شحن لاسلكي"
+          },
+          "width": 800,
+          "url": "https://m.media-amazon.com/images/I/71RpM82mWPL._AC_SL1500_.jpg"
+        }
+      ],
+      "sourceId": "amazon",
+      "isFeatured": false,
+      "description": {
+        "ar": "رافع شاشة YICOSUN هو حل عملي لمن يريد مكتبًا أكثر ترتيبًا واتصالًا دون إضافة عدة ملحقات منفصلة. يأتي بتصميم ألمنيوم متين يعمل كحامل شاشة ورافع للابتوب، مع مساحة إضافية أسفل المنصة لتنظيم لوحة المفاتيح والإكسسوارات. تدمج قاعدة التوصيل 6 في 1 منفذ 4K HDMI مع USB-C وUSB 3.0 ودعم شحن PD حتى 100 واط، إضافة إلى شحن لاسلكي يصل إلى 15 واط حسب مواصفات المنتج. يساعد رافع الشاشة على رفع مستوى العرض إلى وضع أكثر راحة، بينما يساهم درج التنظيم في تقليل الفوضى على سطح المكتب. لذلك يناسب مكاتب العمل والدراسة والإنتاجية والإعدادات متعددة الأجهزة، خصوصًا للمستخدمين الذين يبحثون عن حامل شاشة ألمنيوم مزود بـ USB Hub وشحن لاسلكي.",
+        "en": "The YICOSUN monitor stand hub is designed for users who want a cleaner, more functional workstation without relying on multiple separate accessories. Its aluminum riser can support a monitor or laptop while creating useful storage space underneath for keyboards and desk essentials. The integrated 6-in-1 docking station combines 4K HDMI at 60Hz, USB 3.0 data connectivity and USB-C with up to 100W PD charging. It also includes wireless charging rated up to 15W, adding convenient power access for compatible devices. The elevated design can improve screen positioning for a more comfortable desk setup, while the built-in drawer organizer helps reduce clutter. With its combination of monitor riser, USB hub, laptop stand, charging station and desk organizer, it is a practical choice for modern office, study and productivity setups."
+      },
+      "priceAmount": 119.99,
+      "clicksCount": 0,
+      "status": "published",
+      "whyWePickedIt": {
+        "en": "This monitor stand combines ergonomic screen elevation, workspace organization and multiple connectivity options in one aluminum design. Its 4K HDMI, USB 3.0, USB-C, 100W PD and wireless charging features add practical value to modern workstations.",
+        "ar": "يجمع هذا الستاند بين رفع الشاشة وتنظيم مساحة المكتب وتوسيع خيارات الاتصال في تصميم واحد أنيق من الألمنيوم. وجود HDMI بدقة 4K وUSB 3.0 وUSB-C مع شحن PD 100W وشحن لاسلكي يجعله مناسبًا للعمل المكتبي والإعدادات التقنية الحديثة."
+      },
+      "priceCurrency": "USD",
+      "updatedAt": "2026-10-05T16:29:37.760Z",
+      "sourceDisclosure": {
+        "en": "As an Amazon Associate I earn from qualifying purchases.",
+        "ar": "بصفتنا شريكاً في برنامج Amazon Associates، فإننا نكسب من عمليات الشراء المؤهلة."
+      },
+      "priceDisplayPolicy": "show_with_timestamp",
+      "categoryId": "electronics",
+      "shortSummary": {
+        "ar": "رافع شاشة ألمنيوم عملي يجمع منافذ 4K HDMI وUSB-C وUSB 3.0 وشحن PD 100W وشحن لاسلكي وتنظيم المكتب.",
+        "en": "Upgrade your desk with a 6-in-1 aluminum monitor stand featuring 4K HDMI, USB-C, USB 3.0, 100W PD and wireless charging."
+      },
+      "affiliateUrl": "https://link.amazon/B0hMvBpFa",
+      "discountPercent": 65,
+      "stars": 4.1,
+      "priceUpdatedAt": "2026-10-05T16:29:37.760Z"
+    }
+  },
+  "testimonials": {},
+  "reviews": {
+    "0be78604ff0d3cc1b3ae": {
+      "productSlug": "24oz-slim-insulated-water-bottle-straw-amazon",
+      "userName": "أحمد السعيد",
+      "rating": 5,
+      "comment": "منتج ممتاز جداً ويحفظ البرودة طوال اليوم، أنصح به بشدة!",
+      "createdAt": "2026-10-05T13:07:28.381Z",
+      "approved": true
+    }
+  }
+}

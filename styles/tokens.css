@@ -1,0 +1,156 @@
+:root,
+[data-theme='light'] {
+  /* 60% Dominant Neutral Canvas (Warm Stone Neutrals) */
+  --color-bg-canvas: #f8f7f4;
+  --color-bg-elevated: #ffffff;
+  --color-bg-subtle: #f1efe9;
+  --color-bg-muted: #e7e4dc;
+  --color-bg-overlay: rgba(20, 24, 23, 0.48);
+
+  /* 30% Structural Surfaces & Typography */
+  --color-text-primary: #141817;
+  --color-text-secondary: #4e5653;
+  --color-text-muted: #6c7571;
+  --color-text-on-accent: #ffffff;
+
+  --color-border-hairline: #e4e1d8;
+  --color-border-strong: #cbc6b9;
+
+  /* 10% Brand Accent Budget (Deep Botanical Emerald) */
+  --color-accent-primary: #0f5243;
+  --color-accent-hover: #0a3b30;
+  --color-accent-active: #072b23;
+  --color-accent-subtle: #e6f2ef;
+  --color-accent-border: #b3d8ce;
+
+  /* Standard Semantic Tokens */
+  --color-primary: var(--color-accent-primary);
+  --color-surface: var(--color-bg-elevated);
+  --color-border: var(--color-border-strong);
+  --color-text: var(--color-text-primary);
+
+  /* Semantic Feedback Colors (Always paired with text + icon) */
+  --color-status-success-bg: #e8f5ee;
+  --color-status-success-text: #0d5c3a;
+  --color-status-success-border: #b6dec9;
+
+  --color-status-warning-bg: #fdf5e6;
+  --color-status-warning-text: #7c4d05;
+  --color-status-warning-border: #ebd09e;
+
+  --color-status-danger-bg: #fbeaea;
+  --color-status-danger-text: #8c1d1d;
+  --color-status-danger-border: #e8b5b5;
+
+  /* Shadows (Single-Elevation Discipline) */
+  --shadow-card: 0 2px 10px rgba(20, 24, 23, 0.04);
+  --shadow-card-hover: 0 8px 24px rgba(20, 24, 23, 0.08);
+  --shadow-modal: 0 20px 48px rgba(20, 24, 23, 0.16);
+
+  /* Typography Families */
+  --font-display-latin: var(--font-fraunces), Georgia, serif;
+  --font-body-latin: var(--font-inter), 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-arabic: var(--font-cairo), 'Cairo', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  /* Refined Type Scale */
+  --text-xs: 0.75rem;     /* 12px - Muted metadata */
+  --text-sm: 0.84375rem;  /* 13.5px - Controls & secondary labels */
+  --text-base: 0.96875rem;/* 15.5px - Body prose */
+  --text-md: 1.0625rem;   /* 17px - Card titles & lead paragraphs */
+  --text-lg: 1.25rem;     /* 20px - Subsection headers */
+  --text-xl: 1.5rem;      /* 24px - Section headers */
+  --text-2xl: 1.875rem;   /* 30px - Page titles */
+  --text-3xl: 2.25rem;    /* 36px - Hero display */
+
+  /* Line Heights */
+  --leading-tight: 1.22;
+  --leading-snug: 1.38;
+  --leading-normal: 1.62;
+  --leading-relaxed: 1.75;
+
+  /* 8px Base Spacing Scale */
+  --space-1: 0.25rem;  /* 4px */
+  --space-2: 0.5rem;   /* 8px */
+  --space-3: 0.75rem;  /* 12px */
+  --space-4: 1rem;     /* 16px */
+  --space-5: 1.25rem;  /* 20px */
+  --space-6: 1.5rem;   /* 24px */
+  --space-8: 2rem;     /* 32px */
+  --space-10: 2.5rem;  /* 40px */
+  --space-12: 3rem;    /* 48px */
+  --space-16: 4rem;    /* 64px */
+  --space-20: 5rem;    /* 80px */
+
+  /* Layout Containers */
+  --container-max-width: 1200px;
+  --container-reading-width: 68ch;
+  --header-height: 64px;
+
+  /* Border Radii (Nested radius math: outer = inner + padding) */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+
+  /* Motion Durations & Settling Curves */
+  --duration-fast: 150ms;
+  --duration-normal: 200ms;
+  --duration-slow: 360ms;
+  --ease-out-quart: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Optical Compensation */
+  --letter-spacing-body: 0em;
+}
+
+[data-theme='dark'] {
+  /* 60% Dominant Neutral Canvas (Deep Obsidian Slate) */
+  --color-bg-canvas: #0e1211;
+  --color-bg-elevated: #161c1a;
+  --color-bg-subtle: #1c2421;
+  --color-bg-muted: #242e2b;
+  --color-bg-overlay: rgba(5, 8, 7, 0.72);
+
+  /* 30% Structural Surfaces & Typography */
+  --color-text-primary: #f1f0ec;
+  --color-text-secondary: #b0b8b5;
+  --color-text-muted: #858f8b;
+  --color-text-on-accent: #081c17;
+
+  --color-border-hairline: #26302d;
+  --color-border-strong: #384642;
+
+  /* 10% Brand Accent Budget (Luminous Botanical Emerald) */
+  --color-accent-primary: #2bc4a3;
+  --color-accent-hover: #42d4b5;
+  --color-accent-active: #1fa88a;
+  --color-accent-subtle: rgba(43, 196, 163, 0.12);
+  --color-accent-border: rgba(43, 196, 163, 0.35);
+
+  /* Standard Semantic Tokens */
+  --color-primary: var(--color-accent-primary);
+  --color-surface: var(--color-bg-elevated);
+  --color-border: var(--color-border-strong);
+  --color-text: var(--color-text-primary);
+
+  /* Semantic Feedback Colors (Dark Mode calibrated) */
+  --color-status-success-bg: rgba(24, 148, 96, 0.16);
+  --color-status-success-text: #5ce0a8;
+  --color-status-success-border: rgba(92, 224, 168, 0.3);
+
+  --color-status-warning-bg: rgba(217, 142, 24, 0.16);
+  --color-status-warning-text: #f6c163;
+  --color-status-warning-border: rgba(246, 193, 99, 0.3);
+
+  --color-status-danger-bg: rgba(214, 58, 58, 0.16);
+  --color-status-danger-text: #f78b8b;
+  --color-status-danger-border: rgba(247, 139, 139, 0.3);
+
+  /* Shadows in Dark Mode */
+  --shadow-card: 0 2px 12px rgba(0, 0, 0, 0.28);
+  --shadow-card-hover: 0 10px 28px rgba(0, 0, 0, 0.42);
+  --shadow-modal: 0 24px 56px rgba(0, 0, 0, 0.65);
+
+  /* Dark mode optical compensation */
+  --letter-spacing-body: 0.008em;
+}

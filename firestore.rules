@@ -1,0 +1,107 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isSignedInVerified() {
+      return request.auth != null && request.auth.token.email_verified == true;
+    }
+
+    function isAdmin() {
+      return request.auth != null &&
+        request.auth.token.email_verified == true &&
+        (
+          request.auth.token.email == 'soufshop.online@gmail.com' ||
+          request.auth.token.email == 'soufyane2035@gmail.com'
+        );
+    }
+
+    // 1. Products: Publicly readable when published; full read/write for verified admins.
+    match /products/{productId} {
+      allow get, list: if resource.data.status == 'published' || isAdmin();
+      allow create, update, delete: if isAdmin();
+    }
+
+    // 2. Categories: Publicly readable when active; full read/write for verified admins.
+    match /categories/{categoryId} {
+      allow get, list: if resource.data.isActive == true || isAdmin();
+      allow create, update, delete: if isAdmin();
+    }
+
+    // 3. Partner Sources: Publicly readable when active; full read/write for verified admins.
+    match /sources/{sourceId} {
+      allow get, list: if resource.data.isActive == true || isAdmin();
+      allow create, update, delete: if isAdmin();
+    }
+
+    // 4. Editorial Articles: Publicly readable when published; full read/write for verified admins.
+    match /articles/{articleId} {
+      allow get, list: if resource.data.status == 'published' || isAdmin();
+      allow create, update, delete: if isAdmin();
+    }
+
+    // 5. Public Site Settings: Publicly readable for 'public'; full read/write for verified admins.
+    match /settings/{settingId} {
+      allow get: if settingId == 'public' || isAdmin();
+      allow list, create, update, delete: if isAdmin();
+    }
+
+    // 6. User Profiles: Owner can read/write own profile; verified admins can read/manage.
+    match /users/{userId} {
+      allow get: if (isSignedInVerified() && isValidId(userId) && request.auth.uid == userId) || isAdmin();
+      allow create, update: if (isSignedInVerified() && isValidId(userId) && request.auth.uid == userId) || isAdmin();
+      allow list, delete: if isAdmin();
+    }
+
+    // 7. Contact Messages: Visitors can create messages; admins can read/update/delete.
+    match /messages/{messageId} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+
+    // 8. Click Analytics: Server/Visitor click logging + admin analytics read.
+    match /clicks/{clickId} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+
+    // 9. Amazon PA-API Sync Logs: Admin read/write.
+    match /sync_logs/{logId} {
+      allow read, write: if isAdmin();
+    }
+
+    // 10. Visitor Testimonials: Public can read approved testimonials and submit unapproved ones; Admins can read/approve/delete.
+    match /testimonials/{testimonialId} {
+      allow get, list: if resource.data.approved == true || isAdmin();
+      allow create: if request.resource.data.approved == false &&
+        request.resource.data.name is string &&
+        request.resource.data.name.size() >= 1 &&
+        request.resource.data.name.size() <= 50 &&
+        request.resource.data.rating is number &&
+        request.resource.data.rating >= 1 &&
+        request.resource.data.rating <= 5 &&
+        request.resource.data.text is string &&
+        request.resource.data.text.size() >= 1 &&
+        request.resource.data.text.size() <= 300;
+      allow update, delete: if isAdmin();
+    }
+
+    // 11. Product Reviews: Public can read approved reviews and create valid reviews; admins can manage.
+    match /reviews/{reviewId} {
+      allow get, list: if resource.data.approved == true || isAdmin();
+      allow create: if request.resource.data.userName is string &&
+        request.resource.data.userName.size() >= 1 &&
+        request.resource.data.userName.size() <= 80 &&
+        request.resource.data.rating is number &&
+        request.resource.data.rating >= 1 &&
+        request.resource.data.rating <= 5 &&
+        request.resource.data.productSlug is string &&
+        request.resource.data.productSlug.size() >= 1;
+      allow update, delete: if isAdmin();
+    }
+  }
+}
