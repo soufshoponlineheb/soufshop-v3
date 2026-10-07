@@ -22,6 +22,9 @@ export async function generateMetadata({
         'x-default': `${SITE_URL}/en`,
       },
     },
+    verification: {
+      google: 'oS_3HRPs49irqAH5Ey9SwCB9vrNxeshh61SYJSfZP2E',
+    },
   };
 }
 
@@ -30,18 +33,5 @@ export default function LocaleLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <>
-      <link rel="alternate" hrefLang="en" href={`${SITE_URL}/en`} />
-      <link rel="alternate" hrefLang="ar" href={`${SITE_URL}/ar`} />
-      <link
-        rel="alternate"
-        hrefLang="x-default"
-        href={`${SITE_URL}/en`}
-      />
-      <link rel="alternate" hrefLang="en" href={`${SITE_URL_COM}/en`} />
-      <link rel="alternate" hrefLang="ar" href={`${SITE_URL_COM}/ar`} />
-      {children}
-    </>
-  );
+  return <>{children}</>;
 }

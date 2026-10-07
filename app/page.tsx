@@ -41,6 +41,9 @@ export const metadata: Metadata = {
       'x-default': `${siteUrl}/en`,
     },
   },
+  verification: {
+    google: 'oS_3HRPs49irqAH5Ey9SwCB9vrNxeshh61SYJSfZP2E',
+  },
 };
 
 export default async function HomePage() {

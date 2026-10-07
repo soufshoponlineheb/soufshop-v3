@@ -36,6 +36,9 @@ export async function generateMetadata({
         'x-default': `${SITE_URL}/en`,
       },
     },
+    verification: {
+      google: 'oS_3HRPs49irqAH5Ey9SwCB9vrNxeshh61SYJSfZP2E',
+    },
     openGraph: {
       title: isAr
         ? 'AQURIVO — أفضل المنتجات المختارة'
@@ -107,7 +110,7 @@ export default async function LocalizedHomePage({
         '@type': 'Organization',
         name: 'AQURIVO',
         url: SITE_URL,
-        logo: `${SITE_URL}/api/logo?size=512`,
+        logo: `${SITE_URL}/images/hero-bg.jpg`,
         description:
           locale === 'ar'
             ? 'دليل تسوق ذكي وموثوق لأفضل المنتجات العالمية'

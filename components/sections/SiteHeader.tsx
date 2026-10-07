@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Globe, LogIn, Menu, Moon, Sun, User } from 'lucide-react';
 import { useI18n } from '@/i18n/I18nProvider';
@@ -15,6 +15,11 @@ export function SiteHeader({ savedCount: _savedCount }: { savedCount?: number })
   const { theme, toggleTheme } = useTheme();
   const { user } = useSaved();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleLanguageSwitch = () => {
     setLocale(locale === 'en' ? 'ar' : 'en');
@@ -49,7 +54,7 @@ export function SiteHeader({ savedCount: _savedCount }: { savedCount?: number })
           <Link href={`/${locale}/contact`} className={styles.navLink}>
             {messages.nav.contact}
           </Link>
-          {user?.role === 'admin' && (
+          {mounted && user?.role === 'admin' && (
             <Link href="/admin" className={styles.navLink}>
               {messages.nav.adminDashboard}
             </Link>
@@ -76,12 +81,12 @@ export function SiteHeader({ savedCount: _savedCount }: { savedCount?: number })
             type="button"
             onClick={toggleTheme}
             className={styles.iconBtn}
-            aria-label={theme === 'light' ? messages.nav.themeDark : messages.nav.themeLight}
+            aria-label={mounted && theme === 'dark' ? messages.nav.themeLight : messages.nav.themeDark}
           >
-            {theme === 'light' ? (
-              <Moon size={18} aria-hidden="true" />
-            ) : (
+            {mounted && theme === 'dark' ? (
               <Sun size={18} aria-hidden="true" />
+            ) : (
+              <Moon size={18} aria-hidden="true" />
             )}
           </button>
 
@@ -147,7 +152,7 @@ export function SiteHeader({ savedCount: _savedCount }: { savedCount?: number })
           </Link>
 
           <div className={styles.mobileAuthSection}>
-            {user ? (
+            {mounted && user ? (
               <>
                 <Link
                   href="/account"

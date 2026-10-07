@@ -84,10 +84,7 @@ export const metadata: Metadata = {
   },
   manifest: '/manifest.webmanifest',
   verification: {
-    google: [
-      'oS_3HRPs49irqAH5Ey9SwCB9vrNxeshh61SYJSfZP2E',
-      'BU-7VQXvTZbTHF4CJGdH1bq1cYePU3LmB6MJMYfFWho',
-    ],
+    google: 'oS_3HRPs49irqAH5Ey9SwCB9vrNxeshh61SYJSfZP2E',
   },
 };
 
@@ -168,15 +165,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             __html: `(function(){try{var s=localStorage.getItem('soufshop_theme');var d=s==='dark'||(!s&&window.matchMedia('(prefers-color-scheme: dark)').matches);var c=d?'dark':'light';document.documentElement.classList.add(c);document.documentElement.setAttribute('data-theme',c);}catch(e){}})();`,
           }}
         />
-        <link rel="alternate" hrefLang="en" href="https://aqurivo.store/en" />
-        <link rel="alternate" hrefLang="ar" href="https://aqurivo.store/ar" />
-        <link
-          rel="alternate"
-          hrefLang="x-default"
-          href="https://aqurivo.store/en"
-        />
-        <link rel="alternate" hrefLang="en" href={`${siteUrlCom}/en`} />
-        <link rel="alternate" hrefLang="ar" href={`${siteUrlCom}/ar`} />
       </head>
       <body suppressHydrationWarning>
         <script
