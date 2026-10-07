@@ -70,7 +70,7 @@ export function assertRequiredServerEnv(): ServerEnvironment {
 
   if (readiness.missingVariables.length > 0) {
     throw new Error(
-      `[SoufShop Configuration Error] Missing required environment variables in .env.local: ${readiness.missingVariables.join(
+      `[AQURIVO Configuration Error] Missing required environment variables in .env.local: ${readiness.missingVariables.join(
         ', '
       )}. Please configure them according to .env.example.`
     );
@@ -89,14 +89,14 @@ export function normalizeSiteUrl(raw?: string): string {
     process.env.VERCEL_PROJECT_PRODUCTION_URL ||
     process.env.VERCEL_URL ||
     process.env.APP_URL ||
-    'https://soufshop.store'
+    'https://aqurivo.store'
   )
     .trim()
     .replace(/^['"]+|['"]+$/g, '')
     .replace(/\/+$/, '');
 
   if (!candidate) {
-    return 'https://soufshop.store';
+    return 'https://aqurivo.store';
   }
 
   const withProtocol = /^https?:\/\//i.test(candidate)
@@ -109,7 +109,7 @@ export function normalizeSiteUrl(raw?: string): string {
     const parsed = new URL(withProtocol);
     return parsed.origin;
   } catch {
-    return 'https://soufshop.store';
+    return 'https://aqurivo.store';
   }
 }
 

@@ -29,40 +29,42 @@ const cairoFont = Cairo({
   display: 'swap',
 });
 
-const siteUrl = 'https://soufshop.store';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://aqurivo.store';
+const siteUrlCom = process.env.NEXT_PUBLIC_SITE_URL_COM || 'https://aqurivo.com';
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://soufshop.store'),
+  metadataBase: new URL(siteUrl),
   title: {
-    default: 'SoufShop — اكتشف أفضل المنتجات المختارة',
-    template: '%s | SoufShop',
+    default: 'AQURIVO — اكتشف أفضل المنتجات المختارة',
+    template: '%s | AQURIVO',
   },
-  authors: [{ name: 'SoufShop Team' }],
+  authors: [{ name: 'AQURIVO Team' }],
   publisher: 'souftools ai',
   other: {
-    author: 'SoufShop Team',
+    author: 'AQURIVO Team',
   },
   description:
     'نبحث عنك ونختار لك أفضل المنتجات بأفضل الأسعار. كل ما عليك هو النقر والشراء من المتجر الأصلي مباشرة.',
   keywords: 'تسوق اونلاين، منتجات مختارة، افضل اسعار، عروض مميزة',
   openGraph: {
-    title: 'SoufShop — اكتشف أفضل المنتجات المختارة',
+    title: 'AQURIVO — اكتشف أفضل المنتجات المختارة',
     description:
       'نبحث عنك ونختار لك أفضل المنتجات بأفضل الأسعار. كل ما عليك هو النقر والشراء من المتجر الأصلي مباشرة.',
     url: siteUrl,
-    siteName: 'SoufShop',
+    siteName: 'AQURIVO',
     images: [{ url: `${siteUrl}/api/og`, width: 1200, height: 630 }],
     locale: 'ar_SA',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'SoufShop — اكتشف أفضل المنتجات المختارة',
+    title: 'AQURIVO — اكتشف أفضل المنتجات المختارة',
     description:
       'نبحث عنك ونختار لك أفضل المنتجات بأفضل الأسعار. كل ما عليك هو النقر والشراء من المتجر الأصلي مباشرة.',
     images: [`${siteUrl}/api/og`],
   },
   alternates: {
+    canonical: siteUrl,
     languages: {
       en: `${siteUrl}/en`,
       ar: `${siteUrl}/ar`,
@@ -82,15 +84,18 @@ export const metadata: Metadata = {
   },
   manifest: '/manifest.webmanifest',
   verification: {
-    google: 'BU-7VQXvTZbTHF4CJGdH1bq1cYePU3LmB6MJMYfFWho',
+    google: [
+      'oS_3HRPs49irqAH5Ey9SwCB9vrNxeshh61SYJSfZP2E',
+      'BU-7VQXvTZbTHF4CJGdH1bq1cYePU3LmB6MJMYfFWho',
+    ],
   },
 };
 
 const organizationContactSchema = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
-  name: 'SoufShop',
-  url: 'https://soufshop.store',
+  name: 'AQURIVO',
+  url: 'https://aqurivo.store',
   email: 'soufshop.online@gmail.com',
   telephone: '+212684063908',
   contactPoint: {
@@ -109,8 +114,8 @@ const organizationAndWebsiteJsonLd = {
     {
       '@type': 'Organization',
       '@id': `${siteUrl}/#organization`,
-      name: 'SoufShop',
-      alternateName: ['سوف شوب', 'SoufShop Online'],
+      name: 'AQURIVO',
+      alternateName: ['أكوريفو', 'AQURIVO Online'],
       url: siteUrl,
       email: 'soufshop.online@gmail.com',
       telephone: '+212684063908',
@@ -134,8 +139,8 @@ const organizationAndWebsiteJsonLd = {
       '@type': 'WebSite',
       '@id': `${siteUrl}/#website`,
       url: siteUrl,
-      name: 'SoufShop',
-      alternateName: ['سوف شوب', 'SoufShop'],
+      name: 'AQURIVO',
+      alternateName: ['أكوريفو', 'AQURIVO'],
       publisher: {
         '@id': `${siteUrl}/#organization`,
       },
@@ -163,13 +168,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             __html: `(function(){try{var s=localStorage.getItem('soufshop_theme');var d=s==='dark'||(!s&&window.matchMedia('(prefers-color-scheme: dark)').matches);var c=d?'dark':'light';document.documentElement.classList.add(c);document.documentElement.setAttribute('data-theme',c);}catch(e){}})();`,
           }}
         />
-        <link rel="alternate" hrefLang="en" href="https://soufshop.store/en" />
-        <link rel="alternate" hrefLang="ar" href="https://soufshop.store/ar" />
+        <link rel="alternate" hrefLang="en" href="https://aqurivo.store/en" />
+        <link rel="alternate" hrefLang="ar" href="https://aqurivo.store/ar" />
         <link
           rel="alternate"
           hrefLang="x-default"
-          href="https://soufshop.store/en"
+          href="https://aqurivo.store/en"
         />
+        <link rel="alternate" hrefLang="en" href={`${siteUrlCom}/en`} />
+        <link rel="alternate" hrefLang="ar" href={`${siteUrlCom}/ar`} />
       </head>
       <body suppressHydrationWarning>
         <script

@@ -7,7 +7,7 @@ import { GuidesView } from './GuidesView';
 
 export const dynamic = 'force-dynamic';
 
-const BASE_URL = 'https://soufshop.store';
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://aqurivo.store';
 
 export async function generateMetadata({
   params,
@@ -17,18 +17,18 @@ export async function generateMetadata({
   const { locale } = await params;
   if (locale !== 'ar' && locale !== 'en') {
     return {
-      title: 'Not Found | SoufShop',
+      title: 'Not Found | AQURIVO',
     };
   }
 
   const isAr = locale === 'ar';
   const title = isAr
-    ? 'أدلة الشراء والمراجعات الشاملة | SoufShop'
-    : 'Editorial Buying Guides & In-Depth Reviews | SoufShop';
+    ? 'أدلة الشراء والمراجعات الشاملة | AQURIVO'
+    : 'Editorial Buying Guides & In-Depth Reviews | AQURIVO';
 
   const description = isAr
     ? 'مقارنات دقيقة ودلائل شراء عملية تساعدك على اختيار أفضل المنتجات بأفضل الأسعار الموثوقة.'
-    : 'Comprehensive buying guides, specs comparisons, and candid product recommendations from the SoufShop editorial team.';
+    : 'Comprehensive buying guides, specs comparisons, and candid product recommendations from the AQURIVO editorial team.';
 
   const canonicalUrl = `${BASE_URL}/${locale}/guides`;
 
@@ -47,14 +47,14 @@ export async function generateMetadata({
       title,
       description: description.slice(0, 155),
       url: canonicalUrl,
-      siteName: 'SoufShop',
+      siteName: 'AQURIVO',
       type: 'website',
       images: [
         {
           url: `${BASE_URL}/images/hero-bg.jpg`,
           width: 1200,
           height: 630,
-          alt: 'SoufShop Buying Guides',
+          alt: 'AQURIVO Buying Guides',
         },
       ],
     },
@@ -97,7 +97,7 @@ export default async function LocalizedGuidesPage({
       },
       {
         '@type': 'ItemList',
-        name: isAr ? 'أدلة SoufShop' : 'SoufShop Buying Guides',
+        name: isAr ? 'أدلة AQURIVO' : 'AQURIVO Buying Guides',
         numberOfItems: articles.length,
         itemListElement: articles.slice(0, 30).map((article, idx) => ({
           '@type': 'ListItem',

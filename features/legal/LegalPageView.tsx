@@ -190,12 +190,12 @@ function getLegalDocumentContent(
       ? {
           title: 'سياسة الخصوصية وحماية البيانات',
           subtitle:
-            'نلتزم في SoufShop بأعلى معايير الخصوصية والشفافية وفق اللائحة العامة لحماية البيانات (GDPR).',
+            'نلتزم في AQURIVO بأعلى معايير الخصوصية والشفافية وفق اللائحة العامة لحماية البيانات (GDPR).',
           sections: [
             {
               heading: '1. مبدأ الحد الأدنى من البيانات',
               paragraphs: [
-                'صُمّم موقع SoufShop بحيث يمكنك تصفح جميع المنتجات، وقراءة أدلة الشراء، وحفظ منتجاتك المفضلة على جهازك دون الحاجة لإنشاء حساب أو تقديم أي بيانات شخصية.',
+                'صُمّم موقع AQURIVO بحيث يمكنك تصفح جميع المنتجات، وقراءة أدلة الشراء، وحفظ منتجاتك المفضلة على جهازك دون الحاجة لإنشاء حساب أو تقديم أي بيانات شخصية.',
                 'نحن لا نبيع ولا نؤجر ولا نشارك بيانات زوارنا الشخصية مع أي جهات إعلانية خارجية.',
               ],
             },
@@ -218,12 +218,12 @@ function getLegalDocumentContent(
       : {
           title: 'Privacy Policy & Data Protection',
           subtitle:
-            'SoufShop is built on strict data minimization and privacy-by-design principles in compliance with GDPR.',
+            'AQURIVO is built on strict data minimization and privacy-by-design principles in compliance with GDPR.',
           sections: [
             {
               heading: '1. Data Minimization Principle',
               paragraphs: [
-                'You can browse SoufShop, read all buying guides, and save favorite products locally on your device without creating an account or sharing personal information.',
+                'You can browse AQURIVO, read all buying guides, and save favorite products locally on your device without creating an account or sharing personal information.',
                 'We never sell, rent, or trade visitor personal data with third-party data brokers.',
               ],
             },
@@ -250,12 +250,12 @@ function getLegalDocumentContent(
       ? {
           title: 'شروط الاستخدام',
           subtitle:
-            'توضح هذه الشروط طبيعة خدمة SoufShop بصفته دليلاً تحريرياً مستقلاً لترشيح المنتجات.',
+            'توضح هذه الشروط طبيعة خدمة AQURIVO بصفته دليلاً تحريرياً مستقلاً لترشيح المنتجات.',
           sections: [
             {
               heading: '1. طبيعة الخدمة وعدم البيع المباشر',
               paragraphs: [
-                'يعمل موقع SoufShop كمنصة إعلامية وتحريرية مستقلة لانتقاء ومراجعة المنتجات. نحن لا نبيع المنتجات بشكل مباشر، ولا نستلم مدفوعات من المتسوقين، ولا نتولى عمليات الشحن أو التخزين.',
+                'يعمل موقع AQURIVO كمنصة إعلامية وتحريرية مستقلة لانتقاء ومراجعة المنتجات. نحن لا نبيع المنتجات بشكل مباشر، ولا نستلم مدفوعات من المتسوقين، ولا نتولى عمليات الشحن أو التخزين.',
                 'عند الضغط على زر الشراء لأي منتج، يتم توجيهك إلى المتجر الإلكتروني الأصلي (مثل Amazon أو Noon أو Temu أو ClickBank) حيث تتم عملية الشراء والدفع والشحن وفق شروط وسياسات ذلك المتجر.',
               ],
             },
@@ -276,13 +276,13 @@ function getLegalDocumentContent(
       : {
           title: 'Terms of Use',
           subtitle:
-            'Please read these terms carefully to understand how SoufShop operates as an independent product curation platform.',
+            'Please read these terms carefully to understand how AQURIVO operates as an independent product curation platform.',
           sections: [
             {
               heading: '1. Editorial Curation & Third-Party Marketplaces',
               paragraphs: [
-                'SoufShop is an independent editorial curation and product discovery website. We do not sell products directly, process customer payments, or handle shipping and fulfillment.',
-                'When you click a purchase link on SoufShop, you are redirected to the external merchant or marketplace (such as Amazon, Noon, Temu, or ClickBank), where your transaction is governed by that merchant’s terms and privacy policies.',
+                'AQURIVO is an independent editorial curation and product discovery website. We do not sell products directly, process customer payments, or handle shipping and fulfillment.',
+                'When you click a purchase link on AQURIVO, you are redirected to the external merchant or marketplace (such as Amazon, Noon, Temu, or ClickBank), where your transaction is governed by that merchant’s terms and privacy policies.',
               ],
             },
             {
@@ -306,12 +306,12 @@ function getLegalDocumentContent(
       ? {
           title: 'إفصاح العمولة والشفافية المالية',
           subtitle:
-            'بيان واضح ومفصّل حول كيفية تمويل SoufShop عبر برامج الشركاء وفق إرشادات FTC وتشريعات الاتحاد الأوروبي (UCPD).',
+            'بيان واضح ومفصّل حول كيفية تمويل AQURIVO عبر برامج الشركاء وفق إرشادات FTC وتشريعات الاتحاد الأوروبي (UCPD).',
           sections: [
             {
-              heading: '1. كيف يعمل نظام التسويق بالعمولة في SoufShop؟',
+              heading: '1. كيف يعمل نظام التسويق بالعمولة في AQURIVO؟',
               paragraphs: [
-                'يُدار موقع SoufShop كمشروع تحريري مستقل ومجاني لجميع الزوار. لتغطية تكاليف البحث والتشغيل وتطوير الموقع، نشارك في برامج التسويق بالعمولة (Affiliate Programs) لعدد من المتاجر العالمية الموثوقة.',
+                'يُدار موقع AQURIVO كمشروع تحريري مستقل ومجاني لجميع الزوار. لتغطية تكاليف البحث والتشغيل وتطوير الموقع، نشارك في برامج التسويق بالعمولة (Affiliate Programs) لعدد من المتاجر العالمية الموثوقة.',
                 'يعني ذلك أنه عندما تضغط على زر «اشترِ من...» أو «تحقق من السعر في...» في موقعنا وتنتقل إلى المتجر الشريك ثم تُتم عملية شراء مؤهلة، قد نحصل على عمولة إحالة صغيرة من ذلك المتجر دون أن يتحمل المتسوق أي سنت إضافي.',
               ],
             },
@@ -340,13 +340,13 @@ function getLegalDocumentContent(
       : {
           title: 'Affiliate Disclosure & Editorial Independence',
           subtitle:
-            'Full transparency on how SoufShop is funded in compliance with FTC Endorsement Guides and the EU Unfair Commercial Practices Directive.',
+            'Full transparency on how AQURIVO is funded in compliance with FTC Endorsement Guides and the EU Unfair Commercial Practices Directive.',
           sections: [
             {
-              heading: '1. How Affiliate Links Work on SoufShop',
+              heading: '1. How Affiliate Links Work on AQURIVO',
               paragraphs: [
-                'SoufShop is free for readers. To fund our research, writing, and hosting costs, we participate in affiliate marketing programs with vetted global retailers and marketplaces.',
-                'When you click an outbound purchase button on SoufShop and make a qualifying purchase on the merchant’s site, we may earn a referral commission from the merchant at zero additional cost to you.',
+                'AQURIVO is free for readers. To fund our research, writing, and hosting costs, we participate in affiliate marketing programs with vetted global retailers and marketplaces.',
+                'When you click an outbound purchase button on AQURIVO and make a qualifying purchase on the merchant’s site, we may earn a referral commission from the merchant at zero additional cost to you.',
               ],
             },
             {
@@ -359,7 +359,7 @@ function getLegalDocumentContent(
             {
               heading: '3. Other Partner Programs (Noon, Temu, ClickBank)',
               paragraphs: [
-                'SoufShop also participates in affiliate programs with Noon, Temu, ClickBank, and selected direct-to-consumer brands. Every outbound affiliate link is clearly marked and accompanied by a visible disclosure right next to the action button.',
+                'AQURIVO also participates in affiliate programs with Noon, Temu, ClickBank, and selected direct-to-consumer brands. Every outbound affiliate link is clearly marked and accompanied by a visible disclosure right next to the action button.',
               ],
             },
             {
@@ -377,7 +377,7 @@ function getLegalDocumentContent(
     ? {
         title: 'سياسة وإعدادات ملفات تعريف الارتباط (Cookies)',
         subtitle:
-          'تحكم كامل وشفاف في ملفات تعريف الارتباط والتخزين المحلي المستخدم في SoufShop.',
+          'تحكم كامل وشفاف في ملفات تعريف الارتباط والتخزين المحلي المستخدم في AQURIVO.',
         sections: [
           {
             heading: '1. ملفات تعريف الارتباط الضرورية (Essential Cookies)',
@@ -388,7 +388,7 @@ function getLegalDocumentContent(
           {
             heading: '2. الإحصائيات الاختيارية وتوجيه المتاجر الشريكة',
             paragraphs: [
-              'نحن لا نحمّل أي برمجيات تتبع إعلانية خارجية دون موافقتك. وعندما تضغط بمحض إرادتك على زر الشراء للانتقال إلى متجر شريك (مثل Amazon أو Noon أو Temu أو ClickBank)، قد يضع ذلك المتجر الشريك على صفحته الخاصة ملف ارتباط لتسجيل أن الزيارة جاءت من SoufShop لاحتساب العمولة وفق سياسة الخصوصية الخاصة بذلك المتجر.',
+              'نحن لا نحمّل أي برمجيات تتبع إعلانية خارجية دون موافقتك. وعندما تضغط بمحض إرادتك على زر الشراء للانتقال إلى متجر شريك (مثل Amazon أو Noon أو Temu أو ClickBank)، قد يضع ذلك المتجر الشريك على صفحته الخاصة ملف ارتباط لتسجيل أن الزيارة جاءت من AQURIVO لاحتساب العمولة وفق سياسة الخصوصية الخاصة بذلك المتجر.',
             ],
           },
         ],
@@ -396,7 +396,7 @@ function getLegalDocumentContent(
     : {
         title: 'Cookie Policy & Preferences',
         subtitle:
-          'Clear explanation and instant control over how cookies and local storage are used on SoufShop.',
+          'Clear explanation and instant control over how cookies and local storage are used on AQURIVO.',
         sections: [
           {
             heading: '1. Strictly Necessary Cookies & Local Storage',
@@ -407,7 +407,7 @@ function getLegalDocumentContent(
           {
             heading: '2. Optional Analytics & Partner Store Attribution',
             paragraphs: [
-              'We do not load third-party advertising trackers on SoufShop. When you actively click a "Buy at [Store]" button to visit an external merchant (such as Amazon, Noon, Temu, or ClickBank), that merchant may set its own attribution cookie on its domain to credit the referral in accordance with its privacy policy.',
+              'We do not load third-party advertising trackers on AQURIVO. When you actively click a "Buy at [Store]" button to visit an external merchant (such as Amazon, Noon, Temu, or ClickBank), that merchant may set its own attribution cookie on its domain to credit the referral in accordance with its privacy policy.',
             ],
           },
         ],

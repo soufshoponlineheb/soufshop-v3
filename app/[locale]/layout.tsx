@@ -1,6 +1,9 @@
 import React from 'react';
 import type { Metadata } from 'next';
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://aqurivo.store';
+const SITE_URL_COM = process.env.NEXT_PUBLIC_SITE_URL_COM || 'https://aqurivo.com';
+
 export async function generateMetadata({
   params,
 }: {
@@ -10,13 +13,13 @@ export async function generateMetadata({
   const safeLocale = locale === 'ar' ? 'ar' : 'en';
 
   return {
-    metadataBase: new URL('https://soufshop.store'),
+    metadataBase: new URL(SITE_URL),
     alternates: {
-      canonical: `https://soufshop.store/${safeLocale}`,
+      canonical: `${SITE_URL}/${safeLocale}`,
       languages: {
-        en: 'https://soufshop.store/en',
-        ar: 'https://soufshop.store/ar',
-        'x-default': 'https://soufshop.store/en',
+        en: `${SITE_URL}/en`,
+        ar: `${SITE_URL}/ar`,
+        'x-default': `${SITE_URL}/en`,
       },
     },
   };
@@ -29,13 +32,15 @@ export default function LocaleLayout({
 }) {
   return (
     <>
-      <link rel="alternate" hrefLang="en" href="https://soufshop.store/en" />
-      <link rel="alternate" hrefLang="ar" href="https://soufshop.store/ar" />
+      <link rel="alternate" hrefLang="en" href={`${SITE_URL}/en`} />
+      <link rel="alternate" hrefLang="ar" href={`${SITE_URL}/ar`} />
       <link
         rel="alternate"
         hrefLang="x-default"
-        href="https://soufshop.store/en"
+        href={`${SITE_URL}/en`}
       />
+      <link rel="alternate" hrefLang="en" href={`${SITE_URL_COM}/en`} />
+      <link rel="alternate" hrefLang="ar" href={`${SITE_URL_COM}/ar`} />
       {children}
     </>
   );

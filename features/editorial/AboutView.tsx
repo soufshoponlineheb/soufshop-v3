@@ -27,8 +27,8 @@ const SOUFSHOP_TEAM: TeamMemberItem[] = [
     nameEn: 'Soufiane',
     initialAr: 'س',
     initialEn: 'S',
-    roleAr: 'مؤسس SoufShop ومدير مشروع souftools ai',
-    roleEn: 'Founder of SoufShop & Project Lead at souftools ai',
+    roleAr: 'مؤسس AQURIVO ومدير مشروع souftools ai',
+    roleEn: 'Founder of AQURIVO & Project Lead at souftools ai',
     avatarClass: styles.avatarEmerald,
   },
   {
@@ -82,7 +82,7 @@ export function AboutView() {
       <SiteHeader />
 
       <main id="main-content" className={`siteContainer ${styles.main}`}>
-        {/* 1. About SoufShop */}
+        {/* 1. About AQURIVO */}
         <header className={`${styles.heroBlock} revealUp`}>
           <SignatureMotif index="01" label={messages.about.heading} />
           <h1 className={styles.heroTitle}>{messages.about.heading}</h1>

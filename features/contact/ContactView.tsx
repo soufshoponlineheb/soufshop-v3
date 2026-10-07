@@ -77,7 +77,7 @@ export function ContactView() {
         <header className={`${styles.header} revealUp`}>
           <SignatureMotif index="01" label={messages.nav.contact} />
           <h1 className={styles.title}>
-            {isAr ? 'تواصل مع فريق SoufShop' : 'Get in Touch with SoufShop'}
+            {isAr ? 'تواصل مع فريق AQURIVO' : 'Get in Touch with AQURIVO'}
           </h1>
           <p className={styles.subtitle}>
             {isAr
@@ -85,7 +85,7 @@ export function ContactView() {
               : 'Whether you have a question about a curated pick, want to report an outdated store link, or suggest a product category, we would love to hear from you.'}
           </p>
           <address className={styles.staticContactSummary}>
-            <span>SoufShop — </span>
+            <span>AQURIVO — </span>
             <a href="mailto:soufshop.online@gmail.com">soufshop.online@gmail.com</a>
             <span aria-hidden="true"> · </span>
             <a href="https://wa.me/212684063908">WhatsApp: +212 684 063908</a>
@@ -182,8 +182,8 @@ export function ContactView() {
                   </h2>
                   <p className={styles.successText}>
                     {isAr
-                      ? 'شكراً لتواصلك مع SoufShop. سيقوم فريقنا بمراجعة رسالتك والرد عليك عبر البريد الإلكتروني في أقرب وقت.'
-                      : 'Thank you for reaching out to SoufShop. Our team will review your note and reply to your email shortly.'}
+                      ? 'شكراً لتواصلك مع AQURIVO. سيقوم فريقنا بمراجعة رسالتك والرد عليك عبر البريد الإلكتروني في أقرب وقت.'
+                      : 'Thank you for reaching out to AQURIVO. Our team will review your note and reply to your email shortly.'}
                   </p>
                   <Button variant="outline" onClick={() => setIsSent(false)}>
                     {isAr ? 'إرسال رسالة أخرى' : 'Send another message'}

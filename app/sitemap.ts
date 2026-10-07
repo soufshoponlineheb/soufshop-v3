@@ -4,7 +4,7 @@ import { listPublishedArticles } from '@/server/repositories/articles.repo';
 
 export const dynamic = 'force-dynamic';
 
-const BASE_URL = 'https://soufshop.store';
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://aqurivo.store';
 const LOCALES = ['en', 'ar'] as const;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {

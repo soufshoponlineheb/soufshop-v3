@@ -8,8 +8,8 @@ const PUBLIC_DOC_ID = 'public';
 
 export const DEFAULT_SITE_SETTINGS: SiteSettings = {
   siteName: {
-    en: 'SoufShop',
-    ar: 'SoufShop',
+    en: 'AQURIVO',
+    ar: 'AQURIVO',
   },
   topBarAnnouncement: {
     en: 'Independent product curation — transparent affiliate links with zero extra cost to you.',

@@ -3,6 +3,8 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { LegalPageView } from '@/features/legal/LegalPageView';
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://aqurivo.store';
+
 export async function generateMetadata({
   params,
 }: {
@@ -11,32 +13,33 @@ export async function generateMetadata({
   const { locale } = await params;
   if (locale !== 'ar' && locale !== 'en') {
     return {
-      metadataBase: new URL('https://soufshop.store'),
-      title: '404 | SoufShop',
+      metadataBase: new URL(SITE_URL),
+      title: '404 | AQURIVO',
       robots: 'noindex, nofollow',
     };
   }
 
   const isEn = locale === 'en';
-  const canonicalUrl = `https://soufshop.store/${isEn ? 'en' : 'ar'}/terms`;
+  const canonicalUrl = `${SITE_URL}/${isEn ? 'en' : 'ar'}/terms`;
 
   return {
-    metadataBase: new URL('https://soufshop.store'),
-    title: isEn ? 'Terms of Use - SoufShop' : 'شروط الاستخدام - SoufShop',
+    metadataBase: new URL(SITE_URL),
+    title: isEn ? 'Terms of Use - AQURIVO' : 'شروط الاستخدام - AQURIVO',
     description: isEn
-      ? 'Terms of use for browsing SoufShop and purchasing products through partner stores.'
-      : 'شروط الاستخدام لتصفح منصة SoufShop والتسوق بأمان.',
+      ? 'Terms of use for browsing AQURIVO and purchasing products through partner stores.'
+      : 'شروط الاستخدام لتصفح منصة AQURIVO والتسوق بأمان.',
     alternates: {
       canonical: canonicalUrl,
       languages: {
-        ar: 'https://soufshop.store/ar/terms',
-        en: 'https://soufshop.store/en/terms',
+        ar: `${SITE_URL}/ar/terms`,
+        en: `${SITE_URL}/en/terms`,
+        'x-default': `${SITE_URL}/en/terms`,
       },
     },
     openGraph: {
-      title: isEn ? 'Terms of Use - SoufShop' : 'شروط الاستخدام - SoufShop',
+      title: isEn ? 'Terms of Use - AQURIVO' : 'شروط الاستخدام - AQURIVO',
       url: canonicalUrl,
-      siteName: 'SoufShop',
+      siteName: 'AQURIVO',
       type: 'website',
     },
   };
@@ -55,8 +58,8 @@ export default async function LocalizedTermsPage({
   const termsJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'WebPage',
-    name: 'شروط الاستخدام - SoufShop',
-    url: `https://soufshop.store/${locale}/terms`,
+    name: 'شروط الاستخدام - AQURIVO',
+    url: `${SITE_URL}/${locale}/terms`,
   };
 
   return (

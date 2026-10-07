@@ -22,7 +22,7 @@ import styles from './ProductPage.module.css';
 
 export const dynamic = 'force-dynamic';
 
-const BASE_URL = 'https://soufshop.store';
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://aqurivo.store';
 
 function resolveLocalizedField(
   val1: unknown,
@@ -71,20 +71,20 @@ export async function generateMetadata({
   const image = product.images?.[0]?.url || '';
 
   return {
-    title: `${name} | SoufShop`,
+    title: `${name} | AQURIVO`,
     description: description.slice(0, 155),
     alternates: {
-      canonical: `https://soufshop.store/${locale}/products/${slug}`,
+      canonical: `${BASE_URL}/${locale}/products/${slug}`,
       languages: {
-        en: `https://soufshop.store/en/products/${slug}`,
-        ar: `https://soufshop.store/ar/products/${slug}`,
-        'x-default': `https://soufshop.store/en/products/${slug}`,
+        en: `${BASE_URL}/en/products/${slug}`,
+        ar: `${BASE_URL}/ar/products/${slug}`,
+        'x-default': `${BASE_URL}/en/products/${slug}`,
       },
     },
     openGraph: {
       title: name,
       description: description.slice(0, 155),
-      url: `https://soufshop.store/${locale}/products/${slug}`,
+      url: `${BASE_URL}/${locale}/products/${slug}`,
       images: image
         ? [
             {
@@ -98,7 +98,7 @@ export async function generateMetadata({
     },
     twitter: {
       card: 'summary_large_image',
-      title: `${name} | SoufShop`,
+      title: `${name} | AQURIVO`,
       description: description.slice(0, 155),
       images: image ? [image] : [],
     },

@@ -95,7 +95,7 @@ export function AddTestimonialForm({ onClose }: AddTestimonialFormProps) {
     <div className={styles.formWrapper}>
       <div className={styles.formHeader}>
         <h3 className={styles.formTitle}>
-          {isAr ? 'أضف شهادتك حول SoufShop' : 'Share Your SoufShop Experience'}
+          {isAr ? 'أضف شهادتك حول AQURIVO' : 'Share Your AQURIVO Experience'}
         </h3>
         {onClose && (
           <button
@@ -186,8 +186,8 @@ export function AddTestimonialForm({ onClose }: AddTestimonialFormProps) {
             onChange={(e) => setText(e.target.value.slice(0, 300))}
             placeholder={
               isAr
-                ? 'شاركنا رأيك في سهولة البحث ومقارنة الأسعار عبر SoufShop...'
-                : 'Tell visitors how SoufShop helped you find or compare products...'
+                ? 'شاركنا رأيك في سهولة البحث ومقارنة الأسعار عبر AQURIVO...'
+                : 'Tell visitors how AQURIVO helped you find or compare products...'
             }
             className={styles.textArea}
           />

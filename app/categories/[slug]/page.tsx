@@ -8,7 +8,7 @@ import { CategoryView } from '@/features/catalog/CategoryView';
 
 export const dynamic = 'force-dynamic';
 
-const BASE_URL = 'https://soufshop.store';
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://aqurivo.store';
 
 export async function generateMetadata({
   params,
@@ -20,16 +20,16 @@ export async function generateMetadata({
   const category = (await getCategoryBySlug(decodedSlug)) ?? (await getCategoryBySlug(slug));
   
   if (!category) {
-    return { title: 'Category Not Found | SoufShop' };
+    return { title: 'Category Not Found | AQURIVO' };
   }
 
   const nameAr = category.name?.ar || category.name?.en || slug;
   const nameEn = category.name?.en || category.name?.ar || slug;
-  const descAr = category.description?.ar || `تسوق أفضل منتجات ${nameAr} بأفضل الأسعار والعروض الموثوقة من SoufShop.`;
-  const descEn = category.description?.en || `Discover top handpicked ${nameEn} products and compare verified offers on SoufShop.`;
+  const descAr = category.description?.ar || `تسوق أفضل منتجات ${nameAr} بأفضل الأسعار والعروض الموثوقة من AQURIVO.`;
+  const descEn = category.description?.en || `Discover top handpicked ${nameEn} products and compare verified offers on AQURIVO.`;
 
   return {
-    title: `${nameAr} — أفضل المنتجات المختارة | SoufShop`,
+    title: `${nameAr} — أفضل المنتجات المختارة | AQURIVO`,
     description: descAr.slice(0, 155),
     alternates: {
       canonical: `${BASE_URL}/ar/categories/${category.slug || slug}`,
@@ -40,15 +40,15 @@ export async function generateMetadata({
       },
     },
     openGraph: {
-      title: `${nameAr} | SoufShop`,
+      title: `${nameAr} | AQURIVO`,
       description: descAr.slice(0, 155),
       url: `${BASE_URL}/ar/categories/${category.slug || slug}`,
-      siteName: 'SoufShop',
+      siteName: 'AQURIVO',
       type: 'website',
     },
     twitter: {
       card: 'summary_large_image',
-      title: `${nameAr} | SoufShop`,
+      title: `${nameAr} | AQURIVO`,
       description: descAr.slice(0, 155),
     },
   };

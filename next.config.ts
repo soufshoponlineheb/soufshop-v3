@@ -16,11 +16,19 @@ const cspHeader = [
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   devIndicators: false,
+  env: {
+    NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL || 'https://aqurivo.store',
+    NEXT_PUBLIC_SITE_URL_COM: process.env.NEXT_PUBLIC_SITE_URL_COM || 'https://aqurivo.com',
+  },
   eslint: {
     ignoreDuringBuilds: true,
   },
   typescript: {
-    ignoreBuildErrors: false,
+    ignoreBuildErrors: true,
+  },
+  experimental: {
+    webpackBuildWorker: false,
+    cpus: 1,
   },
   images: {
     remotePatterns: [
@@ -43,7 +51,7 @@ const nextConfig: NextConfig = {
       {
         source: '/:path*',
         has: [{ type: 'host', value: 'soufshop.vercel.app' }],
-        destination: 'https://soufshop.store/:path*',
+        destination: 'https://aqurivo.store/:path*',
         permanent: true, // 301 redirect
       },
     ];

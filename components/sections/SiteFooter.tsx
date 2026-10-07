@@ -35,7 +35,7 @@ export function SiteFooter({ productsCount }: SiteFooterProps = {}) {
               <BrandLogo size="md" />
             </Link>
             <p className={styles.amazonDisclosure}>
-              SoufShop يستخدم روابط تسويق بالعمولة — affiliate links
+              AQURIVO يستخدم روابط تسويق بالعمولة — affiliate links
             </p>
           </div>
 
@@ -144,8 +144,8 @@ export function SiteFooter({ productsCount }: SiteFooterProps = {}) {
         <div className={styles.bottomBar}>
           <p className={`${styles.copyright} tabularNums`}>
             {isAr
-              ? '© 2026 SoufShop — جميع الحقوق محفوظة'
-              : '© 2026 SoufShop — All rights reserved'}
+              ? '© 2026 AQURIVO — جميع الحقوق محفوظة'
+              : '© 2026 AQURIVO — All rights reserved'}
           </p>
 
           <address className={styles.bottomAddress}>

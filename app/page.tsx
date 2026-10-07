@@ -9,27 +9,27 @@ import { HomeClient } from '@/components/sections/HomeClient';
 
 export const dynamic = 'force-dynamic';
 
-const siteUrl = 'https://soufshop.store';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://aqurivo.store';
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: 'SoufShop — أفضل المنتجات المختارة بعناية',
+  title: 'AQURIVO — أفضل المنتجات المختارة بعناية',
   description:
-    'نختار لك أفضل المنتجات من الإنترنت بعناية. تسوق بأمان وثقة مع SoufShop.',
+    'نختار لك أفضل المنتجات من الإنترنت بعناية. تسوق بأمان وثقة مع AQURIVO.',
   keywords: 'تسوق اونلاين، منتجات مختارة، افضل اسعار، عروض مميزة',
   robots: 'index, follow',
   openGraph: {
-    title: 'SoufShop — أفضل المنتجات المختارة',
+    title: 'AQURIVO — أفضل المنتجات المختارة',
     description: 'نختار لك أفضل المنتجات من الإنترنت بعناية.',
     url: siteUrl,
-    siteName: 'SoufShop',
-    images: [{ url: `${siteUrl}/images/hero-bg.jpg`, width: 1200, height: 630, alt: 'SoufShop' }],
+    siteName: 'AQURIVO',
+    images: [{ url: `${siteUrl}/images/hero-bg.jpg`, width: 1200, height: 630, alt: 'AQURIVO' }],
     locale: 'ar_SA',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'SoufShop — أفضل المنتجات المختارة',
+    title: 'AQURIVO — أفضل المنتجات المختارة',
     description: 'نختار لك أفضل المنتجات من الإنترنت بعناية.',
     images: [`${siteUrl}/images/hero-bg.jpg`],
   },
@@ -55,12 +55,12 @@ export default async function HomePage() {
   const websiteJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
-    name: 'SoufShop',
-    url: 'https://soufshop.store',
+    name: 'AQURIVO',
+    url: siteUrl,
     description: 'Discover top curated products and compare prices',
     potentialAction: {
       '@type': 'SearchAction',
-      target: 'https://soufshop.store/en/products?q={search_term}',
+      target: `${siteUrl}/en/products?q={search_term}`,
       'query-input': 'required name=search_term',
     },
   };

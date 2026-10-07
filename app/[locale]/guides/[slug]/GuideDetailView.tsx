@@ -72,7 +72,7 @@ export function GuideDetailView({
   const categoryName = t(article.categoryName);
   const rawBody = t(article.contentHtml);
   const formattedPublished = formatCalendarDate(article.publishedAt, locale);
-  const authorName = article.authorName || 'SoufShop Editorial Team';
+  const authorName = article.authorName || 'AQURIVO Editorial Team';
   const faqItems = article.faqItems || [];
 
   const { chunks, toc } = useMemo(

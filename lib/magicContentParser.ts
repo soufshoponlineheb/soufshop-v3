@@ -1,5 +1,5 @@
 /**
- * Parser for Smart Magic Paste in SoufShop Admin.
+ * Parser for Smart Magic Paste in AQURIVO Admin.
  * Handles JSON structures, Markdown tags, and Plain Tagged key-value blocks in Arabic & English.
  */
 
@@ -30,7 +30,7 @@ export interface ParsedProductDraft {
   tags?: string;
 }
 
-export const MAGIC_AI_PROMPT_TEMPLATE = `أنت خبير SEO وصانع محتوى تجاري متخصص لمتجر SoufShop.
+export const MAGIC_AI_PROMPT_TEMPLATE = `أنت خبير SEO وصانع محتوى تجاري متخصص لمتجر AQURIVO.
 
 عندما أعطيك اسم منتج أو رابطه أو مواصفاته، ابحث عنه وحلله بعمق، ثم أعطني النتيجة كاملة داخل حاوية كود واحدة قابلة للنسخ (Code Block) بدون كتابة الأقواس الدائرية التوضيحية، باستخدام هذا التنسيق والعناوين المحددة بدقة:
 
@@ -363,7 +363,7 @@ export interface ParsedArticleDraft {
   }>;
 }
 
-export const MAGIC_ARTICLE_AI_PROMPT_TEMPLATE = `أنت محرر تقني وخبير SEO متخصص في كتابة دلائل الشراء والمقارنات لمتجر SoufShop.
+export const MAGIC_ARTICLE_AI_PROMPT_TEMPLATE = `أنت محرر تقني وخبير SEO متخصص في كتابة دلائل الشراء والمقارنات لمتجر AQURIVO.
 
 عندما أعطيك موضوع دليل شراء أو قائمة منتجات للمقارنة، اكتب دليلاً تحريرياً شاملاً باللغتين العربية والإنجليزية داخل مربع كود واحد (\`\`\`text ... \`\`\`) باستخدام هذه العناوين بدقة:
 
@@ -378,7 +378,7 @@ export const MAGIC_ARTICLE_AI_PROMPT_TEMPLATE = `أنت محرر تقني وخب
 [وصف SEO بالعربية]: وصف تعريفي لمحركات البحث (Meta Description) بحد أقصى 155 حرفاً
 [وصف SEO بالإنجليزية]: SEO meta description max 155 chars
 [الكلمات المفتاحية]: أفضل سماعات، دليل شراء، مقارنة، best headphones, buying guide
-[الكاتب]: SoufShop Editorial Team
+[الكاتب]: AQURIVO Editorial Team
 [وقت القراءة]: 6
 [الفئة]: electronics
 [المحتوى بالعربية]: <h2>كيف تختار المنتج الأنسب؟</h2><p>شرح عميق ومفيد...</p><h2>أهم المعايير قبل الشراء</h2><ul><li>المعيار الأول</li><li>المعيار الثاني</li></ul>

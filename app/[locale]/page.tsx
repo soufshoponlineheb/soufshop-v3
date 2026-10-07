@@ -11,6 +11,8 @@ import type { Locale } from '@/types';
 
 export const dynamic = 'force-dynamic';
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://aqurivo.store';
+
 export async function generateMetadata({
   params,
 }: {
@@ -21,47 +23,47 @@ export async function generateMetadata({
 
   return {
     title: isAr
-      ? 'SoufShop — أفضل المنتجات المختارة بعناية'
-      : "SoufShop — Handpicked Products You'll Love",
+      ? 'AQURIVO — أفضل المنتجات المختارة بعناية'
+      : "AQURIVO — Handpicked Products You'll Love",
     description: isAr
-      ? 'نختار لك أفضل المنتجات من الإنترنت بعناية. تسوق بأمان وثقة مع SoufShop.'
-      : 'We handpick the best products from around the web. Shop smarter with SoufShop.',
+      ? 'نختار لك أفضل المنتجات من الإنترنت بعناية. تسوق بأمان وثقة مع AQURIVO.'
+      : 'We handpick the best products from around the web. Shop smarter with AQURIVO.',
     alternates: {
-      canonical: `https://soufshop.store/${locale}`,
+      canonical: `${SITE_URL}/${locale}`,
       languages: {
-        en: 'https://soufshop.store/en',
-        ar: 'https://soufshop.store/ar',
-        'x-default': 'https://soufshop.store/en',
+        en: `${SITE_URL}/en`,
+        ar: `${SITE_URL}/ar`,
+        'x-default': `${SITE_URL}/en`,
       },
     },
     openGraph: {
       title: isAr
-        ? 'SoufShop — أفضل المنتجات المختارة'
-        : 'SoufShop — Handpicked Products',
+        ? 'AQURIVO — أفضل المنتجات المختارة'
+        : 'AQURIVO — Handpicked Products',
       description: isAr
         ? 'نختار لك أفضل المنتجات من الإنترنت بعناية.'
         : 'We handpick the best products from around the web.',
       images: [
         {
-          url: 'https://soufshop.store/images/hero-bg.jpg',
+          url: `${SITE_URL}/images/hero-bg.jpg`,
           width: 1200,
           height: 630,
-          alt: 'SoufShop',
+          alt: 'AQURIVO',
         },
       ],
-      url: `https://soufshop.store/${locale}`,
-      siteName: 'SoufShop',
+      url: `${SITE_URL}/${locale}`,
+      siteName: 'AQURIVO',
       type: 'website',
     },
     twitter: {
       card: 'summary_large_image',
       title: isAr
-        ? 'SoufShop — أفضل المنتجات المختارة'
-        : 'SoufShop — Handpicked Products',
+        ? 'AQURIVO — أفضل المنتجات المختارة'
+        : 'AQURIVO — Handpicked Products',
       description: isAr
         ? 'نختار لك أفضل المنتجات من الإنترنت بعناية.'
         : 'We handpick the best products from around the web.',
-      images: ['https://soufshop.store/images/hero-bg.jpg'],
+      images: [`${SITE_URL}/images/hero-bg.jpg`],
     },
   };
 }
@@ -89,23 +91,23 @@ export default async function LocalizedHomePage({
     '@graph': [
       {
         '@type': 'WebSite',
-        name: 'SoufShop',
-        url: 'https://soufshop.store',
+        name: 'AQURIVO',
+        url: SITE_URL,
         description:
           locale === 'ar'
-            ? 'نختار لك أفضل المنتجات من الإنترنت بعناية. تسوق بأمان وثقة مع SoufShop.'
-            : 'We handpick the best products from around the web. Shop smarter with SoufShop.',
+            ? 'نختار لك أفضل المنتجات من الإنترنت بعناية. تسوق بأمان وثقة مع AQURIVO.'
+            : 'We handpick the best products from around the web. Shop smarter with AQURIVO.',
         potentialAction: {
           '@type': 'SearchAction',
-          target: `https://soufshop.store/${locale}/products?q={search_term}`,
+          target: `${SITE_URL}/${locale}/products?q={search_term}`,
           'query-input': 'required name=search_term',
         },
       },
       {
         '@type': 'Organization',
-        name: 'SoufShop',
-        url: 'https://soufshop.store',
-        logo: 'https://soufshop.store/images/hero-bg.jpg',
+        name: 'AQURIVO',
+        url: SITE_URL,
+        logo: `${SITE_URL}/api/logo?size=512`,
         description:
           locale === 'ar'
             ? 'دليل تسوق ذكي وموثوق لأفضل المنتجات العالمية'
@@ -113,7 +115,7 @@ export default async function LocalizedHomePage({
         contactPoint: {
           '@type': 'ContactPoint',
           contactType: 'customer support',
-          email: 'support@soufshop.store',
+          email: 'support@aqurivo.store',
           availableLanguage: ['Arabic', 'English'],
         },
       },

@@ -2,8 +2,8 @@ import type { MetadataRoute } from 'next';
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'SoufShop — Discover Top Curated Products',
-    short_name: 'SoufShop',
+    name: 'AQURIVO — Discover Top Curated Products',
+    short_name: 'AQURIVO',
     description:
       'Independent product curation and price comparison across trusted global stores.',
     start_url: '/en',

@@ -189,8 +189,8 @@ export function AuthFormView({ mode }: AuthFormViewProps) {
           <h1 className={styles.title}>
             {mode === 'login'
               ? locale === 'ar'
-                ? 'مرحباً بعودتك إلى SoufShop'
-                : 'Welcome back to SoufShop'
+                ? 'مرحباً بعودتك إلى AQURIVO'
+                : 'Welcome back to AQURIVO'
               : locale === 'ar'
                 ? 'احفظ مختاراتك عبر جميع أجهزتك'
                 : 'Sync your saved picks across devices'}

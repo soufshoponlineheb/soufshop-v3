@@ -1,6 +1,6 @@
 export const enMessages = {
   meta: {
-    siteName: 'SoufShop',
+    siteName: 'AQURIVO',
     tagline: 'Thoughtfully vetted products from trusted global stores.',
     defaultDescription:
       "Top products from the world's biggest stores, all in one place",
@@ -41,7 +41,7 @@ export const enMessages = {
     },
   },
   howItWorks: {
-    heading: 'How SoufShop Works',
+    heading: 'How AQURIVO Works',
     step1Title: 'We Search & Select',
     step1Text:
       'We review thousands of products across Amazon, Noon, Temu, and ClickBank and select only the best in price and quality.',
@@ -53,16 +53,16 @@ export const enMessages = {
       'When you click the buy button, you go directly to the original store to complete your purchase with complete safety.',
   },
   about: {
-    heading: 'About SoufShop',
-    p1: 'SoufShop is an independent product selection platform. We search Amazon, Noon, Temu & ClickBank daily to bring you the best deals in one place.',
+    heading: 'About AQURIVO',
+    p1: 'AQURIVO is an independent product selection platform. We search Amazon, Noon, Temu & ClickBank daily to bring you the best deals in one place.',
     p2: 'When you click the buy button, you are taken directly to the original store to complete your purchase safely — we never handle your financial or personal data in any way.',
     p3: 'We earn a small commission from the store when you buy through our links, at no extra cost to you.',
     teamHeading: 'Our Team',
     teamIntro:
-      'The SoufShop Team — specialists working daily to bring you the best products',
+      'The AQURIVO Team — specialists working daily to bring you the best products',
     founderQuote:
-      'I built SoufShop because finding a great product at a fair price takes too long. Our goal is to save you that time.',
-    founderSignature: 'Soufiane — Founder of SoufShop',
+      'I built AQURIVO because finding a great product at a fair price takes too long. Our goal is to save you that time.',
+    founderSignature: 'Soufiane — Founder of AQURIVO',
   },
   product: {
     buyNow: 'Buy Now ↗',
@@ -109,7 +109,7 @@ export const enMessages = {
   },
   footer: {
     aboutSummary:
-      'SoufShop is an independent product curation studio. When you buy through our links, we may earn a commission from partner stores.',
+      'AQURIVO is an independent product curation studio. When you buy through our links, we may earn a commission from partner stores.',
     amazonMandatoryNotice:
       'As an Amazon Associate I earn from qualifying purchases.',
     quickLinks: 'Explore',

@@ -47,7 +47,7 @@ export function AdminArticleFormView({
     existingArticle?.editorVerdict?.en || ''
   );
   const [authorName, setAuthorName] = useState(
-    existingArticle?.authorName || 'SoufShop Editorial Team'
+    existingArticle?.authorName || 'AQURIVO Editorial Team'
   );
   const [seoTitleAr, setSeoTitleAr] = useState(existingArticle?.seoTitle?.ar || '');
   const [seoTitleEn, setSeoTitleEn] = useState(existingArticle?.seoTitle?.en || '');
@@ -204,7 +204,7 @@ export function AdminArticleFormView({
         excerpt: { en: excerptEn, ar: excerptAr },
         contentHtml: { en: contentEn, ar: contentAr },
         editorVerdict: { en: editorVerdictEn, ar: editorVerdictAr },
-        authorName: authorName.trim() || 'SoufShop Editorial Team',
+        authorName: authorName.trim() || 'AQURIVO Editorial Team',
         seoTitle: { en: seoTitleEn, ar: seoTitleAr },
         seoDescription: { en: seoDescriptionEn, ar: seoDescriptionAr },
         seoKeywords: seoKeywords
@@ -360,7 +360,7 @@ export function AdminArticleFormView({
             label={isAr ? 'اسم الكاتب / الفريق التحريري' : 'Author Name'}
             value={authorName}
             onChange={(e) => setAuthorName(e.target.value)}
-            placeholder="SoufShop Editorial Team"
+            placeholder="AQURIVO Editorial Team"
             required
           />
         </div>
@@ -528,7 +528,7 @@ export function AdminArticleFormView({
               }
               value={seoTitleAr}
               onChange={(e) => setSeoTitleAr(e.target.value)}
-              placeholder={titleAr || 'أفضل 5 سماعات لاسلكية 2026 | SoufShop'}
+              placeholder={titleAr || 'أفضل 5 سماعات لاسلكية 2026 | AQURIVO'}
             />
 
             <Input
@@ -539,7 +539,7 @@ export function AdminArticleFormView({
               }
               value={seoTitleEn}
               onChange={(e) => setSeoTitleEn(e.target.value)}
-              placeholder={titleEn || 'Top 5 Wireless Headphones 2026 | SoufShop'}
+              placeholder={titleEn || 'Top 5 Wireless Headphones 2026 | AQURIVO'}
             />
           </div>
 

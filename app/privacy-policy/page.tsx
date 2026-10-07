@@ -2,16 +2,19 @@ import React from 'react';
 import type { Metadata } from 'next';
 import { LegalPageView } from '@/features/legal/LegalPageView';
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://aqurivo.store';
+
 export const metadata: Metadata = {
-  metadataBase: new URL('https://soufshop.store'),
-  title: 'سياسة الخصوصية - SoufShop',
+  metadataBase: new URL(SITE_URL),
+  title: 'سياسة الخصوصية - AQURIVO',
   description:
-    'تعرف على سياسة الخصوصية في SoufShop وكيف نحمي بياناتك ونحترم خصوصيتك.',
+    'تعرف على سياسة الخصوصية في AQURIVO وكيف نحمي بياناتك ونحترم خصوصيتك.',
   alternates: {
-    canonical: 'https://soufshop.store/ar/privacy-policy',
+    canonical: `${SITE_URL}/ar/privacy-policy`,
     languages: {
-      ar: 'https://soufshop.store/ar/privacy-policy',
-      en: 'https://soufshop.store/en/privacy-policy',
+      ar: `${SITE_URL}/ar/privacy-policy`,
+      en: `${SITE_URL}/en/privacy-policy`,
+      'x-default': `${SITE_URL}/en/privacy-policy`,
     },
   },
 };
@@ -19,8 +22,8 @@ export const metadata: Metadata = {
 const privacyJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'WebPage',
-  name: 'سياسة الخصوصية - SoufShop',
-  url: 'https://soufshop.store/ar/privacy-policy',
+  name: 'سياسة الخصوصية - AQURIVO',
+  url: `${SITE_URL}/ar/privacy-policy`,
 };
 
 export default function PrivacyPolicyPage() {

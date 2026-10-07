@@ -92,8 +92,8 @@ export function Testimonials({
   const reviewSchemaJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: 'SoufShop',
-    url: 'https://soufshop.store',
+    name: 'AQURIVO',
+    url: 'https://aqurivo.store',
     aggregateRating: {
       '@type': 'AggregateRating',
       ratingValue: String(averageRating),
@@ -127,8 +127,8 @@ export function Testimonials({
           </h2>
           <p className={styles.subheading}>
             {isAr
-              ? 'تجارب حقيقية من متسوقين قارنوا الأسعار والعروض عبر SoufShop'
-              : 'Real experiences from shoppers comparing deals and prices on SoufShop'}
+              ? 'تجارب حقيقية من متسوقين قارنوا الأسعار والعروض عبر AQURIVO'
+              : 'Real experiences from shoppers comparing deals and prices on AQURIVO'}
           </p>
         </div>
       </div>
@@ -149,7 +149,7 @@ export function Testimonials({
                 itemScope
                 itemType="https://schema.org/Organization"
               >
-                <meta itemProp="name" content="SoufShop" />
+                <meta itemProp="name" content="AQURIVO" />
               </div>
 
               <div className={styles.cardTop}>

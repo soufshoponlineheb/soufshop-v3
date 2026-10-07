@@ -2,9 +2,14 @@ import React from 'react';
 import type { Metadata } from 'next';
 import { AuthFormView } from '@/features/account/AuthFormView';
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://aqurivo.store';
+
 export const metadata: Metadata = {
   title: 'Create Account',
-  description: 'Create an optional SoufShop account to keep your saved items synced.',
+  description: 'Create an optional AQURIVO account to keep your saved items synced.',
+  alternates: {
+    canonical: `${SITE_URL}/register`,
+  },
 };
 
 export default function RegisterPage() {

@@ -26,7 +26,7 @@ export const FALLBACK_TESTIMONIALS: Testimonial[] = [
     id: 'default-1',
     name: 'أحمد م.',
     rating: 5,
-    text: 'وجدت منتجاً كنت أبحث عنه من أسبوع في أقل من دقيقة عبر SoufShop',
+    text: 'وجدت منتجاً كنت أبحث عنه من أسبوع في أقل من دقيقة عبر AQURIVO',
     createdAt: '2026-09-28T10:00:00.000Z',
     approved: true,
     locale: 'ar',

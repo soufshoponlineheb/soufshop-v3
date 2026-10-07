@@ -3,6 +3,8 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { AboutView } from '@/features/editorial/AboutView';
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://aqurivo.store';
+
 export async function generateMetadata({
   params,
 }: {
@@ -11,33 +13,34 @@ export async function generateMetadata({
   const { locale } = await params;
   if (locale !== 'ar' && locale !== 'en') {
     return {
-      metadataBase: new URL('https://soufshop.store'),
-      title: '404 | SoufShop',
+      metadataBase: new URL(SITE_URL),
+      title: '404 | AQURIVO',
       robots: 'noindex, nofollow',
     };
   }
 
   const isEn = locale === 'en';
-  const canonicalUrl = `https://soufshop.store/${isEn ? 'en' : 'ar'}/about`;
+  const canonicalUrl = `${SITE_URL}/${isEn ? 'en' : 'ar'}/about`;
 
   return {
-    metadataBase: new URL('https://soufshop.store'),
-    title: isEn ? 'About Us - SoufShop' : 'من نحن - SoufShop',
+    metadataBase: new URL(SITE_URL),
+    title: isEn ? 'About Us - AQURIVO' : 'من نحن - AQURIVO',
     description:
-      'SoufShop منصة لاختيار وعرض أفضل المنتجات، نوجهك مباشرة للمتجر الأصلي للشراء بأمان',
+      'AQURIVO منصة لاختيار وعرض أفضل المنتجات، نوجهك مباشرة للمتجر الأصلي للشراء بأمان',
     alternates: {
       canonical: canonicalUrl,
       languages: {
-        ar: 'https://soufshop.store/ar/about',
-        en: 'https://soufshop.store/en/about',
+        ar: `${SITE_URL}/ar/about`,
+        en: `${SITE_URL}/en/about`,
+        'x-default': `${SITE_URL}/en/about`,
       },
     },
     openGraph: {
-      title: isEn ? 'About Us - SoufShop' : 'من نحن - SoufShop',
+      title: isEn ? 'About Us - AQURIVO' : 'من نحن - AQURIVO',
       description:
-        'SoufShop منصة لاختيار وعرض أفضل المنتجات، نوجهك مباشرة للمتجر الأصلي للشراء بأمان',
+        'AQURIVO منصة لاختيار وعرض أفضل المنتجات، نوجهك مباشرة للمتجر الأصلي للشراء بأمان',
       url: canonicalUrl,
-      siteName: 'SoufShop',
+      siteName: 'AQURIVO',
       type: 'website',
     },
   };
@@ -56,14 +59,14 @@ export default async function LocalizedAboutPage({
   const aboutPageJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'AboutPage',
-    name: 'من نحن - SoufShop',
-    url: `https://soufshop.store/${locale}/about`,
+    name: 'من نحن - AQURIVO',
+    url: `${SITE_URL}/${locale}/about`,
     description:
-      'SoufShop منصة لاختيار وعرض أفضل المنتجات، نوجهك مباشرة للمتجر الأصلي للشراء بأمان',
+      'AQURIVO منصة لاختيار وعرض أفضل المنتجات، نوجهك مباشرة للمتجر الأصلي للشراء بأمان',
     publisher: {
       '@type': 'Organization',
-      name: 'SoufShop',
-      url: 'https://soufshop.store',
+      name: 'AQURIVO',
+      url: SITE_URL,
     },
   };
 

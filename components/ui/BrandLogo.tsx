@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useId } from 'react';
 import styles from './BrandLogo.module.css';
 
 interface BrandLogoProps {
@@ -7,121 +7,169 @@ interface BrandLogoProps {
 }
 
 /**
- * Iconic Brand Identity for SoufShop — "The Curated Prism S":
- * - Architectural dark emerald & obsidian squircle shield (#0B2920 -> #115E49)
- * - Interlocking dual-ribbon 'S' monogram (Turquoise #2DD4BF upper ascending deal wing
- *   + Crisp Alabaster #FFFFFF lower trust wing)
- * - Negative-space 4-pointed Curation Star (✦) with a Saharan Gold (#E0963E) diamond core
- *   at the exact geometric center of the 'S'
- * - Precision Saharan Gold ascending arrow spark at the upper right corner
- * - Paired with a bespoke "Souf◆Shop" wordmark anchored by a micro gold diamond
+ * AQURIVO Exclusive Brand Symbol — "The Sovereign Lotus-Crown & Aqua-Jewel":
+ * A pure, non-lettermark luxury emblem crafted exclusively for AQURIVO:
+ * - Central 4-facet kite-cut Aqua-Diamond (symbolizing 'Aqua' — clarity & rare curated selection)
+ * - Twin sweeping Champagne Gold crescent wings (symbolizing 'Rivo' — converging streams of global excellence)
+ * - Central 4-point Golden Polaris spark & sovereign diamond pedestal
+ * - Unified, high-fashion geometric wordmark "AQURIVO"
  */
 export function BrandLogo({ size = 'md', showWordmark = true }: BrandLogoProps) {
+  const uid = useId().replace(/:/g, '');
+  const bgGradId = `aqBg_${uid}`;
+  const glowGradId = `aqGlow_${uid}`;
+  const rimGradId = `aqRim_${uid}`;
+  const goldLeftId = `aqGoldL_${uid}`;
+  const goldRightId = `aqGoldR_${uid}`;
+
   return (
     <span className={`${styles.brandLockup} ${styles[size]}`}>
       <svg
         className={styles.mark}
-        viewBox="0 0 44 44"
+        viewBox="0 0 48 48"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
         aria-hidden="true"
       >
         <defs>
           <linearGradient
-            id="soufShieldGrad"
+            id={bgGradId}
             x1="4"
             y1="4"
-            x2="40"
-            y2="40"
+            x2="44"
+            y2="44"
             gradientUnits="userSpaceOnUse"
           >
-            <stop offset="0%" stopColor="#0D382B" />
-            <stop offset="55%" stopColor="#115E49" />
-            <stop offset="100%" stopColor="#09221A" />
+            <stop offset="0%" stopColor="#115E49" />
+            <stop offset="52%" stopColor="#083026" />
+            <stop offset="100%" stopColor="#031510" />
+          </linearGradient>
+
+          <radialGradient
+            id={glowGradId}
+            cx="24"
+            cy="20"
+            r="19"
+            gradientUnits="userSpaceOnUse"
+          >
+            <stop offset="0%" stopColor="rgba(45, 212, 191, 0.24)" />
+            <stop offset="100%" stopColor="rgba(45, 212, 191, 0)" />
+          </radialGradient>
+
+          <linearGradient
+            id={rimGradId}
+            x1="2"
+            y1="2"
+            x2="46"
+            y2="46"
+            gradientUnits="userSpaceOnUse"
+          >
+            <stop offset="0%" stopColor="rgba(253, 230, 138, 0.7)" />
+            <stop offset="50%" stopColor="rgba(45, 212, 191, 0.32)" />
+            <stop offset="100%" stopColor="rgba(217, 119, 6, 0.6)" />
           </linearGradient>
 
           <linearGradient
-            id="soufTurquoiseRibbon"
-            x1="11"
-            y1="9"
-            x2="33"
-            y2="24"
+            id={goldLeftId}
+            x1="9"
+            y1="14"
+            x2="22"
+            y2="37"
             gradientUnits="userSpaceOnUse"
           >
-            <stop offset="0%" stopColor="#5EEAD4" />
-            <stop offset="100%" stopColor="#14B8A6" />
+            <stop offset="0%" stopColor="#FEF3C7" />
+            <stop offset="48%" stopColor="#FBBF24" />
+            <stop offset="100%" stopColor="#D97706" />
           </linearGradient>
 
           <linearGradient
-            id="soufGoldCore"
-            x1="18"
-            y1="18"
+            id={goldRightId}
+            x1="39"
+            y1="14"
             x2="26"
-            y2="26"
+            y2="37"
             gradientUnits="userSpaceOnUse"
           >
-            <stop offset="0%" stopColor="#FBBF24" />
-            <stop offset="100%" stopColor="#C87D28" />
+            <stop offset="0%" stopColor="#FEF3C7" />
+            <stop offset="48%" stopColor="#F59E0B" />
+            <stop offset="100%" stopColor="#B45309" />
           </linearGradient>
         </defs>
 
-        {/* Outer Sculpted Tag-Shield Squircle */}
+        {/* Imperial Emerald Squircle Crest */}
         <rect
-          x="3"
-          y="3"
+          x="2"
+          y="2"
+          width="44"
+          height="44"
+          rx="12.5"
+          fill={`url(#${bgGradId})`}
+          stroke={`url(#${rimGradId})`}
+          strokeWidth="1.5"
+        />
+
+        {/* Ambient Emerald Inner Aura */}
+        <rect
+          x="2.75"
+          y="2.75"
+          width="42.5"
+          height="42.5"
+          rx="11.75"
+          fill={`url(#${glowGradId})`}
+        />
+
+        {/* Fine Watchmaker Inner Bezel */}
+        <rect
+          x="5"
+          y="5"
           width="38"
           height="38"
-          rx="11"
-          fill="url(#soufShieldGrad)"
-          stroke="rgba(45, 212, 191, 0.28)"
-          strokeWidth="1.2"
+          rx="9.5"
+          stroke="rgba(253, 230, 138, 0.15)"
+          strokeWidth="0.75"
         />
 
-        {/* Subtle Inner Architectural Frame */}
-        <rect
-          x="5.5"
-          y="5.5"
-          width="33"
-          height="33"
-          rx="8.5"
-          stroke="rgba(255, 255, 255, 0.07)"
-          strokeWidth="0.9"
-        />
+        {/* Twin Golden Rivo Crescent Wings (Sovereign Lotus Petals) */}
+        <g className={styles.goldenWings}>
+          {/* Left Golden Wing */}
+          <path
+            d="M9.2 14.8C11.8 15.8 14.0 17.6 15.4 20.2L21.8 36.2C13.8 33.8 8.6 25.2 9.2 14.8Z"
+            fill={`url(#${goldLeftId})`}
+          />
+          {/* Right Golden Wing */}
+          <path
+            d="M38.8 14.8C36.2 15.8 34.0 17.6 32.6 20.2L26.2 36.2C34.2 33.8 39.4 25.2 38.8 14.8Z"
+            fill={`url(#${goldRightId})`}
+          />
+          {/* Sovereign Diamond Pedestal Base */}
+          <path
+            d="M16.5 39.4L24 37.8L31.5 39.4L24 41.0L16.5 39.4Z"
+            fill={`url(#${goldLeftId})`}
+          />
+        </g>
 
-        {/* Upper Ribbon of the 'S' — Ascending Turquoise Deal Wing */}
-        <path
-          d="M29.5 11.5H17.2C13.7758 11.5 11 14.2758 11 17.7C11 20.65 13.06 23.12 15.85 23.75L21.5 22L17.4 18.8C16.55 18.45 16.1 17.6 16.4 16.75C16.65 16.05 17.32 15.6 18.1 15.6H26.8L29.5 11.5Z"
-          fill="url(#soufTurquoiseRibbon)"
-        />
-
-        {/* Lower Ribbon of the 'S' — Crisp White Trust Wing */}
-        <path
-          d="M14.5 32.5H26.8C30.2242 32.5 33 29.7242 33 26.3C33 23.35 30.94 20.88 28.15 20.25L22.5 22L26.6 25.2C27.45 25.55 27.9 26.4 27.6 27.25C27.35 27.95 26.68 28.4 25.9 28.4H17.2L14.5 32.5Z"
-          fill="#FFFFFF"
-        />
-
-        {/* Central Negative-Space 4-Pointed Curation Star & Saharan Gold Diamond Core */}
-        <path
-          className={styles.curationStar}
-          d="M22 16.6L23.55 20.45L27.4 22L23.55 23.55L22 27.4L20.45 23.55L16.6 22L20.45 20.45L22 16.6Z"
-          fill="url(#soufGoldCore)"
-        />
-
-        {/* Precision Ascending Deal Arrowhead Notch at Upper Right */}
-        <path
-          d="M27.8 9.8H33.2V15.2"
-          stroke="#E0963E"
-          strokeWidth="2.1"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
+        {/* Central 4-Faceted Kite-Cut Aqua-Jewel (The Spire) */}
+        <g className={styles.centralJewel}>
+          {/* Upper-Left Lit Alabaster Facet */}
+          <path d="M24 7.5L17.8 18.5H24V7.5Z" fill="#FFFFFF" />
+          {/* Upper-Right Pearl-Aqua Facet */}
+          <path d="M24 7.5L30.2 18.5H24V7.5Z" fill="#CCFBF1" />
+          {/* Lower-Left Silky Mint Facet */}
+          <path d="M17.8 18.5L24 33.8V18.5H17.8Z" fill="#E6F4F1" />
+          {/* Lower-Right Turquoise-Emerald Facet */}
+          <path d="M30.2 18.5L24 33.8V18.5H30.2Z" fill="#5EEAD4" />
+          {/* Inner 4-Point Golden Polaris Spark */}
+          <path
+            d="M24 14.6L25.05 17.45L27.9 18.5L25.05 19.55L24 22.4L22.95 19.55L20.1 18.5L22.95 17.45L24 14.6Z"
+            fill="#F59E0B"
+          />
+          <circle cx="24" cy="18.5" r="1.1" fill="#FEF3C7" />
+        </g>
       </svg>
 
       {showWordmark && (
         <span className={styles.wordmark} dir="ltr">
-          <span className={styles.wordPrimary}>Souf</span>
-          <span className={styles.wordDiamond} aria-hidden="true" />
-          <span className={styles.wordAccent}>Shop</span>
+          AQURIVO
         </span>
       )}
     </span>

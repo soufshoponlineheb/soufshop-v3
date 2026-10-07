@@ -8,6 +8,8 @@ import { CatalogView } from '@/features/catalog/CatalogView';
 
 export const dynamic = 'force-dynamic';
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://aqurivo.store';
+
 export async function generateMetadata({
   params,
 }: {
@@ -16,20 +18,20 @@ export async function generateMetadata({
   const { locale } = await params;
   if (locale !== 'ar' && locale !== 'en') {
     return {
-      metadataBase: new URL('https://soufshop.store'),
-      title: '404 — Page Not Found | SoufShop',
+      metadataBase: new URL(SITE_URL),
+      title: '404 — Page Not Found | AQURIVO',
       robots: 'noindex, nofollow',
     };
   }
 
   const isEn = locale === 'en';
-  const canonicalUrl = `https://soufshop.store/${isEn ? 'en' : 'ar'}/products`;
+  const canonicalUrl = `${SITE_URL}/${isEn ? 'en' : 'ar'}/products`;
 
   return {
-    metadataBase: new URL('https://soufshop.store'),
+    metadataBase: new URL(SITE_URL),
     title: isEn
-      ? 'Curated Products Directory | SoufShop'
-      : 'دليل المنتجات المنتقاة | SoufShop',
+      ? 'Curated Products Directory | AQURIVO'
+      : 'دليل المنتجات المنتقاة | AQURIVO',
     description: isEn
       ? 'Top curated products across global stores in one place — compare prices and verified offers.'
       : 'أفضل المنتجات من أكبر المتاجر العالمية في مكان واحد — قارن الأسعار والعروض الموثوقة.',
@@ -37,19 +39,20 @@ export async function generateMetadata({
     alternates: {
       canonical: canonicalUrl,
       languages: {
-        ar: 'https://soufshop.store/ar/products',
-        en: 'https://soufshop.store/en/products',
+        ar: `${SITE_URL}/ar/products`,
+        en: `${SITE_URL}/en/products`,
+        'x-default': `${SITE_URL}/en/products`,
       },
     },
     openGraph: {
       title: isEn
-        ? 'Curated Products Directory | SoufShop'
-        : 'دليل المنتجات المنتقاة | SoufShop',
+        ? 'Curated Products Directory | AQURIVO'
+        : 'دليل المنتجات المنتقاة | AQURIVO',
       description: isEn
         ? 'Top curated products across global stores in one place'
         : 'أفضل المنتجات من أكبر المتاجر العالمية في مكان واحد',
       url: canonicalUrl,
-      siteName: 'SoufShop',
+      siteName: 'AQURIVO',
       type: 'website',
     },
   };
@@ -79,12 +82,12 @@ export default async function LocalizedProductsPage({
   const itemListJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
-    name: isEn ? 'SoufShop Curated Products' : 'منتجات SoufShop المنتقاة',
+    name: isEn ? 'AQURIVO Curated Products' : 'منتجات AQURIVO المنتقاة',
     numberOfItems: products.length,
     itemListElement: products.slice(0, 50).map((product, index) => ({
       '@type': 'ListItem',
       position: index + 1,
-      url: `https://soufshop.store/${isEn ? 'en' : 'ar'}/products/${encodeURIComponent(
+      url: `${SITE_URL}/${isEn ? 'en' : 'ar'}/products/${encodeURIComponent(
         product.slug
       )}`,
       name: isEn

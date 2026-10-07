@@ -8,7 +8,7 @@ import { GuideDetailView } from './GuideDetailView';
 
 export const dynamic = 'force-dynamic';
 
-const BASE_URL = 'https://soufshop.store';
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://aqurivo.store';
 
 export async function generateMetadata({
   params,
@@ -22,7 +22,7 @@ export async function generateMetadata({
     (await getPublishedArticleBySlug(slug));
 
   if (!article) {
-    return { title: 'Guide Not Found | SoufShop' };
+    return { title: 'Guide Not Found | AQURIVO' };
   }
 
   const isAr = locale === 'ar';
@@ -53,10 +53,10 @@ export async function generateMetadata({
       : `${BASE_URL}${article.coverImage}`
     : `${BASE_URL}/images/hero-bg.jpg`;
 
-  const authorName = article.authorName || 'SoufShop Editorial Team';
+  const authorName = article.authorName || 'AQURIVO Editorial Team';
 
   return {
-    title: rawTitle.includes('SoufShop') ? rawTitle : `${rawTitle} | SoufShop`,
+    title: rawTitle.includes('AQURIVO') ? rawTitle : `${rawTitle} | AQURIVO`,
     description: description.slice(0, 155),
     ...(article.seoKeywords && article.seoKeywords.length > 0
       ? { keywords: article.seoKeywords.join(', ') }
@@ -76,7 +76,7 @@ export async function generateMetadata({
       title: rawTitle,
       description: description.slice(0, 155),
       url: canonicalUrl,
-      siteName: 'SoufShop',
+      siteName: 'AQURIVO',
       type: 'article',
       publishedTime: article.publishedAt,
       modifiedTime: article.updatedAt,
@@ -139,7 +139,7 @@ export default async function GuideDetailPage({
       ? article.coverImage
       : `${BASE_URL}${article.coverImage}`
     : `${BASE_URL}/images/hero-bg.jpg`;
-  const authorName = article.authorName || 'SoufShop Editorial Team';
+  const authorName = article.authorName || 'AQURIVO Editorial Team';
 
   const faqItems = article.faqItems || [];
   const faqSchemaNode =
@@ -185,10 +185,10 @@ export default async function GuideDetailPage({
         },
         publisher: {
           '@type': 'Organization',
-          name: 'SoufShop',
+          name: 'AQURIVO',
           logo: {
             '@type': 'ImageObject',
-            url: `${BASE_URL}/images/hero-bg.jpg`,
+            url: `${BASE_URL}/api/logo?size=512`,
           },
         },
       },

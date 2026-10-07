@@ -28,10 +28,10 @@ const DEFAULT_ARTICLES: Article[] = [
       en: '<h2>Why Invest in Active Noise Cancelling?</h2><p>ANC headphones are essential for high-focus work, travel, and daily commuting. We evaluated the top market contenders to bring you verified recommendations.</p><h2>Key Buying Criteria</h2><p>Look for dynamic frequency response, long battery life (30+ hours), and comfortable memory foam padding.</p>',
     },
     coverImage: '/images/hero-bg.jpg',
-    authorName: 'SoufShop Editorial Team',
+    authorName: 'AQURIVO Editorial Team',
     seoTitle: {
-      ar: 'أفضل 5 سماعات لاسلكية عازلة للضوضاء 2026 — دليل الشراء | SoufShop',
-      en: 'Top 5 Wireless ANC Headphones 2026 — Buying Guide | SoufShop',
+      ar: 'أفضل 5 سماعات لاسلكية عازلة للضوضاء 2026 — دليل الشراء | AQURIVO',
+      en: 'Top 5 Wireless ANC Headphones 2026 — Buying Guide | AQURIVO',
     },
     seoDescription: {
       ar: 'مقارنة شاملة لأفضل سماعات الرأس اللاسلكية العازلة للضوضاء لعام 2026 من حيث الصوت والبطارية والسعر.',
@@ -94,10 +94,10 @@ const DEFAULT_ARTICLES: Article[] = [
       en: '<h2>Start Simple: Smart Plugs and Lighting</h2><p>Smart plugs give you immediate remote control over coffee makers, lamps, and chargers via your phone.</p><h2>Sensors and Home Security</h2><p>Motion sensors and wireless cameras provide effortless peace of mind and energy savings.</p>',
     },
     coverImage: '/images/hero-bg.jpg',
-    authorName: 'SoufShop Editorial Team',
+    authorName: 'AQURIVO Editorial Team',
     seoTitle: {
-      ar: 'دليل تأسيس المنزل الذكي للمبتدئين بأقل تكلفة | SoufShop',
-      en: 'Smart Home Essentials Buying Guide for Beginners | SoufShop',
+      ar: 'دليل تأسيس المنزل الذكي للمبتدئين بأقل تكلفة | AQURIVO',
+      en: 'Smart Home Essentials Buying Guide for Beginners | AQURIVO',
     },
     seoDescription: {
       ar: 'تعرف على أهم أجهزة المنزل الذكي للمبتدئين وكيفية اختيار المقابس والإضاءة الذكية المتوافقة.',
@@ -145,10 +145,10 @@ const DEFAULT_ARTICLES: Article[] = [
       en: '<h2>Battery Life vs Advanced Features</h2><p>If you want a 14-day battery life for basic step and sleep tracking, fitness trackers win easily. If you want calling and notifications on your wrist, get a smartwatch.</p>',
     },
     coverImage: '/images/hero-bg.jpg',
-    authorName: 'SoufShop Editorial Team',
+    authorName: 'AQURIVO Editorial Team',
     seoTitle: {
-      ar: 'الفرق بين سوار اللياقة البدنية والساعة الذكية — أيهما أفضل؟ | SoufShop',
-      en: 'Fitness Tracker vs Smartwatch Comparison Guide | SoufShop',
+      ar: 'الفرق بين سوار اللياقة البدنية والساعة الذكية — أيهما أفضل؟ | AQURIVO',
+      en: 'Fitness Tracker vs Smartwatch Comparison Guide | AQURIVO',
     },
     seoDescription: {
       ar: 'دليل مقارنة شامل بين الساعات الذكية وأساور اللياقة البدنية من حيث البطارية ودقة الحساسات والسعر.',
@@ -320,7 +320,7 @@ export async function upsertArticleAdmin(input: unknown, existingId?: string): P
 
   const coverImage = typeof data.coverImage === 'string' ? sanitizePlainText(data.coverImage, 500) : undefined;
   const topPickProductId = typeof data.topPickProductId === 'string' ? sanitizePlainText(data.topPickProductId, 128) : undefined;
-  const authorName = typeof data.authorName === 'string' ? sanitizePlainText(data.authorName, 128) : 'SoufShop Editorial Team';
+  const authorName = typeof data.authorName === 'string' ? sanitizePlainText(data.authorName, 128) : 'AQURIVO Editorial Team';
 
   const rawSeoTitle = validateLocalizedText(data.seoTitle, 'عنوان SEO', 0, 180);
   const seoTitle = rawSeoTitle.ar || rawSeoTitle.en ? rawSeoTitle : undefined;

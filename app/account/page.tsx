@@ -5,9 +5,14 @@ import { AccountView } from '@/features/account/AccountView';
 
 export const dynamic = 'force-dynamic';
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://aqurivo.store';
+
 export const metadata: Metadata = {
   title: 'Saved Picks & Account',
-  description: 'View and compare your saved curated products on SoufShop.',
+  description: 'View and compare your saved curated products on AQURIVO.',
+  alternates: {
+    canonical: `${SITE_URL}/account`,
+  },
 };
 
 export default async function AccountPage() {

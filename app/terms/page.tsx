@@ -2,15 +2,18 @@ import React from 'react';
 import type { Metadata } from 'next';
 import { LegalPageView } from '@/features/legal/LegalPageView';
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://aqurivo.store';
+
 export const metadata: Metadata = {
-  metadataBase: new URL('https://soufshop.store'),
-  title: 'شروط الاستخدام - SoufShop',
-  description: 'شروط الاستخدام لتصفح منصة SoufShop والتسوق بأمان.',
+  metadataBase: new URL(SITE_URL),
+  title: 'شروط الاستخدام - AQURIVO',
+  description: 'شروط الاستخدام لتصفح منصة AQURIVO والتسوق بأمان.',
   alternates: {
-    canonical: 'https://soufshop.store/ar/terms',
+    canonical: `${SITE_URL}/ar/terms`,
     languages: {
-      ar: 'https://soufshop.store/ar/terms',
-      en: 'https://soufshop.store/en/terms',
+      ar: `${SITE_URL}/ar/terms`,
+      en: `${SITE_URL}/en/terms`,
+      'x-default': `${SITE_URL}/en/terms`,
     },
   },
 };
@@ -18,8 +21,8 @@ export const metadata: Metadata = {
 const termsJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'WebPage',
-  name: 'شروط الاستخدام - SoufShop',
-  url: 'https://soufshop.store/ar/terms',
+  name: 'شروط الاستخدام - AQURIVO',
+  url: `${SITE_URL}/ar/terms`,
 };
 
 export default function TermsPage() {

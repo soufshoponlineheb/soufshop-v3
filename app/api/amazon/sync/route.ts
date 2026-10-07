@@ -88,7 +88,7 @@ async function upsertAmazonProductIfNew(
     source: 'amazon',
     lastSyncedAt: nowIso,
 
-    // Standard SoufShop Product schema fields so it renders across all pages
+    // Standard AQURIVO Product schema fields so it renders across all pages
     slug: seoSlug || docId,
     title: { ar: cleanTitle, en: cleanTitle },
     shortSummary: { ar: cleanTitle, en: cleanTitle },
@@ -121,8 +121,8 @@ async function upsertAmazonProductIfNew(
     sourceSlug: 'amazon',
     sourceName: { ar: 'Amazon', en: 'Amazon' },
     sourceDisclosure: {
-      ar: 'SoufShop يستخدم روابط تسويق بالعمولة — affiliate links',
-      en: 'SoufShop يستخدم روابط تسويق بالعمولة — affiliate links',
+      ar: 'AQURIVO يستخدم روابط تسويق بالعمولة — affiliate links',
+      en: 'AQURIVO يستخدم روابط تسويق بالعمولة — affiliate links',
     },
     tags: ['amazon', asin.toLowerCase(), catInfo.slug],
     status: 'published' as const,

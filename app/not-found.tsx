@@ -6,9 +6,11 @@ import { SiteFooter } from '@/components/sections/SiteFooter';
 import { SignatureMotif } from '@/components/ui/SignatureMotif';
 import styles from './not-found.module.css';
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://aqurivo.store';
+
 export const metadata: Metadata = {
-  metadataBase: new URL('https://soufshop.store'),
-  title: '404 — الصفحة غير موجودة | SoufShop',
+  metadataBase: new URL(SITE_URL),
+  title: '404 — الصفحة غير موجودة | AQURIVO',
   robots: 'noindex, nofollow',
 };
 

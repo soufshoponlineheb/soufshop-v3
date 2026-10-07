@@ -2,24 +2,27 @@ import React from 'react';
 import type { Metadata } from 'next';
 import { AboutView } from '@/features/editorial/AboutView';
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://aqurivo.store';
+
 export const metadata: Metadata = {
-  metadataBase: new URL('https://soufshop.store'),
-  title: 'من نحن - SoufShop',
+  metadataBase: new URL(SITE_URL),
+  title: 'من نحن - AQURIVO',
   description:
-    'SoufShop منصة لاختيار وعرض أفضل المنتجات، نوجهك مباشرة للمتجر الأصلي للشراء بأمان',
+    'AQURIVO منصة لاختيار وعرض أفضل المنتجات، نوجهك مباشرة للمتجر الأصلي للشراء بأمان',
   alternates: {
-    canonical: 'https://soufshop.store/ar/about',
+    canonical: `${SITE_URL}/ar/about`,
     languages: {
-      ar: 'https://soufshop.store/ar/about',
-      en: 'https://soufshop.store/en/about',
+      ar: `${SITE_URL}/ar/about`,
+      en: `${SITE_URL}/en/about`,
+      'x-default': `${SITE_URL}/en/about`,
     },
   },
   openGraph: {
-    title: 'من نحن - SoufShop',
+    title: 'من نحن - AQURIVO',
     description:
-      'SoufShop منصة لاختيار وعرض أفضل المنتجات، نوجهك مباشرة للمتجر الأصلي للشراء بأمان',
-    url: 'https://soufshop.store/ar/about',
-    siteName: 'SoufShop',
+      'AQURIVO منصة لاختيار وعرض أفضل المنتجات، نوجهك مباشرة للمتجر الأصلي للشراء بأمان',
+    url: `${SITE_URL}/ar/about`,
+    siteName: 'AQURIVO',
     type: 'website',
   },
 };
@@ -27,14 +30,14 @@ export const metadata: Metadata = {
 const aboutPageJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'AboutPage',
-  name: 'من نحن - SoufShop',
-  url: 'https://soufshop.store/ar/about',
+  name: 'من نحن - AQURIVO',
+  url: `${SITE_URL}/ar/about`,
   description:
-    'SoufShop منصة لاختيار وعرض أفضل المنتجات، نوجهك مباشرة للمتجر الأصلي للشراء بأمان',
+    'AQURIVO منصة لاختيار وعرض أفضل المنتجات، نوجهك مباشرة للمتجر الأصلي للشراء بأمان',
   publisher: {
     '@type': 'Organization',
-    name: 'SoufShop',
-    url: 'https://soufshop.store',
+    name: 'AQURIVO',
+    url: SITE_URL,
   },
 };
 

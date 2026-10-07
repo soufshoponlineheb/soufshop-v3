@@ -2,7 +2,7 @@ import type { MessagesDictionary } from './en';
 
 export const arMessages: MessagesDictionary = {
   meta: {
-    siteName: 'SoufShop',
+    siteName: 'AQURIVO',
     tagline: 'منتجات منتقاة بعناية من أرقى المتاجر العالمية الموثوقة.',
     defaultDescription: 'أفضل المنتجات من أكبر المتاجر العالمية في مكان واحد',
   },
@@ -33,7 +33,7 @@ export const arMessages: MessagesDictionary = {
     subtitle:
       'نختار لك أفضل المنتجات من الإنترنت بعناية، كل ما عليك هو النقر والشراء بأمان.',
     primaryCta: 'اكتشف المنتجات',
-    secondaryCta: 'كيف يعمل SoufShop؟',
+    secondaryCta: 'كيف يعمل AQURIVO؟',
     stats: {
       products: '+500 منتج مختار',
       stores: 'توصيل عالمي',
@@ -42,7 +42,7 @@ export const arMessages: MessagesDictionary = {
     },
   },
   howItWorks: {
-    heading: 'كيف يعمل SoufShop',
+    heading: 'كيف يعمل AQURIVO',
     step1Title: 'نبحث ونختار',
     step1Text:
       'نراجع آلاف المنتجات من Amazon و Noon و Temu و ClickBank ونختار فقط الأفضل سعراً وجودةً',
@@ -55,15 +55,15 @@ export const arMessages: MessagesDictionary = {
   },
   about: {
     heading: 'من نحن',
-    p1: 'SoufShop منصة مستقلة لاختيار المنتجات. نبحث يومياً في Amazon و Noon و Temu و ClickBank لنجلب لك أفضل العروض في مكان واحد.',
+    p1: 'AQURIVO منصة مستقلة لاختيار المنتجات. نبحث يومياً في Amazon و Noon و Temu و ClickBank لنجلب لك أفضل العروض في مكان واحد.',
     p2: 'عند الضغط على زر الشراء ستنتقل للمتجر الأصلي لإتمام عملية الشراء بأمان — نحن لا نتعامل مع بياناتك المالية أو الشخصية بأي شكل.',
     p3: 'نحصل على عمولة بسيطة من المتجر عند شرائك عبر روابطنا، دون أي تكلفة إضافية عليك.',
     teamHeading: 'فريقنا',
     teamIntro:
-      'فريق SoufShop — نخبة من المتخصصين يعملون يومياً لاختيار أفضل المنتجات لك',
+      'فريق AQURIVO — نخبة من المتخصصين يعملون يومياً لاختيار أفضل المنتجات لك',
     founderQuote:
-      'أنشأت SoufShop لأن البحث عن منتج جيد بسعر مناسب يأخذ وقتاً طويلاً. هدفنا أن نوفر عليك هذا الوقت.',
-    founderSignature: 'سفيان — مؤسس SoufShop',
+      'أنشأت AQURIVO لأن البحث عن منتج جيد بسعر مناسب يأخذ وقتاً طويلاً. هدفنا أن نوفر عليك هذا الوقت.',
+    founderSignature: 'سفيان — مؤسس AQURIVO',
   },
   product: {
     buyNow: 'اشترِ الآن ↗',
@@ -110,7 +110,7 @@ export const arMessages: MessagesDictionary = {
   },
   footer: {
     aboutSummary:
-      'SoufShop منصة مستقلة لانتقاء ومراجعة المنتجات. عند الشراء عبر روابطنا قد نحصل على عمولة من المتاجر الشريكة دون أي زيادة في السعر عليك.',
+      'AQURIVO منصة مستقلة لانتقاء ومراجعة المنتجات. عند الشراء عبر روابطنا قد نحصل على عمولة من المتاجر الشريكة دون أي زيادة في السعر عليك.',
     amazonMandatoryNotice:
       'بصفتنا شريكاً في برنامج Amazon Associates، فإننا نكسب من عمليات الشراء المؤهلة.',
     quickLinks: 'استكشف',

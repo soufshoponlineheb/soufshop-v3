@@ -216,7 +216,7 @@ export function GuidesView({ articles, categories }: GuidesViewProps) {
                     fontWeight: 'bold',
                   }}
                 >
-                  SoufShop Guide
+                  AQURIVO Guide
                 </div>
               )}
             </div>
