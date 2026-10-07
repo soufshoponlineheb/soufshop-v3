@@ -7,6 +7,7 @@ import { ToastProvider } from '@/components/ui/Toast';
 import { SavedProvider } from '@/features/saved/SavedProvider';
 import { CookieBanner } from '@/components/sections/CookieBanner';
 import { Analytics } from '@vercel/analytics/next';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 const fraunces = Fraunces({
   subsets: ['latin'],
@@ -191,6 +192,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 {children}
                 <CookieBanner />
                 <Analytics />
+                <SpeedInsights />
               </SavedProvider>
             </ToastProvider>
           </I18nProvider>
