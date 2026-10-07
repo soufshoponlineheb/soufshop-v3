@@ -1,7 +1,7 @@
 .brandLockup {
   display: inline-flex;
   align-items: center;
-  gap: 11px;
+  gap: 10px;
   color: var(--color-text-primary);
   white-space: nowrap;
   flex-shrink: 0;
@@ -10,64 +10,40 @@
 
 .mark {
   flex-shrink: 0;
-  filter: drop-shadow(0 3px 10px rgba(9, 52, 41, 0.22));
-  transition: transform var(--duration-normal) var(--ease-out-quart);
 }
 
-.goldenWings,
-.centralJewel {
-  transform-origin: 24px 24px;
-  transition: transform var(--duration-normal) var(--ease-out-quart);
-}
-
-.brandLockup:hover .mark {
-  transform: translateY(-1px) scale(1.03);
-}
-
-.brandLockup:hover .centralJewel {
-  transform: translateY(-1px) scale(1.04);
-}
-
-.wordmark {
-  display: inline-block;
-  font-family: var(--font-body-latin), -apple-system, BlinkMacSystemFont, sans-serif;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  line-height: 1;
+.wordmarkSvg {
+  display: block;
+  flex-shrink: 0;
   color: var(--color-text-primary);
 }
 
 .sm .mark {
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
 }
 
-.sm .wordmark {
-  font-size: 16px;
+.sm .wordmarkSvg {
+  height: 16px;
+  width: auto;
 }
 
 .md .mark {
-  width: 38px;
-  height: 38px;
+  width: 36px;
+  height: 36px;
 }
 
-.md .wordmark {
-  font-size: 19px;
+.md .wordmarkSvg {
+  height: 19px;
+  width: auto;
 }
 
 .lg .mark {
-  width: 46px;
-  height: 46px;
+  width: 44px;
+  height: 44px;
 }
 
-.lg .wordmark {
-  font-size: 24px;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .mark,
-  .goldenWings,
-  .centralJewel {
-    transition: none;
-  }
+.lg .wordmarkSvg {
+  height: 23px;
+  width: auto;
 }

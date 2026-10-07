@@ -16,8 +16,6 @@ export async function GET(req: NextRequest) {
       ? Math.round(rawSize)
       : 512;
 
-  const svgSize = Math.round(size * 0.88);
-
   return new ImageResponse(
     (
       <div
@@ -27,45 +25,26 @@ export async function GET(req: NextRequest) {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          background:
-            'linear-gradient(135deg, #125E4A 0%, #093429 52%, #041913 100%)',
-          borderRadius: `${Math.round(size * 0.24)}px`,
-          border: `${Math.max(1, Math.round(size * 0.025))}px solid rgba(251, 191, 36, 0.45)`,
-          position: 'relative',
+          backgroundColor: '#0d1117',
+          borderRadius: `${Math.round(size * 0.1875)}px`,
         }}
       >
         <svg
-          width={svgSize}
-          height={svgSize}
-          viewBox="0 0 48 48"
+          width={size}
+          height={size}
+          viewBox="0 0 32 32"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >
-          {/* Left Golden Rivo Wing */}
+          <rect width="32" height="32" rx="6" fill="#0d1117" />
           <path
-            d="M9.2 14.8C11.8 15.8 14.0 17.6 15.4 20.2L21.8 36.2C13.8 33.8 8.6 25.2 9.2 14.8Z"
-            fill="#FBBF24"
+            fillRule="evenodd"
+            clipRule="evenodd"
+            d="M4.5 27.5L12.1 6.4C12.9 4.2 14.3 3.5 16 3.5C17.7 3.5 19.1 4.2 19.9 6.4L27.5 27.5H22.6L17.4 12.1C17.0 10.9 16.5 10.5 16 10.5C15.5 10.5 15.0 10.9 14.6 12.1L9.4 27.5H4.5Z"
+            fill="#F9FAFB"
           />
-          {/* Right Golden Rivo Wing */}
-          <path
-            d="M38.8 14.8C36.2 15.8 34.0 17.6 32.6 20.2L26.2 36.2C34.2 33.8 39.4 25.2 38.8 14.8Z"
-            fill="#F59E0B"
-          />
-          {/* Sovereign Diamond Pedestal */}
-          <path
-            d="M16.5 39.4L24 37.8L31.5 39.4L24 41.0L16.5 39.4Z"
-            fill="#FBBF24"
-          />
-          {/* Central 4-Faceted Kite-Cut Aqua-Jewel */}
-          <path d="M24 7.5L17.8 18.5H24V7.5Z" fill="#FFFFFF" />
-          <path d="M24 7.5L30.2 18.5H24V7.5Z" fill="#CCFBF1" />
-          <path d="M17.8 18.5L24 33.8V18.5H17.8Z" fill="#E6F4F1" />
-          <path d="M30.2 18.5L24 33.8V18.5H30.2Z" fill="#5EEAD4" />
-          {/* Inner 4-Point Golden Polaris Spark */}
-          <path
-            d="M24 14.6L25.05 17.45L27.9 18.5L25.05 19.55L24 22.4L22.95 19.55L20.1 18.5L22.95 17.45L24 14.6Z"
-            fill="#F59E0B"
-          />
+          <path d="M16 3.5L17.6 7.5L16 9.2L14.4 7.5L16 3.5Z" fill="#2DD4BF" />
+          <path d="M16 14.5L20.8 20.5L16 26.5L11.2 20.5L16 14.5Z" fill="#2DD4BF" />
         </svg>
       </div>
     ),

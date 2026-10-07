@@ -1,4 +1,4 @@
-import React, { useId } from 'react';
+import React from 'react';
 import styles from './BrandLogo.module.css';
 
 interface BrandLogoProps {
@@ -7,170 +7,80 @@ interface BrandLogoProps {
 }
 
 /**
- * AQURIVO Exclusive Brand Symbol — "The Sovereign Lotus-Crown & Aqua-Jewel":
- * A pure, non-lettermark luxury emblem crafted exclusively for AQURIVO:
- * - Central 4-facet kite-cut Aqua-Diamond (symbolizing 'Aqua' — clarity & rare curated selection)
- * - Twin sweeping Champagne Gold crescent wings (symbolizing 'Rivo' — converging streams of global excellence)
- * - Central 4-point Golden Polaris spark & sovereign diamond pedestal
- * - Unified, high-fashion geometric wordmark "AQURIVO"
+ * AQURIVO Trademark SVG Logo:
+ * - Flat design only (#0d1117 dark, #F9FAFB white, #2DD4BF teal)
+ * - Logomark: Stylized gateway arch "A" with inner discovery diamond & apex ray (32x32 viewBox)
+ * - Wordmark: 100% custom geometric vector paths for "AQURIVO"
  */
 export function BrandLogo({ size = 'md', showWordmark = true }: BrandLogoProps) {
-  const uid = useId().replace(/:/g, '');
-  const bgGradId = `aqBg_${uid}`;
-  const glowGradId = `aqGlow_${uid}`;
-  const rimGradId = `aqRim_${uid}`;
-  const goldLeftId = `aqGoldL_${uid}`;
-  const goldRightId = `aqGoldR_${uid}`;
-
   return (
     <span className={`${styles.brandLockup} ${styles[size]}`}>
       <svg
         className={styles.mark}
-        viewBox="0 0 48 48"
+        viewBox="0 0 32 32"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
         aria-hidden="true"
       >
-        <defs>
-          <linearGradient
-            id={bgGradId}
-            x1="4"
-            y1="4"
-            x2="44"
-            y2="44"
-            gradientUnits="userSpaceOnUse"
-          >
-            <stop offset="0%" stopColor="#115E49" />
-            <stop offset="52%" stopColor="#083026" />
-            <stop offset="100%" stopColor="#031510" />
-          </linearGradient>
-
-          <radialGradient
-            id={glowGradId}
-            cx="24"
-            cy="20"
-            r="19"
-            gradientUnits="userSpaceOnUse"
-          >
-            <stop offset="0%" stopColor="rgba(45, 212, 191, 0.24)" />
-            <stop offset="100%" stopColor="rgba(45, 212, 191, 0)" />
-          </radialGradient>
-
-          <linearGradient
-            id={rimGradId}
-            x1="2"
-            y1="2"
-            x2="46"
-            y2="46"
-            gradientUnits="userSpaceOnUse"
-          >
-            <stop offset="0%" stopColor="rgba(253, 230, 138, 0.7)" />
-            <stop offset="50%" stopColor="rgba(45, 212, 191, 0.32)" />
-            <stop offset="100%" stopColor="rgba(217, 119, 6, 0.6)" />
-          </linearGradient>
-
-          <linearGradient
-            id={goldLeftId}
-            x1="9"
-            y1="14"
-            x2="22"
-            y2="37"
-            gradientUnits="userSpaceOnUse"
-          >
-            <stop offset="0%" stopColor="#FEF3C7" />
-            <stop offset="48%" stopColor="#FBBF24" />
-            <stop offset="100%" stopColor="#D97706" />
-          </linearGradient>
-
-          <linearGradient
-            id={goldRightId}
-            x1="39"
-            y1="14"
-            x2="26"
-            y2="37"
-            gradientUnits="userSpaceOnUse"
-          >
-            <stop offset="0%" stopColor="#FEF3C7" />
-            <stop offset="48%" stopColor="#F59E0B" />
-            <stop offset="100%" stopColor="#B45309" />
-          </linearGradient>
-        </defs>
-
-        {/* Imperial Emerald Squircle Crest */}
-        <rect
-          x="2"
-          y="2"
-          width="44"
-          height="44"
-          rx="12.5"
-          fill={`url(#${bgGradId})`}
-          stroke={`url(#${rimGradId})`}
-          strokeWidth="1.5"
+        <rect width="32" height="32" rx="6" fill="#0d1117" />
+        <path
+          fillRule="evenodd"
+          clipRule="evenodd"
+          d="M4.5 27.5L12.1 6.4C12.9 4.2 14.3 3.5 16 3.5C17.7 3.5 19.1 4.2 19.9 6.4L27.5 27.5H22.6L17.4 12.1C17.0 10.9 16.5 10.5 16 10.5C15.5 10.5 15.0 10.9 14.6 12.1L9.4 27.5H4.5Z"
+          fill="#F9FAFB"
         />
-
-        {/* Ambient Emerald Inner Aura */}
-        <rect
-          x="2.75"
-          y="2.75"
-          width="42.5"
-          height="42.5"
-          rx="11.75"
-          fill={`url(#${glowGradId})`}
-        />
-
-        {/* Fine Watchmaker Inner Bezel */}
-        <rect
-          x="5"
-          y="5"
-          width="38"
-          height="38"
-          rx="9.5"
-          stroke="rgba(253, 230, 138, 0.15)"
-          strokeWidth="0.75"
-        />
-
-        {/* Twin Golden Rivo Crescent Wings (Sovereign Lotus Petals) */}
-        <g className={styles.goldenWings}>
-          {/* Left Golden Wing */}
-          <path
-            d="M9.2 14.8C11.8 15.8 14.0 17.6 15.4 20.2L21.8 36.2C13.8 33.8 8.6 25.2 9.2 14.8Z"
-            fill={`url(#${goldLeftId})`}
-          />
-          {/* Right Golden Wing */}
-          <path
-            d="M38.8 14.8C36.2 15.8 34.0 17.6 32.6 20.2L26.2 36.2C34.2 33.8 39.4 25.2 38.8 14.8Z"
-            fill={`url(#${goldRightId})`}
-          />
-          {/* Sovereign Diamond Pedestal Base */}
-          <path
-            d="M16.5 39.4L24 37.8L31.5 39.4L24 41.0L16.5 39.4Z"
-            fill={`url(#${goldLeftId})`}
-          />
-        </g>
-
-        {/* Central 4-Faceted Kite-Cut Aqua-Jewel (The Spire) */}
-        <g className={styles.centralJewel}>
-          {/* Upper-Left Lit Alabaster Facet */}
-          <path d="M24 7.5L17.8 18.5H24V7.5Z" fill="#FFFFFF" />
-          {/* Upper-Right Pearl-Aqua Facet */}
-          <path d="M24 7.5L30.2 18.5H24V7.5Z" fill="#CCFBF1" />
-          {/* Lower-Left Silky Mint Facet */}
-          <path d="M17.8 18.5L24 33.8V18.5H17.8Z" fill="#E6F4F1" />
-          {/* Lower-Right Turquoise-Emerald Facet */}
-          <path d="M30.2 18.5L24 33.8V18.5H30.2Z" fill="#5EEAD4" />
-          {/* Inner 4-Point Golden Polaris Spark */}
-          <path
-            d="M24 14.6L25.05 17.45L27.9 18.5L25.05 19.55L24 22.4L22.95 19.55L20.1 18.5L22.95 17.45L24 14.6Z"
-            fill="#F59E0B"
-          />
-          <circle cx="24" cy="18.5" r="1.1" fill="#FEF3C7" />
-        </g>
+        <path d="M16 3.5L17.6 7.5L16 9.2L14.4 7.5L16 3.5Z" fill="#2DD4BF" />
+        <path d="M16 14.5L20.8 20.5L16 26.5L11.2 20.5L16 14.5Z" fill="#2DD4BF" />
       </svg>
 
       {showWordmark && (
-        <span className={styles.wordmark} dir="ltr">
-          AQURIVO
-        </span>
+        <svg
+          className={styles.wordmarkSvg}
+          viewBox="0 0 173 29"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          role="img"
+          aria-label="AQURIVO"
+        >
+          {/* A */}
+          <path
+            fillRule="evenodd"
+            clipRule="evenodd"
+            d="M0 24L8.2 0H11.8L20 24H16.1L14.3 18.2H5.7L3.9 24H0ZM6.8 14.8H13.2L10 4.6L6.8 14.8Z"
+            fill="currentColor"
+          />
+          {/* Q */}
+          <path
+            fillRule="evenodd"
+            clipRule="evenodd"
+            d="M39 0C45.6 0 50 4.8 50 12C50 19.4 45.6 24.3 39 24.3C32.4 24.3 28 19.4 28 12C28 4.8 32.4 0 39 0ZM39 3.5C34.5 3.5 31.8 6.8 31.8 12C31.8 17.2 34.5 20.7 39 20.7C43.5 20.7 46.2 17.2 46.2 12C46.2 6.8 43.5 3.5 39 3.5Z"
+            fill="currentColor"
+          />
+          <path d="M42.2 17.6L50.6 26.0L48.0 28.6L39.6 20.2L42.2 17.6Z" fill="#2DD4BF" />
+          {/* U */}
+          <path
+            d="M58 0H61.8V14.6C61.8 18.5 64.1 20.7 67.5 20.7C70.9 20.7 73.2 18.5 73.2 14.6V0H77V14.8C77 20.8 73.2 24.3 67.5 24.3C61.8 24.3 58 20.8 58 14.8V0Z"
+            fill="currentColor"
+          />
+          {/* R */}
+          <path
+            fillRule="evenodd"
+            clipRule="evenodd"
+            d="M86 0H96.2C101.4 0 104.6 2.9 104.6 7.4C104.6 10.9 102.6 13.5 99.1 14.4L105.2 24H100.8L95.2 14.8H89.8V24H86V0ZM89.8 3.4V11.5H95.8C98.9 11.5 100.8 9.9 100.8 7.4C100.8 5.0 98.9 3.4 95.8 3.4H89.8Z"
+            fill="currentColor"
+          />
+          {/* I */}
+          <path d="M113 0H116.8V24H113V0Z" fill="currentColor" />
+          {/* V */}
+          <path d="M124 0H128L134 19.2L140 0H144L135.8 24H132.2L124 0Z" fill="currentColor" />
+          {/* O */}
+          <path
+            fillRule="evenodd"
+            clipRule="evenodd"
+            d="M162 0C168.6 0 173 4.8 173 12C173 19.4 168.6 24.3 162 24.3C155.4 24.3 151 19.4 151 12C151 4.8 155.4 0 162 0ZM162 3.5C157.5 3.5 154.8 6.8 154.8 12C154.8 17.2 157.5 20.7 162 20.7C166.5 20.7 169.2 17.2 169.2 12C169.2 6.8 166.5 3.5 162 3.5Z"
+            fill="currentColor"
+          />
+        </svg>
       )}
     </span>
   );
