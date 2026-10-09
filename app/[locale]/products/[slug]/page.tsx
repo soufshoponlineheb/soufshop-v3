@@ -11,12 +11,17 @@ import {
 } from '@/server/repositories/products.repo';
 import { getCategoryBySlug } from '@/server/repositories/categories.repo';
 import { listPublishedArticles } from '@/server/repositories/articles.repo';
-import { formatProductPrice } from '@/lib/format';
+import { formatNumber, formatProductPrice } from '@/lib/format';
 import { SiteHeader } from '@/components/sections/SiteHeader';
 import { SiteFooter } from '@/components/sections/SiteFooter';
 import { ProductGallery } from './ProductGallery';
+import { ProductPriceRow } from './ProductPriceRow';
 import { ProductDescription } from './ProductDescription';
+import { BuyNowButton } from './BuyNowButton';
 import { ProductReviews } from '@/components/ProductReviews/ProductReviews';
+import { ReportModal } from '@/components/ReportModal/ReportModal';
+import { SmartToolPulse } from '@/components/SmartToolPulse/SmartToolPulse';
+import { EditorialGuideIcon } from '@/components/ui/AqurivoContextIcons';
 import { getReviewsByProductSlug } from '@/server/repositories/reviews.repo';
 import styles from './ProductPage.module.css';
 
@@ -53,12 +58,20 @@ export async function generateMetadata({
 
   if (!product) return {};
 
+  const isAr = locale === 'ar';
   const name =
     product.name?.[locale as Locale] ||
     product.name?.en ||
     product.title?.[locale as Locale] ||
     product.title?.en ||
     '';
+
+  const seoTitle =
+    name.length > 0 && name.length <= 36
+      ? isAr
+        ? `${name} — المواصفات والمميزات وأفضل سعر | AQURIVO`
+        : `${name} — Specs, Pros & Cons & Best Price | AQURIVO`
+      : `${name} | AQURIVO`;
 
   const description =
     product.shortSummary?.[locale as Locale] ||
@@ -68,37 +81,61 @@ export async function generateMetadata({
     product.name?.[locale as Locale] ||
     '';
 
+  const dnaSpecs =
+    (isAr
+      ? product.comparisonDna?.keySpecs?.ar
+      : product.comparisonDna?.keySpecs?.en) || [];
+  const keywords = Array.from(
+    new Set(
+      [
+        name,
+        ...(product.tags || []),
+        ...dnaSpecs,
+        isAr ? `سعر ${name}` : `${name} price`,
+        isAr ? `مراجعة ${name}` : `${name} review`,
+        'AQURIVO',
+      ].filter(Boolean)
+    )
+  ).slice(0, 12);
+
   const image = product.images?.[0]?.url || '';
+  const imageAlt =
+    pickLocalizedText(product.images?.[0]?.alt, locale as Locale) || name;
+  const canonicalSlug = encodeURIComponent(product.slug || decodedSlug);
 
   return {
-    title: `${name} | AQURIVO`,
+    title: seoTitle,
     description: description.slice(0, 155),
+    keywords,
     alternates: {
-      canonical: `${BASE_URL}/${locale}/products/${slug}`,
+      canonical: `${BASE_URL}/${locale}/products/${canonicalSlug}`,
       languages: {
-        en: `${BASE_URL}/en/products/${slug}`,
-        ar: `${BASE_URL}/ar/products/${slug}`,
-        'x-default': `${BASE_URL}/en/products/${slug}`,
+        en: `${BASE_URL}/en/products/${canonicalSlug}`,
+        ar: `${BASE_URL}/ar/products/${canonicalSlug}`,
+        'x-default': `${BASE_URL}/en/products/${canonicalSlug}`,
       },
     },
     openGraph: {
-      title: name,
+      title: seoTitle,
       description: description.slice(0, 155),
-      url: `${BASE_URL}/${locale}/products/${slug}`,
+      url: `${BASE_URL}/${locale}/products/${canonicalSlug}`,
+      siteName: 'AQURIVO',
+      locale: isAr ? 'ar_SA' : 'en_US',
+      type: 'website',
       images: image
         ? [
             {
               url: image,
               width: 800,
               height: 800,
-              alt: name,
+              alt: imageAlt,
             },
           ]
         : [],
     },
     twitter: {
       card: 'summary_large_image',
-      title: `${name} | AQURIVO`,
+      title: seoTitle,
       description: description.slice(0, 155),
       images: image ? [image] : [],
     },
@@ -264,26 +301,115 @@ export default async function ProductPage({
         ? pickLocalizedText(product.categoryName, locale)
         : categorySlug || productsLabel;
 
-  const productUrl = `${BASE_URL}/${locale}/products/${productSlug}`;
-  const primaryImageUrl = images[0]?.url || '';
+  const productUrl = `${BASE_URL}/${locale}/products/${encodeURIComponent(
+    productSlug
+  )}`;
+  const allImageUrls = images.map((img) => img.url).filter(Boolean);
 
-  // JSON-LD structured data with real image URL
+  const sourceRaw = (product.sourceSlug || product.sourceId || 'Amazon').trim();
+  const sourceBrandName =
+    sourceRaw.charAt(0).toUpperCase() + sourceRaw.slice(1);
+
+  // Extract positiveNotes (Pros / Key Specs) and negativeNotes (Cons / Things to Notice) for Google Rich Snippets
+  const positiveNotesList: string[] = [];
+  if (Array.isArray(product.pros) && product.pros.length > 0) {
+    for (const p of product.pros) {
+      const txt = pickLocalizedText(p, locale);
+      if (txt) positiveNotesList.push(txt);
+    }
+  }
+  const dnaKeySpecs =
+    (isAr
+      ? product.comparisonDna?.keySpecs?.ar
+      : product.comparisonDna?.keySpecs?.en) || [];
+  for (const sp of dnaKeySpecs) {
+    if (sp && !positiveNotesList.includes(sp)) {
+      positiveNotesList.push(sp);
+    }
+  }
+  if (positiveNotesList.length === 0 && whyWeChoseIt) {
+    positiveNotesList.push(whyWeChoseIt.slice(0, 120));
+  }
+
+  const negativeNotesList: string[] = [];
+  if (Array.isArray(product.cons) && product.cons.length > 0) {
+    for (const c of product.cons) {
+      const txt = pickLocalizedText(c, locale);
+      if (txt) negativeNotesList.push(txt);
+    }
+  }
+  if (negativeNotesList.length === 0 && thingsToNotice) {
+    negativeNotesList.push(thingsToNotice.slice(0, 120));
+  }
+
+  const editorialReviewNode: Record<string, unknown> = {
+    '@type': 'Review',
+    author: {
+      '@type': 'Organization',
+      name: 'AQURIVO Editorial Team',
+    },
+    reviewRating: {
+      '@type': 'Rating',
+      ratingValue: effectiveRating || 4.7,
+      bestRating: 5,
+      worstRating: 1,
+    },
+    ...(positiveNotesList.length > 0
+      ? {
+          positiveNotes: {
+            '@type': 'ItemList',
+            itemListElement: positiveNotesList.slice(0, 5).map((note, idx) => ({
+              '@type': 'ListItem',
+              position: idx + 1,
+              name: note,
+            })),
+          },
+        }
+      : {}),
+    ...(negativeNotesList.length > 0
+      ? {
+          negativeNotes: {
+            '@type': 'ItemList',
+            itemListElement: negativeNotesList.slice(0, 4).map((note, idx) => ({
+              '@type': 'ListItem',
+              position: idx + 1,
+              name: note,
+            })),
+          },
+        }
+      : {}),
+  };
+
+  // JSON-LD structured data with all real product image URLs, brand, SKU, and Pros/Cons review
   const productSchemaNode: Record<string, unknown> = {
     '@type': 'Product',
     name,
+    sku: product.id || productSlug,
+    mpn: productSlug,
+    category: categoryName,
+    brand: {
+      '@type': 'Brand',
+      name: sourceBrandName,
+    },
     description: (shortSummary || detailedDescription || name).slice(0, 155),
-    ...(primaryImageUrl ? { image: [primaryImageUrl] } : {}),
+    ...(allImageUrls.length > 0 ? { image: allImageUrls } : {}),
     url: productUrl,
+    review: editorialReviewNode,
     ...(priceAmount !== null && priceAmount > 0
       ? {
           offers: {
             '@type': 'Offer',
             price: priceAmount,
             priceCurrency,
+            itemCondition: 'https://schema.org/NewCondition',
             availability: inStock
               ? 'https://schema.org/InStock'
               : 'https://schema.org/OutOfStock',
             url: productUrl,
+            seller: {
+              '@type': 'Organization',
+              name: sourceBrandName,
+            },
           },
         }
       : {}),
@@ -303,6 +429,34 @@ export default async function ProductPage({
       : {}),
   };
 
+  // VideoObject structured data nodes when the product has videos
+  const allVideoUrls = Array.from(
+    new Set(
+      [
+        ...(Array.isArray(product.videoUrls) ? product.videoUrls : []),
+        ...(product.videoUrl ? [product.videoUrl] : []),
+      ]
+        .map((u) => (typeof u === 'string' ? u.trim() : ''))
+        .filter(Boolean)
+    )
+  );
+
+  const videoSchemaNodes = allVideoUrls.map((vUrl, idx) => ({
+    '@type': 'VideoObject',
+    name:
+      allVideoUrls.length > 1
+        ? `${name} — Video ${idx + 1}`
+        : `${name} — Product Video`,
+    description: (shortSummary || detailedDescription || name).slice(0, 155),
+    thumbnailUrl:
+      allImageUrls.length > 0
+        ? allImageUrls
+        : [`${BASE_URL}/images/hero-bg.jpg`],
+    uploadDate: product.updatedAt || product.createdAt || new Date().toISOString(),
+    contentUrl: vUrl,
+    embedUrl: vUrl,
+  }));
+
   const breadcrumbSchemaNode = {
     '@type': 'BreadcrumbList',
     itemListElement: [
@@ -318,7 +472,9 @@ export default async function ProductPage({
               '@type': 'ListItem',
               position: 2,
               name: categoryName,
-              item: `${BASE_URL}/${locale}/categories/${categorySlug}`,
+              item: `${BASE_URL}/${locale}/categories/${encodeURIComponent(
+                categorySlug
+              )}`,
             },
             {
               '@type': 'ListItem',
@@ -340,7 +496,7 @@ export default async function ProductPage({
 
   const structuredDataJsonLd = {
     '@context': 'https://schema.org',
-    '@graph': [productSchemaNode, breadcrumbSchemaNode],
+    '@graph': [productSchemaNode, breadcrumbSchemaNode, ...videoSchemaNodes],
   };
 
   return (
@@ -397,12 +553,14 @@ export default async function ProductPage({
 
         {/* Top Product Layout: Single column on mobile, 50/50 on desktop */}
         <div className={styles.productLayout}>
-          {/* Section 1: Gallery (images: [{ url }]) */}
+          {/* Section 1: Gallery (images: [{ url, alt }]) */}
           <div className={styles.imageSection}>
             <ProductGallery
               images={images}
               videoUrl={product.videoUrl}
+              videoUrls={product.videoUrls}
               productTitle={name}
+              locale={locale}
             />
           </div>
 
@@ -441,7 +599,7 @@ export default async function ProductPage({
 
                 {effectiveReviewCount !== null && effectiveReviewCount > 0 && (
                   <span className={styles.reviewCount}>
-                    ({effectiveReviewCount.toLocaleString(locale)}{' '}
+                    ({formatNumber(effectiveReviewCount, locale as Locale)}{' '}
                     {isAr ? 'تقييم' : 'reviews'})
                   </span>
                 )}
@@ -452,53 +610,40 @@ export default async function ProductPage({
                       •
                     </span>
                     {isAr
-                      ? `تم بيع +${salesCount.toLocaleString(locale)} قطعة`
-                      : `${salesCount.toLocaleString(locale)}+ sold`}
+                      ? `تم بيع +${formatNumber(salesCount, locale as Locale)} قطعة`
+                      : `${formatNumber(salesCount, locale as Locale)}+ sold`}
                   </span>
                 )}
               </div>
             )}
 
-            <div className={styles.priceRow}>
-              {priceAmount !== null && (
-                <span className={`${styles.price} tabularNums`}>
-                  {formattedPrice}
-                </span>
-              )}
-
-              {formattedOldPrice && (
-                <span className={`${styles.priceOriginal} tabularNums`}>
-                  {formattedOldPrice}
-                </span>
-              )}
-
-              {discount !== null && discount > 0 && (
-                <span className={styles.discountBadge}>
-                  -{discount}%
-                </span>
-              )}
-
-              <span className={styles.inStockBadge}>
-                <span className={styles.inStockDot} aria-hidden="true" />
-                {inStock
-                  ? isAr
-                    ? 'متوفر بالمخزون'
-                    : 'In Stock'
-                  : isAr
-                    ? 'نفذت الكمية'
-                    : 'Out of Stock'}
-              </span>
-            </div>
+            <ProductPriceRow
+              priceAmount={priceAmount}
+              oldPrice={oldPrice}
+              priceCurrency={priceCurrency}
+              discount={discount}
+              inStock={inStock}
+              locale={locale}
+              productMeta={{
+                id: product.id || productSlug,
+                slug: productSlug,
+                titleAr:
+                  resolveLocalizedField(product.name, product.title, 'ar') ||
+                  name,
+                titleEn:
+                  resolveLocalizedField(product.name, product.title, 'en') ||
+                  name,
+                categorySlug: categorySlug.toLowerCase(),
+                imageUrl: allImageUrls[0] || '',
+              }}
+            />
 
             <div className={styles.purchaseActions}>
-              <a
+              <BuyNowButton
                 href={affiliateUrl}
-                target="_blank"
-                rel="sponsored noopener noreferrer"
-                className={styles.buyNowBtn}
-              >
-                <span>{isAr ? 'اشتري الآن' : 'Buy Now'}</span>
-              </a>
+                label={isAr ? 'اشتري الآن' : 'Buy Now'}
+                variant="primary"
+              />
 
               <p className={styles.redirectNotice}>
                 {isAr
@@ -511,6 +656,28 @@ export default async function ProductPage({
                   ✓
                 </span>
                 <span>{isAr ? 'شراء آمن ومضمون' : 'Safe & Secure'}</span>
+              </div>
+
+              <div className={styles.secondaryActionsRow}>
+                <SmartToolPulse
+                  productSlug={productSlug}
+                  productName={name}
+                  priceAmount={priceAmount}
+                  priceCurrency={priceCurrency}
+                  formattedPrice={priceAmount !== null ? formattedPrice : undefined}
+                  categorySlug={categorySlug}
+                  categoryName={categoryName}
+                  discount={discount}
+                  shortSummary={shortSummary}
+                  locale={locale}
+                />
+
+                <ReportModal
+                  productSlug={productSlug}
+                  productName={name}
+                  locale={locale}
+                  variant="product"
+                />
               </div>
             </div>
           </div>
@@ -576,7 +743,10 @@ export default async function ProductPage({
         {relatedGuides.length > 0 && (
           <section className={styles.relatedGuidesSection} aria-labelledby="related-guides-heading">
             <h2 id="related-guides-heading" className={styles.relatedGuidesHeading}>
-              {isAr ? '📖 أدلة ومراجعات ذات صلة' : '📖 Related Buying Guides & Reviews'}
+              <EditorialGuideIcon size={20} />
+              <span>
+                {isAr ? 'أدلة ومراجعات ذات صلة' : 'Related Buying Guides & Reviews'}
+              </span>
             </h2>
             <div className={styles.relatedGuidesGrid}>
               {relatedGuides.map((guide) => (
@@ -695,14 +865,11 @@ export default async function ProductPage({
             </div>
           )}
         </div>
-        <a
+        <BuyNowButton
           href={affiliateUrl}
-          target="_blank"
-          rel="sponsored noopener noreferrer"
-          className={styles.stickyButton}
-        >
-          {isAr ? 'اشتري الآن' : 'Buy Now'}
-        </a>
+          label={isAr ? 'اشتري الآن' : 'Buy Now'}
+          variant="sticky"
+        />
       </div>
 
       <SiteFooter />

@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { listPublishedProducts } from '@/server/repositories/products.repo';
 import { listActiveCategories } from '@/server/repositories/categories.repo';
 import { listActiveSources } from '@/server/repositories/sources.repo';
+import { listPublishedArticles } from '@/server/repositories/articles.repo';
 import { CatalogView } from '@/features/catalog/CatalogView';
 
 export const dynamic = 'force-dynamic';
@@ -39,10 +40,11 @@ export default async function ProductsPage({
   searchParams: Promise<{ category?: string; source?: string; q?: string }>;
 }) {
   const resolvedSearchParams = await searchParams;
-  const [products, categories, sources] = await Promise.all([
+  const [products, categories, sources, articles] = await Promise.all([
     listPublishedProducts(),
     listActiveCategories(),
     listActiveSources(),
+    listPublishedArticles(),
   ]);
 
   const itemListJsonLd = {
@@ -70,6 +72,7 @@ export default async function ProductsPage({
         initialProducts={products}
         categories={categories}
         sources={sources}
+        articles={articles}
         initialCategorySlug={resolvedSearchParams.category || 'all'}
         initialSourceSlug={resolvedSearchParams.source || 'all'}
         initialSearchQuery={resolvedSearchParams.q || ''}

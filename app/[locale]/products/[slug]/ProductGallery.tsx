@@ -11,7 +11,14 @@ interface GalleryImage {
 interface ProductGalleryProps {
   images: GalleryImage[];
   videoUrl?: string;
+  videoUrls?: string[];
   productTitle: string;
+  locale?: 'ar' | 'en';
+}
+
+function isDirectVideoFileUrl(rawUrl: string): boolean {
+  const withoutQuery = rawUrl.trim().split(/[?#]/)[0] || '';
+  return /\.(mp4|webm|mov|m4v|ogv)(\b|$)/i.test(withoutQuery);
 }
 
 function formatVideoEmbedUrl(rawUrl: string): string {
@@ -59,7 +66,15 @@ function formatVideoEmbedUrl(rawUrl: string): string {
       return `https://www.tiktok.com/embed/v2/${tiktokMatch[1]}`;
     }
 
-    // 6. Direct video or other services (e.g. Vimeo, daily motion, etc.)
+    // 6. Vimeo links: vimeo.com/ID -> player.vimeo.com/video/ID
+    const vimeoMatch = trimmed.match(
+      /(?:https?:\/\/)?(?:www\.)?vimeo\.com\/(\d+)/i
+    );
+    if (vimeoMatch && vimeoMatch[1]) {
+      return `https://player.vimeo.com/video/${vimeoMatch[1]}?autoplay=1`;
+    }
+
+    // 7. Direct video or other services
     return trimmed;
   } catch {
     return trimmed;
@@ -69,24 +84,46 @@ function formatVideoEmbedUrl(rawUrl: string): string {
 export function ProductGallery({
   images,
   videoUrl,
+  videoUrls,
   productTitle,
+  locale = 'ar',
 }: ProductGalleryProps) {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [isVideoActive, setIsVideoActive] = useState(false);
+  const [activeVideoIndex, setActiveVideoIndex] = useState<number | null>(null);
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
 
   const safeImages = images && images.length > 0 ? images : [{ url: '' }];
   const currentImage = safeImages[activeIndex] || safeImages[0];
   const currentUrl = currentImage?.url || '';
 
-  const hasVideo = Boolean(videoUrl && videoUrl.trim());
-  const embedUrl = hasVideo ? formatVideoEmbedUrl(videoUrl!) : '';
+  // Combine videoUrls and legacy videoUrl without duplicates
+  const allVideos: string[] = [];
+  if (Array.isArray(videoUrls)) {
+    for (const v of videoUrls) {
+      if (v && v.trim() && !allVideos.includes(v.trim())) {
+        allVideos.push(v.trim());
+      }
+    }
+  }
+  if (videoUrl && videoUrl.trim() && !allVideos.includes(videoUrl.trim())) {
+    allVideos.unshift(videoUrl.trim());
+  }
+
+  const hasVideo = allVideos.length > 0;
+  const isVideoActive = activeVideoIndex !== null && Boolean(allVideos[activeVideoIndex]);
+  const activeRawVideoUrl =
+    activeVideoIndex !== null ? allVideos[activeVideoIndex] || '' : '';
+  const embedUrl = activeRawVideoUrl ? formatVideoEmbedUrl(activeRawVideoUrl) : '';
+  const isDirectVideo = activeRawVideoUrl ? isDirectVideoFileUrl(activeRawVideoUrl) : false;
 
   const getAltText = (img: GalleryImage, idx: number): string => {
     if (!img) return productTitle;
-    if (typeof img.alt === 'string' && img.alt.trim()) return img.alt;
+    if (typeof img.alt === 'string' && img.alt.trim()) return img.alt.trim();
     if (typeof img.alt === 'object' && img.alt) {
-      return img.alt.ar || img.alt.en || `${productTitle} - ${idx + 1}`;
+      const preferred = locale === 'en' ? img.alt.en || img.alt.ar : img.alt.ar || img.alt.en;
+      if (preferred && preferred.trim()) {
+        return preferred.trim();
+      }
     }
     return `${productTitle} - ${idx + 1}`;
   };
@@ -116,16 +153,16 @@ export function ProductGallery({
   };
 
   const handleSelectImage = (idx: number) => {
-    setIsVideoActive(false);
+    setActiveVideoIndex(null);
     setActiveIndex(idx);
   };
 
-  const handleSelectVideo = () => {
-    setIsVideoActive(true);
+  const handleSelectVideo = (vIdx: number) => {
+    setActiveVideoIndex(vIdx);
   };
 
   const handleCloseVideo = () => {
-    setIsVideoActive(false);
+    setActiveVideoIndex(null);
     setActiveIndex(0);
   };
 
@@ -133,7 +170,7 @@ export function ProductGallery({
 
   return (
     <div className={styles.imageGallery}>
-      {/* 1. Main Display Area: Either Video iframe OR Large Main Image */}
+      {/* 1. Main Display Area: Either Video Player OR Large Main Image */}
       {isVideoActive && embedUrl ? (
         <div className={styles.videoPlayerWrapper}>
           <button
@@ -144,13 +181,25 @@ export function ProductGallery({
           >
             ✕
           </button>
-          <iframe
-            src={embedUrl}
-            title={`${productTitle} Video`}
-            className={styles.videoIframe}
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowFullScreen
-          />
+          {isDirectVideo ? (
+            <video
+              key={activeRawVideoUrl}
+              src={activeRawVideoUrl}
+              controls
+              autoPlay
+              playsInline
+              className={styles.videoIframe}
+            />
+          ) : (
+            <iframe
+              key={embedUrl}
+              src={embedUrl}
+              title={`${productTitle} Video ${(activeVideoIndex || 0) + 1}`}
+              className={styles.videoIframe}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
+            />
+          )}
         </div>
       ) : (
         <>
@@ -201,7 +250,7 @@ export function ProductGallery({
         </>
       )}
 
-      {/* 2. Thumbnails Row: All images first, then video thumbnail at the end */}
+      {/* 2. Thumbnails Row: All images first, then all video thumbnails */}
       {showThumbnails && (
         <div
           className={styles.thumbnailsRow}
@@ -237,24 +286,36 @@ export function ProductGallery({
             );
           })}
 
-          {/* Video thumbnail at the end */}
-          {hasVideo && (
-            <button
-              type="button"
-              role="tab"
-              aria-selected={isVideoActive}
-              aria-label={`${productTitle} Video`}
-              onClick={handleSelectVideo}
-              className={`${styles.videoThumbnailButton} ${
-                isVideoActive ? styles.thumbnailActive : ''
-              }`}
-            >
-              <span className={styles.videoThumbnailPlayIcon} aria-hidden="true">
-                ▶
-              </span>
-              <span className={styles.videoThumbnailLabel}>فيديو</span>
-            </button>
-          )}
+          {/* Multiple Video thumbnails at the end */}
+          {allVideos.map((vUrl, vIdx) => {
+            const isSelectedVid = isVideoActive && activeVideoIndex === vIdx;
+            const labelText =
+              allVideos.length > 1
+                ? locale === 'en'
+                  ? `Video ${vIdx + 1}`
+                  : `فيديو ${vIdx + 1}`
+                : locale === 'en'
+                  ? 'Video'
+                  : 'فيديو';
+            return (
+              <button
+                key={`${vUrl}-${vIdx}`}
+                type="button"
+                role="tab"
+                aria-selected={isSelectedVid}
+                aria-label={`${productTitle} ${labelText}`}
+                onClick={() => handleSelectVideo(vIdx)}
+                className={`${styles.videoThumbnailButton} ${
+                  isSelectedVid ? styles.thumbnailActive : ''
+                }`}
+              >
+                <span className={styles.videoThumbnailPlayIcon} aria-hidden="true">
+                  ▶
+                </span>
+                <span className={styles.videoThumbnailLabel}>{labelText}</span>
+              </button>
+            );
+          })}
         </div>
       )}
     </div>

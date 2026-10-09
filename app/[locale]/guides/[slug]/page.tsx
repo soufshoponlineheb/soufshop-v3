@@ -3,7 +3,10 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import type { Product } from '@/types';
 import { getPublishedArticleBySlug } from '@/server/repositories/articles.repo';
-import { getProductBySlug } from '@/server/repositories/products.repo';
+import {
+  getProductBySlug,
+  listPublishedProducts,
+} from '@/server/repositories/products.repo';
 import { GuideDetailView } from './GuideDetailView';
 
 export const dynamic = 'force-dynamic';
@@ -118,13 +121,90 @@ export default async function GuideDetailPage({
     notFound();
   }
 
-  // Fetch all related products server-side
-  const relatedProductPromises = (article.relatedProductIds || []).map(
-    (idOrSlug) => getProductBySlug(idOrSlug)
+  // Extract any product slugs referenced inside the article HTML body
+  const htmlCombined = `${article.contentHtml?.ar || ''} ${article.contentHtml?.en || ''}`;
+  const htmlSlugMatches = Array.from(
+    htmlCombined.matchAll(/\/products\/([^/?#\s"'<>]+)/gi),
+    (m) => {
+      try {
+        return decodeURIComponent(m[1]);
+      } catch {
+        return m[1];
+      }
+    }
   );
-  const resolvedProducts = (await Promise.all(relatedProductPromises)).filter(
+
+  const normalizeKey = (raw: string): string => {
+    const trimmed = raw.trim();
+    const urlMatch = trimmed.match(/\/products\/([^/?#\s"'<>]+)/i);
+    const extracted = urlMatch ? urlMatch[1] : trimmed;
+    try {
+      return decodeURIComponent(extracted).trim();
+    } catch {
+      return extracted.trim();
+    }
+  };
+
+  // Fetch all related products server-side (including topPickProductId and inline HTML links)
+  const productLookupKeys = Array.from(
+    new Set(
+      [
+        article.topPickProductId,
+        ...(article.relatedProductIds || []),
+        ...htmlSlugMatches,
+      ]
+        .filter((val): val is string => Boolean(val && val.trim()))
+        .map(normalizeKey)
+        .filter(Boolean)
+    )
+  );
+
+  const relatedProductPromises = productLookupKeys.map((idOrSlug) =>
+    getProductBySlug(idOrSlug)
+  );
+  const directProducts = (await Promise.all(relatedProductPromises)).filter(
     (p): p is Product => p !== null
   );
+
+  // Deduplicate direct matches and supplement from published catalog if fewer than 4 products
+  const seenIds = new Set<string>();
+  const resolvedProducts: Product[] = [];
+  for (const prod of directProducts) {
+    if (!seenIds.has(prod.id)) {
+      seenIds.add(prod.id);
+      resolvedProducts.push(prod);
+    }
+  }
+
+  if (resolvedProducts.length < 4) {
+    const allPublished = await listPublishedProducts();
+    // Sort candidates so products with real uploaded images appear first
+    const sortedCandidates = [...allPublished].sort((a, b) => {
+      const aHasImg = Boolean(a.images?.[0]?.url) ? 1 : 0;
+      const bHasImg = Boolean(b.images?.[0]?.url) ? 1 : 0;
+      if (bHasImg !== aHasImg) return bHasImg - aHasImg;
+      const aSameCat =
+        article.categorySlug && a.categorySlug === article.categorySlug ? 1 : 0;
+      const bSameCat =
+        article.categorySlug && b.categorySlug === article.categorySlug ? 1 : 0;
+      return bSameCat - aSameCat;
+    });
+
+    for (const candidate of sortedCandidates) {
+      if (resolvedProducts.length >= 4) break;
+      if (!seenIds.has(candidate.id)) {
+        seenIds.add(candidate.id);
+        resolvedProducts.push(candidate);
+      }
+    }
+  }
+
+  // Prioritize products that have real uploaded images first so cards look great
+  resolvedProducts.sort((a, b) => {
+    const aHasImg = Boolean(a.images?.[0]?.url) ? 1 : 0;
+    const bHasImg = Boolean(b.images?.[0]?.url) ? 1 : 0;
+    return bHasImg - aHasImg;
+  });
 
   const isAr = locale === 'ar';
   const articleTitle = isAr ? article.title.ar : article.title.en;
@@ -134,11 +214,11 @@ export default async function GuideDetailPage({
   const articleUrl = `${BASE_URL}/${locale}/guides/${encodeURIComponent(
     article.slug
   )}`;
-  const coverImage = article.coverImage
-    ? article.coverImage.startsWith('http')
-      ? article.coverImage
-      : `${BASE_URL}${article.coverImage}`
-    : `${BASE_URL}/images/hero-bg.jpg`;
+  const rawCover =
+    article.coverImage || resolvedProducts[0]?.images?.[0]?.url || '/images/hero-bg.jpg';
+  const coverImage = rawCover.startsWith('http')
+    ? rawCover
+    : `${BASE_URL}${rawCover.startsWith('/') ? rawCover : `/${rawCover}`}`;
   const authorName = article.authorName || 'AQURIVO Editorial Team';
 
   const faqItems = article.faqItems || [];
@@ -161,6 +241,26 @@ export default async function GuideDetailPage({
         }
       : null;
 
+  const comparedProductsItemListNode =
+    resolvedProducts.length > 0
+      ? {
+          '@type': 'ItemList',
+          name: isAr
+            ? `المنتجات المقارنة والموصى بها في: ${articleTitle}`
+            : `Compared & Recommended Products in: ${articleTitle}`,
+          numberOfItems: resolvedProducts.length,
+          itemListElement: resolvedProducts.map((prod, idx) => ({
+            '@type': 'ListItem',
+            position: idx + 1,
+            url: `${BASE_URL}/${locale}/products/${encodeURIComponent(prod.slug)}`,
+            name: isAr
+              ? prod.title?.ar || prod.title?.en || prod.name?.ar || prod.slug
+              : prod.title?.en || prod.title?.ar || prod.name?.en || prod.slug,
+            ...(prod.images?.[0]?.url ? { image: prod.images[0].url } : {}),
+          })),
+        }
+      : null;
+
   const structuredDataJsonLd = {
     '@context': 'https://schema.org',
     '@graph': [
@@ -168,11 +268,25 @@ export default async function GuideDetailPage({
         '@type': 'Article',
         headline: articleTitle,
         description: articleExcerpt.slice(0, 155),
+        inLanguage: isAr ? 'ar' : 'en',
         image: [coverImage],
         datePublished: article.publishedAt,
         dateModified: article.updatedAt || article.publishedAt,
         ...(article.seoKeywords && article.seoKeywords.length > 0
           ? { keywords: article.seoKeywords.join(', ') }
+          : {}),
+        ...(resolvedProducts.length > 0
+          ? {
+              mentions: resolvedProducts.map((prod) => ({
+                '@type': 'Product',
+                name: isAr
+                  ? prod.title?.ar || prod.title?.en || prod.slug
+                  : prod.title?.en || prod.title?.ar || prod.slug,
+                url: `${BASE_URL}/${locale}/products/${encodeURIComponent(
+                  prod.slug
+                )}`,
+              })),
+            }
           : {}),
         mainEntityOfPage: {
           '@type': 'WebPage',
@@ -215,6 +329,7 @@ export default async function GuideDetailPage({
           },
         ],
       },
+      ...(comparedProductsItemListNode ? [comparedProductsItemListNode] : []),
       ...(faqSchemaNode ? [faqSchemaNode] : []),
     ],
   };

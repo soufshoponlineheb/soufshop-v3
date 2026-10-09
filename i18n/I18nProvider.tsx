@@ -1,6 +1,13 @@
 'use client';
 
-import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import type { Direction, Locale, LocalizedText } from '@/types';
 import {
@@ -11,11 +18,16 @@ import {
   pickLocalizedText,
 } from './index';
 import type { MessagesDictionary } from './en';
+import {
+  detectVisitorCurrencyClient,
+  setActiveVisitorCurrency,
+} from '@/lib/format';
 
 interface I18nContextValue {
   locale: Locale;
   dir: Direction;
   messages: MessagesDictionary;
+  currency: string;
   setLocale: (nextLocale: Locale) => void;
   t: (text: LocalizedText | undefined) => string;
   formatTemplate: (template: string, params?: Record<string, string | number>) => string;
@@ -24,6 +36,7 @@ interface I18nContextValue {
 const I18nContext = createContext<I18nContextValue | null>(null);
 
 const LOCALE_STORAGE_KEY = 'soufshop_locale';
+const LOCALE_SCROLL_KEY = 'soufshop_locale_scroll_y';
 
 function resolvePathLocale(pathname: string | null): Locale | null {
   if (!pathname) return null;
@@ -56,32 +69,79 @@ export function I18nProvider({
   const pathname = usePathname();
   const router = useRouter();
   const pathLocale = resolvePathLocale(pathname);
-  const [userLocale, setUserLocale] = useState<Locale>(pathLocale || initialLocale);
-  const locale: Locale = userLocale;
+  const [userLocale, setUserLocale] = useState<Locale>(initialLocale);
+  const [currency, setCurrency] = useState<string>('USD');
+  const pendingScrollYRef = useRef<number | null>(null);
+  const locale: Locale = pathLocale || userLocale;
 
   useEffect(() => {
-    if (pathLocale) {
-      setUserLocale(pathLocale);
-      return;
-    }
-    try {
-      const saved = window.localStorage.getItem(LOCALE_STORAGE_KEY);
-      if (saved === 'en' || saved === 'ar') {
-        setUserLocale(saved);
+    const detected = detectVisitorCurrencyClient();
+    setActiveVisitorCurrency(detected || 'USD');
+
+    queueMicrotask(() => {
+      if (!pathLocale) {
+        try {
+          const saved = window.localStorage.getItem(LOCALE_STORAGE_KEY);
+          if (saved === 'en' || saved === 'ar') {
+            setUserLocale(saved);
+          }
+        } catch {}
       }
-    } catch {
-      // Ignore storage access errors in restricted browsing modes
-    }
+
+      if (detected && detected !== 'USD') {
+        setCurrency(detected);
+      }
+    });
   }, [pathLocale]);
 
   useEffect(() => {
     const dir = getDirection(locale);
     document.documentElement.lang = locale;
     document.documentElement.dir = dir;
-  }, [locale]);
+
+    let savedY = pendingScrollYRef.current;
+    if (savedY === null && typeof window !== 'undefined') {
+      try {
+        const raw = window.sessionStorage.getItem(LOCALE_SCROLL_KEY);
+        if (raw !== null) {
+          const parsed = Number(raw);
+          if (Number.isFinite(parsed)) {
+            savedY = parsed;
+          }
+        }
+      } catch {}
+    }
+
+    if (savedY !== null && typeof window !== 'undefined') {
+      const targetY = savedY;
+      pendingScrollYRef.current = null;
+      try {
+        window.sessionStorage.removeItem(LOCALE_SCROLL_KEY);
+      } catch {}
+
+      const restoreScroll = () => {
+        window.scrollTo({ top: targetY, behavior: 'instant' as ScrollBehavior });
+      };
+
+      restoreScroll();
+      const raf1 = window.requestAnimationFrame(() => {
+        restoreScroll();
+        window.requestAnimationFrame(restoreScroll);
+      });
+      return () => window.cancelAnimationFrame(raf1);
+    }
+  }, [locale, pathname]);
 
   const setLocale = useCallback(
     (nextLocale: Locale) => {
+      if (typeof window !== 'undefined') {
+        const currentScrollY = window.scrollY;
+        pendingScrollYRef.current = currentScrollY;
+        try {
+          window.sessionStorage.setItem(LOCALE_SCROLL_KEY, String(currentScrollY));
+        } catch {}
+      }
+
       setUserLocale(nextLocale);
       try {
         window.localStorage.setItem(LOCALE_STORAGE_KEY, nextLocale);
@@ -93,7 +153,8 @@ export function I18nProvider({
       const nextPath = buildLocalizedPathname(pathname, nextLocale);
       if (nextPath && nextPath !== pathname) {
         const search = typeof window !== 'undefined' ? window.location.search : '';
-        router.push(`${nextPath}${search}`);
+        const hash = typeof window !== 'undefined' ? window.location.hash : '';
+        router.push(`${nextPath}${search}${hash}`, { scroll: false });
       }
     },
     [pathname, router]
@@ -113,6 +174,7 @@ export function I18nProvider({
         locale,
         dir,
         messages,
+        currency,
         setLocale,
         t,
         formatTemplate: interpolateMessage,

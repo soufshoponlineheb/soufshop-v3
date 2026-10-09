@@ -152,6 +152,47 @@
         "locale": { "type": "string", "enum": ["ar", "en"] }
       },
       "required": ["name", "rating", "text", "createdAt", "approved", "locale"]
+    },
+    "Report": {
+      "title": "Report",
+      "description": "Issue or order assistance report submitted via API and managed by admin.",
+      "type": "object",
+      "properties": {
+        "type": { "type": "string", "enum": ["product_issue", "order_issue"] },
+        "reason": {
+          "type": "string",
+          "enum": [
+            "broken_link",
+            "price_mismatch",
+            "wrong_info",
+            "unavailable",
+            "other",
+            "order_issue"
+          ]
+        },
+        "productSlug": { "type": "string", "maxLength": 160 },
+        "productName": { "type": "string", "maxLength": 220 },
+        "email": { "type": "string", "minLength": 5, "maxLength": 160 },
+        "message": { "type": "string", "minLength": 10, "maxLength": 1000 },
+        "orderRef": { "type": "string", "maxLength": 120 },
+        "locale": { "type": "string", "enum": ["ar", "en"] },
+        "status": {
+          "type": "string",
+          "enum": ["new", "in_progress", "resolved"]
+        },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "ipHash": { "type": "string", "minLength": 16, "maxLength": 64 }
+      },
+      "required": [
+        "type",
+        "reason",
+        "email",
+        "message",
+        "locale",
+        "status",
+        "createdAt",
+        "ipHash"
+      ]
     }
   },
   "firestore": {
@@ -190,6 +231,10 @@
     "/testimonials/{testimonialId}": {
       "schema": { "$ref": "#/entities/Testimonial" },
       "description": "Visitor testimonials collection with admin moderation."
+    },
+    "/reports/{reportId}": {
+      "schema": { "$ref": "#/entities/Report" },
+      "description": "Issue and order assistance reports created via API only and managed by admin."
     }
   }
 }

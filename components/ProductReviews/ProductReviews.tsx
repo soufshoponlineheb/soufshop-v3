@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { FirstReviewStarBubbleIcon } from '@/components/ui/AqurivoContextIcons';
 import styles from './ProductReviews.module.css';
 
 export interface ReviewItem {
@@ -360,7 +361,7 @@ export function ProductReviews({
         {reviews.length === 0 ? (
           <div className={styles.emptyState}>
             <span className={styles.emptyStateIcon} aria-hidden="true">
-              💬
+              <FirstReviewStarBubbleIcon size={28} />
             </span>
             <p>{isAr ? 'كن أول من يقيّم هذا المنتج!' : 'Be the first to review this product!'}</p>
           </div>

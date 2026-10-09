@@ -25,6 +25,15 @@ export async function generateMetadata({
     verification: {
       google: 'oS_3HRPs49irqAH5Ey9SwCB9vrNxeshh61SYJSfZP2E',
     },
+    icons: {
+      icon: [
+        { url: '/favicon.ico', sizes: '48x48' },
+        { url: '/icon.svg', type: 'image/svg+xml', sizes: 'any' },
+        { url: '/icon', sizes: '192x192', type: 'image/png' },
+      ],
+      shortcut: ['/favicon.ico'],
+      apple: [{ url: '/apple-icon', sizes: '180x180', type: 'image/png' }],
+    },
   };
 }
 

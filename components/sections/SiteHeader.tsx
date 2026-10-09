@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useState, useSyncExternalStore } from 'react';
 import Link from 'next/link';
 import { Globe, LogIn, Menu, Moon, Sun, User } from 'lucide-react';
 import { useI18n } from '@/i18n/I18nProvider';
@@ -10,16 +10,14 @@ import { BrandLogo } from '@/components/ui/BrandLogo';
 import { Drawer } from '@/components/ui/Drawer';
 import styles from './SiteHeader.module.css';
 
+const emptySubscribe = () => () => {};
+
 export function SiteHeader({ savedCount: _savedCount }: { savedCount?: number }) {
   const { locale, setLocale, messages } = useI18n();
   const { theme, toggleTheme } = useTheme();
   const { user } = useSaved();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
 
   const handleLanguageSwitch = () => {
     setLocale(locale === 'en' ? 'ar' : 'en');
@@ -47,6 +45,9 @@ export function SiteHeader({ savedCount: _savedCount }: { savedCount?: number })
           </Link>
           <Link href={`/${locale}/guides`} className={styles.navLink}>
             {messages.nav.guides}
+          </Link>
+          <Link href={`/${locale}/tools`} className={styles.navLink}>
+            {locale === 'ar' ? 'الأدوات الذكية' : 'Free Tools'}
           </Link>
           <Link href={`/${locale}/about`} className={styles.navLink}>
             {messages.nav.ourMethod}
@@ -128,6 +129,13 @@ export function SiteHeader({ savedCount: _savedCount }: { savedCount?: number })
             onClick={() => setMobileMenuOpen(false)}
           >
             {messages.nav.guides}
+          </Link>
+          <Link
+            href={`/${locale}/tools`}
+            className={styles.mobileNavLink}
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            {locale === 'ar' ? 'الأدوات الذكية' : 'Free Tools'}
           </Link>
           <Link
             href={`/${locale}/about`}

@@ -21,13 +21,38 @@ export async function generateMetadata({
   const { locale } = await params;
   const isAr = locale === 'ar';
 
+  const title = isAr
+    ? 'AQURIVO — أفضل المنتجات المختارة، أدلة الشراء و11 أداة تسوق ذكية'
+    : 'AQURIVO — Handpicked Products, Buying Guides & 11 Free Smart Tools';
+  const description = isAr
+    ? 'نختار لك أفضل المنتجات من المتاجر العالمية بعناية فائقة مع مراجعات المواصفات وأدلة الشراء و11 حاسبة تسوق ومال ذكية مجانية.'
+    : 'Discover top handpicked products across global stores with verified reviews, side-by-side buying guides, and 11 free smart shopping & finance calculators.';
+  const keywords = isAr
+    ? [
+        'AQURIVO',
+        'أفضل المنتجات المختارة',
+        'دليل الشراء والمراجعات',
+        'مقارنة المنتجات',
+        'أدوات تسوق ذكية',
+        'حاسبة هل يستحق الشراء',
+        'حاسبة الفائدة المخفية للتقسيط',
+        'تسوق ذكي',
+      ]
+    : [
+        'AQURIVO',
+        'handpicked products',
+        'buying guides and reviews',
+        'product comparison',
+        'smart shopping calculators',
+        'cost per use calculator',
+        'hidden interest calculator',
+        'verified store deals',
+      ];
+
   return {
-    title: isAr
-      ? 'AQURIVO — أفضل المنتجات المختارة بعناية'
-      : "AQURIVO — Handpicked Products You'll Love",
-    description: isAr
-      ? 'نختار لك أفضل المنتجات من الإنترنت بعناية. تسوق بأمان وثقة مع AQURIVO.'
-      : 'We handpick the best products from around the web. Shop smarter with AQURIVO.',
+    title,
+    description,
+    keywords,
     alternates: {
       canonical: `${SITE_URL}/${locale}`,
       languages: {
@@ -39,13 +64,18 @@ export async function generateMetadata({
     verification: {
       google: 'oS_3HRPs49irqAH5Ey9SwCB9vrNxeshh61SYJSfZP2E',
     },
+    icons: {
+      icon: [
+        { url: '/favicon.ico', sizes: '48x48' },
+        { url: '/icon.svg', type: 'image/svg+xml', sizes: 'any' },
+        { url: '/icon', sizes: '192x192', type: 'image/png' },
+      ],
+      shortcut: ['/favicon.ico'],
+      apple: [{ url: '/apple-icon', sizes: '180x180', type: 'image/png' }],
+    },
     openGraph: {
-      title: isAr
-        ? 'AQURIVO — أفضل المنتجات المختارة'
-        : 'AQURIVO — Handpicked Products',
-      description: isAr
-        ? 'نختار لك أفضل المنتجات من الإنترنت بعناية.'
-        : 'We handpick the best products from around the web.',
+      title,
+      description,
       images: [
         {
           url: `${SITE_URL}/images/hero-bg.jpg`,
@@ -56,16 +86,13 @@ export async function generateMetadata({
       ],
       url: `${SITE_URL}/${locale}`,
       siteName: 'AQURIVO',
+      locale: isAr ? 'ar_SA' : 'en_US',
       type: 'website',
     },
     twitter: {
       card: 'summary_large_image',
-      title: isAr
-        ? 'AQURIVO — أفضل المنتجات المختارة'
-        : 'AQURIVO — Handpicked Products',
-      description: isAr
-        ? 'نختار لك أفضل المنتجات من الإنترنت بعناية.'
-        : 'We handpick the best products from around the web.',
+      title,
+      description,
       images: [`${SITE_URL}/images/hero-bg.jpg`],
     },
   };
@@ -89,17 +116,20 @@ export default async function LocalizedHomePage({
     listPublishedArticles(),
   ]);
 
+  const isAr = locale === 'ar';
+
   const structuredDataJsonLd = {
     '@context': 'https://schema.org',
     '@graph': [
       {
         '@type': 'WebSite',
+        '@id': `${SITE_URL}/${locale}#website`,
         name: 'AQURIVO',
-        url: SITE_URL,
-        description:
-          locale === 'ar'
-            ? 'نختار لك أفضل المنتجات من الإنترنت بعناية. تسوق بأمان وثقة مع AQURIVO.'
-            : 'We handpick the best products from around the web. Shop smarter with AQURIVO.',
+        url: `${SITE_URL}/${locale}`,
+        inLanguage: isAr ? 'ar' : 'en',
+        description: isAr
+          ? 'نختار لك أفضل المنتجات من المتاجر العالمية بعناية فائقة مع مراجعات المواصفات وأدلة الشراء و11 حاسبة تسوق ومال ذكية مجانية.'
+          : 'Discover top handpicked products across global stores with verified reviews, side-by-side buying guides, and 11 free smart shopping & finance calculators.',
         potentialAction: {
           '@type': 'SearchAction',
           target: `${SITE_URL}/${locale}/products?q={search_term}`,
@@ -108,20 +138,85 @@ export default async function LocalizedHomePage({
       },
       {
         '@type': 'Organization',
+        '@id': `${SITE_URL}/#organization`,
         name: 'AQURIVO',
         url: SITE_URL,
-        logo: `${SITE_URL}/images/hero-bg.jpg`,
-        description:
-          locale === 'ar'
-            ? 'دليل تسوق ذكي وموثوق لأفضل المنتجات العالمية'
-            : 'Curated e-commerce shopping guide & product recommendations',
+        email: 'soufshop.online@gmail.com',
+        telephone: '+212684063908',
+        logo: {
+          '@type': 'ImageObject',
+          url: `${SITE_URL}/icon`,
+          contentUrl: `${SITE_URL}/icon.svg`,
+          width: 192,
+          height: 192,
+        },
+        image: `${SITE_URL}/icon`,
+        description: isAr
+          ? 'دليل تسوق ذكي وموثوق لأفضل المنتجات العالمية مع أدوات قرار شراء مجانية'
+          : 'Curated e-commerce shopping guide, product comparisons, and free decision tools',
         contactPoint: {
           '@type': 'ContactPoint',
           contactType: 'customer support',
-          email: 'support@aqurivo.store',
+          email: 'soufshop.online@gmail.com',
+          telephone: '+212684063908',
           availableLanguage: ['Arabic', 'English'],
         },
       },
+      {
+        '@type': 'ItemList',
+        name: isAr ? 'أقسام موقع AQURIVO الرئيسية' : 'AQURIVO Main Navigation',
+        itemListElement: [
+          {
+            '@type': 'SiteNavigationElement',
+            position: 1,
+            name: isAr ? 'دليل المنتجات المنتقاة' : 'Curated Products',
+            url: `${SITE_URL}/${locale}/products`,
+          },
+          {
+            '@type': 'SiteNavigationElement',
+            position: 2,
+            name: isAr ? 'أدلة الشراء والمراجعات' : 'Buying Guides & Reviews',
+            url: `${SITE_URL}/${locale}/guides`,
+          },
+          {
+            '@type': 'SiteNavigationElement',
+            position: 3,
+            name: isAr ? 'الأدوات الذكية المجانية (11 أداة)' : 'Free Smart Tools (11 Calculators)',
+            url: `${SITE_URL}/${locale}/tools`,
+          },
+          {
+            '@type': 'SiteNavigationElement',
+            position: 4,
+            name: isAr ? 'من نحن ومنهجيتنا' : 'About Our Methodology',
+            url: `${SITE_URL}/${locale}/about`,
+          },
+          {
+            '@type': 'SiteNavigationElement',
+            position: 5,
+            name: isAr ? 'اتصل بنا' : 'Contact Us',
+            url: `${SITE_URL}/${locale}/contact`,
+          },
+        ],
+      },
+      ...(products.length > 0
+        ? [
+            {
+              '@type': 'ItemList',
+              name: isAr ? 'أبرز المنتجات المختارة' : 'Featured Curated Products',
+              numberOfItems: Math.min(products.length, 12),
+              itemListElement: products.slice(0, 12).map((prod, idx) => ({
+                '@type': 'ListItem',
+                position: idx + 1,
+                url: `${SITE_URL}/${locale}/products/${encodeURIComponent(
+                  prod.slug
+                )}`,
+                name: isAr
+                  ? prod.title?.ar || prod.title?.en || prod.slug
+                  : prod.title?.en || prod.title?.ar || prod.slug,
+              })),
+            },
+          ]
+        : []),
     ],
   };
 

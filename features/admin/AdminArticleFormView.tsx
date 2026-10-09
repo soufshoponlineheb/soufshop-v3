@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Copy, Plus, Sparkles, Trash2 } from 'lucide-react';
+import { Check, Copy, HelpCircle, Link2, Plus, Trash2 } from 'lucide-react';
+import { SmartAutoDistributeIcon } from '@/components/ui/AqurivoContextIcons';
 import type { Article, ArticleFaqItem, Category, Product } from '@/types';
 import { useI18n } from '@/i18n/I18nProvider';
 import { useSaved } from '@/features/saved/SavedProvider';
@@ -10,8 +11,13 @@ import { useToast } from '@/components/ui/Toast';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import {
-  MAGIC_ARTICLE_AI_PROMPT_TEMPLATE,
+  type AgentHandoffBrief,
+  buildDynamicArticleAiPrompt,
+  clearSavedAgentHandoffBrief,
+  formatAgentHandoffBriefText,
+  getSavedAgentHandoffBrief,
   parseMagicArticleContent,
+  saveAgentHandoffBrief,
 } from '@/lib/magicContentParser';
 import styles from './AdminShell.module.css';
 
@@ -19,6 +25,44 @@ interface AdminArticleFormViewProps {
   existingArticle?: Article | null;
   categories: Category[];
   products: Product[];
+}
+
+function findMatchingProduct(query: string, products: Product[]): Product | undefined {
+  const raw = query.trim();
+  if (!raw) return undefined;
+
+  const ignoreTokens = ['لا يوجد', 'none', 'n/a', 'null', 'تلقائي', 'auto', '-'];
+  if (ignoreTokens.includes(raw.toLowerCase())) return undefined;
+
+  // Extract slug if the AI pasted a full product URL like https://aqurivo.store/ar/products/my-slug
+  const urlSlugMatch = raw.match(/\/products\/([^/?#\s"']+)/i);
+  const cleaned = (urlSlugMatch ? urlSlugMatch[1] : raw)
+    .replace(/^\[slug:\s*|\s*\]$/gi, '')
+    .trim()
+    .toLowerCase();
+
+  if (!cleaned) return undefined;
+
+  // 1. Exact ID, slug, or title match
+  const exact = products.find(
+    (p) =>
+      p.id.toLowerCase() === cleaned ||
+      p.slug.toLowerCase() === cleaned ||
+      p.title.ar?.trim().toLowerCase() === cleaned ||
+      p.title.en?.trim().toLowerCase() === cleaned
+  );
+  if (exact) return exact;
+
+  // 2. Partial slug or title inclusion match
+  return products.find(
+    (p) =>
+      p.slug.toLowerCase().includes(cleaned) ||
+      cleaned.includes(p.slug.toLowerCase()) ||
+      (p.title.ar && p.title.ar.toLowerCase().includes(cleaned)) ||
+      (p.title.en && p.title.en.toLowerCase().includes(cleaned)) ||
+      (p.title.ar && cleaned.includes(p.title.ar.toLowerCase())) ||
+      (p.title.en && cleaned.includes(p.title.en.toLowerCase()))
+  );
 }
 
 export function AdminArticleFormView({
@@ -65,9 +109,6 @@ export function AdminArticleFormView({
   );
 
   const [coverImage, setCoverImage] = useState(existingArticle?.coverImage || '');
-  const [topPickProductId, setTopPickProductId] = useState(
-    existingArticle?.topPickProductId || ''
-  );
   const [categoryId, setCategoryId] = useState(
     existingArticle?.categoryId || categories[0]?.id || 'general'
   );
@@ -81,18 +122,130 @@ export function AdminArticleFormView({
     existingArticle?.relatedProductIds || []
   );
 
+  // Connected Product Agent Handoff Brief state
+  const [activeHandoffBrief, setActiveHandoffBrief] = useState<AgentHandoffBrief | null>(
+    null
+  );
+  const [showPromptPreview, setShowPromptPreview] = useState(false);
+  const [copiedPrompt, setCopiedPrompt] = useState(false);
+
+  useEffect(() => {
+    const saved = getSavedAgentHandoffBrief();
+    if (saved) {
+      setActiveHandoffBrief(saved);
+    }
+  }, []);
+
+  const handleSelectProductForHandoff = (productIdOrSlug: string) => {
+    if (!productIdOrSlug) {
+      setActiveHandoffBrief(null);
+      return;
+    }
+    const found = products.find(
+      (p) => p.id === productIdOrSlug || p.slug === productIdOrSlug
+    );
+    if (!found) return;
+
+    const matchedCat = categories.find(
+      (c) => c.id === found.categoryId || c.slug === found.categorySlug
+    );
+    const brief: AgentHandoffBrief = {
+      productSlug: found.slug,
+      titleAr: found.title.ar || found.title.en || found.slug,
+      titleEn: found.title.en || found.title.ar || found.slug,
+      categorySlug: found.categorySlug || found.categoryId || 'general',
+      categoryNameAr: matchedCat?.name?.ar,
+      categoryNameEn: matchedCat?.name?.en,
+      priceUsd:
+        found.priceAmount !== null && found.priceAmount !== undefined
+          ? String(found.priceAmount)
+          : undefined,
+      oldPriceUsd:
+        found.oldPrice !== null && found.oldPrice !== undefined
+          ? String(found.oldPrice)
+          : undefined,
+      discount:
+        found.discount !== null && found.discount !== undefined
+          ? String(found.discount)
+          : undefined,
+      stars:
+        found.stars !== null && found.stars !== undefined
+          ? String(found.stars)
+          : undefined,
+      sourceProductUrl: found.affiliateUrl || undefined,
+      storePathAr: `/ar/products/${found.slug}`,
+      storePathEn: `/en/products/${found.slug}`,
+      images: (found.images || []).map((img) => ({
+        url: img.url,
+        altAr: img.alt?.ar || found.title.ar || 'صورة المنتج',
+        altEn: img.alt?.en || found.title.en || 'Product image',
+      })),
+      videoUrls:
+        Array.isArray(found.videoUrls) && found.videoUrls.length > 0
+          ? found.videoUrls
+          : found.videoUrl
+            ? [found.videoUrl]
+            : [],
+      bestForAr: found.comparisonDna?.bestFor?.ar,
+      bestForEn: found.comparisonDna?.bestFor?.en,
+      keySpecsAr: found.comparisonDna?.keySpecs?.ar,
+      keySpecsEn: found.comparisonDna?.keySpecs?.en,
+      whyAr: found.whyWePickedIt?.ar,
+      whyEn: found.whyWePickedIt?.en,
+      considerAr: found.whatToConsider?.ar,
+      considerEn: found.whatToConsider?.en,
+      updatedAt: new Date().toISOString(),
+    };
+    saveAgentHandoffBrief(brief);
+    setActiveHandoffBrief(brief);
+
+    // Also pre-link this product and its category alternatives for algorithmic comparison
+    const sameCatProducts = products
+      .filter(
+        (p) =>
+          p.id !== found.id &&
+          (p.categorySlug === found.categorySlug || p.categoryId === found.categoryId)
+      )
+      .slice(0, 3);
+    const nextLinkedIds = Array.from(
+      new Set([found.id, ...sameCatProducts.map((p) => p.id), ...relatedProductIds])
+    );
+    setRelatedProductIds(nextLinkedIds);
+    if (!coverImage && found.images?.[0]?.url) {
+      setCoverImage(found.images[0].url);
+    }
+    if (matchedCat) {
+      setCategoryId(matchedCat.id);
+    }
+  };
+
   const [saving, setSaving] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [discoveryReport, setDiscoveryReport] = useState<{
+    categoryLabel: string;
+    primaryProduct?: Product;
+    linkedProducts: Product[];
+    coverStatus: string;
+    agentNotes?: string;
+  } | null>(null);
+
+  const dynamicArticlePromptText = buildDynamicArticleAiPrompt(
+    products,
+    categories,
+    activeHandoffBrief
+  );
 
   const handleCopyAiPrompt = async () => {
     try {
-      await navigator.clipboard.writeText(MAGIC_ARTICLE_AI_PROMPT_TEMPLATE);
+      await navigator.clipboard.writeText(dynamicArticlePromptText);
+      setCopiedPrompt(true);
       showToast(
         isAr
-          ? 'تم نسخ قالب الذكاء الاصطناعي للمقالات بنجاح.'
-          : 'AI article prompt template copied.',
+          ? 'تم نسخ برومبت وكيل المقالات والمراجعات (مُدمج معه بطاقة المنتج وفهرس المتجر)!'
+          : 'Article & Review Agent prompt copied (with Product Handoff & live catalog)!',
         'success'
       );
+      setTimeout(() => setCopiedPrompt(false), 2500);
     } catch {
       showToast(
         isAr ? 'تعذر النسخ التلقائي.' : 'Unable to copy automatically.',
@@ -129,23 +282,137 @@ export function AdminArticleFormView({
     if (draft.seoKeywords) setSeoKeywords(draft.seoKeywords);
     if (draft.authorName) setAuthorName(draft.authorName);
     if (draft.readingTimeMinutes) setReadingTimeMinutes(draft.readingTimeMinutes);
-    if (draft.coverImage) setCoverImage(draft.coverImage);
+
+    // 1. Resolve Category
+    let resolvedCategoryId = categoryId;
     if (draft.categoryId) {
-      const matched = categories.find(
+      const matchedCat = categories.find(
         (c) =>
           c.id.toLowerCase() === draft.categoryId?.toLowerCase() ||
-          c.slug.toLowerCase() === draft.categoryId?.toLowerCase()
+          c.slug.toLowerCase() === draft.categoryId?.toLowerCase() ||
+          c.name.ar?.toLowerCase() === draft.categoryId?.toLowerCase() ||
+          c.name.en?.toLowerCase() === draft.categoryId?.toLowerCase()
       );
-      if (matched) setCategoryId(matched.id);
+      if (matchedCat) {
+        resolvedCategoryId = matchedCat.id;
+        setCategoryId(matchedCat.id);
+      }
     }
+
+    // 2. Resolve Related Products (from Handoff Brief, [المنتجات المقترحة], AND /products/slug links inside contentHtml)
+    const matchedRelatedSet = new Set<string>();
+    if (activeHandoffBrief?.productSlug) {
+      const fromBrief = findMatchingProduct(activeHandoffBrief.productSlug, products);
+      if (fromBrief) matchedRelatedSet.add(fromBrief.id);
+    }
+
+    if (draft.relatedProductsQuery && draft.relatedProductsQuery.length > 0) {
+      for (const q of draft.relatedProductsQuery) {
+        const found = findMatchingProduct(q, products);
+        if (found) matchedRelatedSet.add(found.id);
+      }
+    }
+
+    // Also scan contentAr and contentEn for internal product links (/products/<slug>)
+    const combinedHtml = `${draft.contentAr || ''} ${draft.contentEn || ''}`;
+    const linkMatches = Array.from(combinedHtml.matchAll(/\/products\/([^/?#\s"'<>]+)/gi));
+    for (const m of linkMatches) {
+      if (m[1]) {
+        const foundByLink = findMatchingProduct(m[1], products);
+        if (foundByLink) matchedRelatedSet.add(foundByLink.id);
+      }
+    }
+
+    let primaryProduct: Product | undefined;
+    if (matchedRelatedSet.size > 0) {
+      const firstId = Array.from(matchedRelatedSet)[0];
+      primaryProduct = products.find((p) => p.id === firstId);
+      if (primaryProduct && !draft.categoryId && primaryProduct.categoryId) {
+        resolvedCategoryId = primaryProduct.categoryId;
+        setCategoryId(primaryProduct.categoryId);
+      }
+    }
+
+    // Ensure same-category store products are included so the Algorithmic Comparison Matrix has peers to compare
+    if (resolvedCategoryId && matchedRelatedSet.size < 3) {
+      const categoryProducts = products
+        .filter(
+          (p) =>
+            p.categoryId === resolvedCategoryId ||
+            p.categorySlug === resolvedCategoryId
+        )
+        .slice(0, 4);
+      for (const cp of categoryProducts) {
+        matchedRelatedSet.add(cp.id);
+      }
+      if (!primaryProduct && categoryProducts[0]) {
+        primaryProduct = categoryProducts[0];
+      }
+    }
+
+    if (matchedRelatedSet.size > 0) {
+      setRelatedProductIds(Array.from(matchedRelatedSet));
+    }
+
+    // 3. Smart Cover Image Resolution (by URL, Handoff Brief image, or primary product image)
+    let resolvedCoverStatus = isAr ? 'لم يتم تحديد صورة غلاف بعد' : 'No cover image set yet';
+    if (draft.coverImage) {
+      const rawCover = draft.coverImage.trim();
+      const isDirectUrl =
+        rawCover.startsWith('http://') ||
+        rawCover.startsWith('https://') ||
+        rawCover.startsWith('/');
+      if (isDirectUrl) {
+        setCoverImage(rawCover);
+        resolvedCoverStatus = isAr
+          ? 'تم تعيين رابط صورة الغلاف المباشر بنجاح'
+          : 'Direct cover image URL applied';
+      } else {
+        const coverMatchedProduct = findMatchingProduct(rawCover, products) || primaryProduct;
+        const productImg =
+          coverMatchedProduct?.images?.[0]?.url || activeHandoffBrief?.images?.[0]?.url;
+        if (productImg) {
+          setCoverImage(productImg);
+          resolvedCoverStatus = isAr
+            ? `تم سحب صورة الغلاف تلقائياً من المنتج`
+            : `Auto-pulled cover image from product`;
+        }
+      }
+    } else if (!coverImage && activeHandoffBrief?.images?.[0]?.url) {
+      setCoverImage(activeHandoffBrief.images[0].url);
+      resolvedCoverStatus = isAr
+        ? `تم اعتماد الصورة الرئيسية من بطاقة تسليم المنتج كغلاف تلقائياً`
+        : `Auto-assigned primary image from Product Handoff Brief`;
+    } else if (!coverImage && primaryProduct?.images?.[0]?.url) {
+      setCoverImage(primaryProduct.images[0].url);
+      resolvedCoverStatus = isAr
+        ? `تم اعتماد صورة المنتج الأساسي كغلاف تلقائياً: ${t(primaryProduct.title)}`
+        : `Auto-assigned primary product image as cover: ${t(primaryProduct.title)}`;
+    }
+
     if (draft.faqItems && draft.faqItems.length > 0) {
       setFaqItems(draft.faqItems);
     }
 
+    const matchedCatObj = categories.find(
+      (c) => c.id === resolvedCategoryId || c.slug === resolvedCategoryId
+    );
+    const linkedProductObjects = Array.from(matchedRelatedSet)
+      .map((id) => products.find((p) => p.id === id))
+      .filter((p): p is Product => Boolean(p));
+
+    setDiscoveryReport({
+      categoryLabel: matchedCatObj ? t(matchedCatObj.name) : resolvedCategoryId,
+      primaryProduct,
+      linkedProducts: linkedProductObjects,
+      coverStatus: resolvedCoverStatus,
+      agentNotes: draft.agentReport,
+    });
+
     showToast(
       isAr
-        ? `تم استخراج وتعبئة ${fieldsFoundCount} حقل تلقائياً!`
-        : `Extracted and populated ${fieldsFoundCount} fields!`,
+        ? `تم استخراج وتعبئة ${fieldsFoundCount} حقل وربط ${matchedRelatedSet.size} منتجات للمقارنة الخوارزمية الحية!`
+        : `Extracted ${fieldsFoundCount} fields and linked ${matchedRelatedSet.size} products for live algorithmic comparison!`,
       'success'
     );
   };
@@ -198,6 +465,34 @@ export function AdminArticleFormView({
     setErrorMessage('');
 
     try {
+      // Smart Cover Image resolution if the user typed a product name/slug or left it blank
+      let finalCoverImage = coverImage.trim();
+      if (
+        finalCoverImage &&
+        !finalCoverImage.startsWith('http://') &&
+        !finalCoverImage.startsWith('https://') &&
+        !finalCoverImage.startsWith('/')
+      ) {
+        const matchedProd = findMatchingProduct(finalCoverImage, products);
+        if (matchedProd?.images?.[0]?.url) {
+          finalCoverImage = matchedProd.images[0].url;
+          setCoverImage(finalCoverImage);
+        }
+      }
+      if (!finalCoverImage) {
+        const fallbackPrimary =
+          (activeHandoffBrief?.productSlug &&
+            findMatchingProduct(activeHandoffBrief.productSlug, products)) ||
+          products.find((p) => relatedProductIds.includes(p.id));
+        if (fallbackPrimary?.images?.[0]?.url) {
+          finalCoverImage = fallbackPrimary.images[0].url;
+          setCoverImage(finalCoverImage);
+        } else if (activeHandoffBrief?.images?.[0]?.url) {
+          finalCoverImage = activeHandoffBrief.images[0].url;
+          setCoverImage(finalCoverImage);
+        }
+      }
+
       const payload = {
         slug: slug.trim().toLowerCase(),
         title: { en: titleEn, ar: titleAr },
@@ -212,8 +507,7 @@ export function AdminArticleFormView({
           .map((k) => k.trim())
           .filter(Boolean),
         faqItems,
-        coverImage: coverImage.trim() || undefined,
-        topPickProductId: topPickProductId.trim() || undefined,
+        coverImage: finalCoverImage || undefined,
         categoryId,
         readingTimeMinutes: Number(readingTimeMinutes) || 5,
         status,
@@ -238,7 +532,7 @@ export function AdminArticleFormView({
       }
 
       showToast(
-        isAr ? 'تم حفظ دليل الشراء بنجاح.' : 'Buying guide saved.',
+        isAr ? 'تم حفظ دليل الشراء والمراجعة بنجاح.' : 'Buying guide & review saved.',
         'success'
       );
       router.push('/admin/articles');
@@ -255,21 +549,21 @@ export function AdminArticleFormView({
           <h1 className={styles.pageTitle}>
             {existingArticle
               ? isAr
-                ? 'تعديل دليل الشراء'
-                : 'Edit Buying Guide'
+                ? 'تعديل المقال والمراجعة التحريرية'
+                : 'Edit Editorial Guide & Review'
               : isAr
-                ? 'كتابة دليل شراء جديد'
-                : 'Write New Buying Guide'}
+                ? 'كتابة مقال ومراجعة منتج جديدة'
+                : 'Write New Product Review & Guide'}
           </h1>
           <p className={styles.pageSubtitle}>
             {isAr
-              ? 'استخدم اللصق السريع الذكي لتعبئة المقال بالكامل، مع حقول SEO المتقدمة والأسئلة الشائعة (FAQPage Schema).'
-              : 'Use Smart Magic Paste to auto-fill guides, with full SEO metadata and FAQPage Schema support.'}
+              ? 'يرتبط وكيل المقالات ببطاقة تسليم وكيل المنتج لكتابة مراجعة خاصة بالمنتج ودمج منتجات الفئة من المتجر في خوارزمية المقارنة الحية.'
+              : 'Connected to the Product Agent Handoff Brief to write a dedicated product review and integrate same-category store options into the live comparison engine.'}
           </p>
         </div>
       </div>
 
-      {/* Smart Magic Paste Box for Articles */}
+      {/* Smart Article & Review Agent Box */}
       <section className={styles.card} style={{ marginBlockEnd: '1.5rem' }}>
         <div
           style={{
@@ -282,33 +576,180 @@ export function AdminArticleFormView({
           }}
         >
           <div>
-            <h2 className={styles.sectionTitle} style={{ marginBlockEnd: '0.25rem' }}>
-              <Sparkles
-                size={16}
-                style={{ display: 'inline', marginInlineEnd: '0.4rem' }}
-              />
-              {isAr
-                ? 'اللصق السريع الذكي لقوالب المقالات (Magic Article Paste)'
-                : 'Smart AI Article Template Paste'}
+            <h2
+              className={styles.sectionTitle}
+              style={{
+                marginBlockEnd: '0.25rem',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.45rem',
+              }}
+            >
+              <SmartAutoDistributeIcon size={18} />
+              <span>
+                {isAr
+                  ? 'وكيل كتابة المقالات والمراجعات المتعمقة (Connected Article Agent — الوكيل 2)'
+                  : 'Connected Editorial Guide & Review Agent (Agent 2)'}
+              </span>
             </h2>
             <p className={styles.pageSubtitle}>
               {isAr
-                ? 'انسخ قالب الذكاء الاصطناعي، الصق المخرج هنا، واضغط تعبئة لتفريغ جميع حقول المقال والـ SEO والأسئلة الشائعة تلقائياً.'
-                : 'Copy the AI prompt template, paste the generated output below, and auto-fill all article, SEO, and FAQ fields.'}
+                ? 'يقرأ بطاقة تسليم المنتج (الصور المعتمدة، الفيديوهات، الرابط الحقيقي، والبصمة الخوارزمية) + فهرس المتجر لكتابة مقال احترافي خاص بالمنتج بدون أسلوب الذكاء الاصطناعي المبتذل.'
+                : 'Uses the Product Handoff Brief (verified images, videos, real link & DNA) + live store catalog to write an authoritative product review.'}
             </p>
           </div>
 
-          <button
-            type="button"
-            onClick={handleCopyAiPrompt}
-            className={styles.topBarBtn}
-          >
-            <Copy size={14} />
-            <span>
-              {isAr ? 'نسخ أمر الذكاء الاصطناعي للمقالات' : 'Copy AI Article Prompt'}
-            </span>
-          </button>
+          <div className={styles.actionRow}>
+            <button
+              type="button"
+              onClick={() => setShowPromptPreview((prev) => !prev)}
+              className={styles.topBarBtn}
+            >
+              <HelpCircle size={14} />
+              <span>{isAr ? 'معاينة برومبت الوكيل' : 'Preview Agent Prompt'}</span>
+            </button>
+            <button
+              type="button"
+              onClick={handleCopyAiPrompt}
+              className={styles.topBarBtn}
+            >
+              {copiedPrompt ? <Check size={14} color="#10B981" /> : <Copy size={14} />}
+              <span>
+                {copiedPrompt
+                  ? isAr
+                    ? 'تم نسخ برومبت وكيل المقالات!'
+                    : 'Article Agent Prompt Copied!'
+                  : isAr
+                    ? 'نسخ برومبت وكيل المقالات والمراجعات'
+                    : 'Copy Article & Review Agent Prompt'}
+              </span>
+            </button>
+          </div>
         </div>
+
+        {/* Connected Product Agent Handoff Panel */}
+        <div
+          style={{
+            padding: '12px 14px',
+            borderRadius: '12px',
+            background: 'rgba(15, 23, 42, 0.35)',
+            border: '1px solid rgba(45, 212, 191, 0.25)',
+            marginBlockEnd: '12px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '10px',
+          }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              gap: '8px',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', fontWeight: 700, color: '#2DD4BF' }}>
+              <Link2 size={15} />
+              <span>
+                {isAr
+                  ? '🤝 الترابط مع وكيل المنتج (بطاقة تسليم المنتج للمقال):'
+                  : '🤝 Product Agent Handoff Connection:'}
+              </span>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+              <select
+                value={activeHandoffBrief?.productSlug || ''}
+                onChange={(e) => handleSelectProductForHandoff(e.target.value)}
+                className={styles.selectInput}
+                style={{ fontSize: '12px', padding: '5px 10px', maxWidth: '320px' }}
+              >
+                <option value="">
+                  {isAr
+                    ? '— اختر منتجاً من المتجر لتوليد بطاقة تسليمه للمقال —'
+                    : '— Select a store product to generate its Handoff Brief —'}
+                </option>
+                {products.map((p) => (
+                  <option key={p.id} value={p.slug}>
+                    {t(p.title)} ({p.slug})
+                  </option>
+                ))}
+              </select>
+
+              {activeHandoffBrief && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    clearSavedAgentHandoffBrief();
+                    setActiveHandoffBrief(null);
+                  }}
+                  className={styles.topBarBtn}
+                  style={{ fontSize: '11px', padding: '4px 8px' }}
+                >
+                  {isAr ? 'إلغاء ربط البطاقة' : 'Clear Handoff'}
+                </button>
+              )}
+            </div>
+          </div>
+
+          {activeHandoffBrief ? (
+            <div
+              style={{
+                fontSize: '12px',
+                color: 'var(--color-text-secondary)',
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: '10px',
+                lineHeight: 1.6,
+              }}
+            >
+              <span>
+                📦 <strong style={{ color: 'var(--color-text-primary)' }}>{isAr ? activeHandoffBrief.titleAr : activeHandoffBrief.titleEn}</strong>{' '}
+                (<code>{activeHandoffBrief.productSlug}</code>)
+              </span>
+              <span>•</span>
+              <span>
+                🖼️ {isAr ? `${activeHandoffBrief.images.length} صور معتمدة مع أوصافها` : `${activeHandoffBrief.images.length} verified images`}
+              </span>
+              <span>•</span>
+              <span>
+                🎬 {isAr ? `${activeHandoffBrief.videoUrls.length} فيديو` : `${activeHandoffBrief.videoUrls.length} video(s)`}
+              </span>
+              {activeHandoffBrief.bestForAr && (
+                <>
+                  <span>•</span>
+                  <span>
+                    🎯 {isAr ? activeHandoffBrief.bestForAr : activeHandoffBrief.bestForEn}
+                  </span>
+                </>
+              )}
+            </div>
+          ) : (
+            <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)' }}>
+              {isAr
+                ? 'يمكنك اختيار أي منتج من القائمة أعلاه (أو إضافة منتج جديد أولاً في صفحة المنتجات ليتم إرسال بطاقة تسليمه إلى هنا تلقائياً).'
+                : 'Select any store product above (or add a product first in the Product Agent to auto-receive its Handoff Brief here).'}
+            </div>
+          )}
+        </div>
+
+        {showPromptPreview && (
+          <div className={styles.promptCard} style={{ marginBlockEnd: '12px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontSize: '12px', fontWeight: 600 }}>
+                {isAr
+                  ? '📋 برومبت وكيل المقالات والمراجعات (مُدمج معه بطاقة تسليم المنتج + فهرس المتجر):'
+                  : '📋 Connected Article Agent Prompt:'}
+              </span>
+              <Button type="button" variant="outline" size="sm" onClick={handleCopyAiPrompt}>
+                <Copy size={13} />
+                <span>{isAr ? 'نسخ' : 'Copy'}</span>
+              </Button>
+            </div>
+            <div className={styles.promptCode}>{dynamicArticlePromptText}</div>
+          </div>
+        )}
 
         <textarea
           rows={4}
@@ -317,8 +758,8 @@ export function AdminArticleFormView({
           className={styles.textareaInput}
           placeholder={
             isAr
-              ? 'الصق هنا مخرج الذكاء الاصطناعي ([العنوان بالعربية]: ... [المحتوى بالعربية]: ...)'
-              : 'Paste AI article template output here...'
+              ? 'الصق هنا مخرج وكيل المقالات والمراجعات ([العنوان بالعربية]: ... [المحتوى بالعربية]: ...)'
+              : 'Paste Article & Review Agent output here...'
           }
         />
 
@@ -330,20 +771,107 @@ export function AdminArticleFormView({
             disabled={!magicRawText.trim()}
           >
             {isAr
-              ? 'تحليل وتعبئة الحقول تلقائياً'
-              : 'Parse & Auto-Fill Article Fields'}
+              ? 'تحليل وتعبئة المقال وربط منتجات المقارنة تلقائياً ⚡'
+              : 'Parse & Auto-Fill Article + Comparison Products ⚡'}
           </Button>
           {magicRawText && (
             <Button
               type="button"
               size="sm"
               variant="ghost"
-              onClick={() => setMagicRawText('')}
+              onClick={() => {
+                setMagicRawText('');
+                setDiscoveryReport(null);
+              }}
             >
               {isAr ? 'مسح النص' : 'Clear'}
             </Button>
           )}
         </div>
+
+        {discoveryReport && (
+          <div
+            style={{
+              marginBlockStart: '1rem',
+              padding: '1rem 1.25rem',
+              borderRadius: 'var(--radius-md)',
+              border: '1px solid var(--color-accent-primary)',
+              backgroundColor: 'var(--color-bg-subtle)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '0.6rem',
+            }}
+          >
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                gap: '0.5rem',
+              }}
+            >
+              <strong style={{ color: 'var(--color-accent-primary)', fontSize: '0.95rem' }}>
+                {isAr
+                  ? '📊 تقرير وكيل المقالات والربط الخوارزمي من متجر AQURIVO'
+                  : '📊 Article Agent & Algorithmic Store Linking Report'}
+              </strong>
+              <button
+                type="button"
+                onClick={() => setDiscoveryReport(null)}
+                className={styles.topBarBtn}
+                style={{ padding: '2px 8px', fontSize: '0.75rem' }}
+              >
+                {isAr ? 'إخفاء' : 'Dismiss'}
+              </button>
+            </div>
+
+            <ul
+              style={{
+                margin: 0,
+                paddingInlineStart: '1.2rem',
+                fontSize: '0.88rem',
+                lineHeight: 1.65,
+                color: 'var(--color-text-secondary)',
+              }}
+            >
+              <li>
+                <strong>{isAr ? 'الفئة المكتشفة:' : 'Matched Category:'}</strong>{' '}
+                {discoveryReport.categoryLabel}
+              </li>
+              <li>
+                <strong>
+                  {isAr
+                    ? `المنتجات المدمجة للمقارنة الخوارزمية الحية (${discoveryReport.linkedProducts.length}):`
+                    : `Integrated Products for Live Algorithmic Comparison (${discoveryReport.linkedProducts.length}):`}
+                </strong>{' '}
+                {discoveryReport.linkedProducts.length > 0
+                  ? discoveryReport.linkedProducts.map((p) => t(p.title)).join(' ، ')
+                  : isAr
+                    ? 'لم يتم العثور على منتجات مطابقة في المتجر بعد'
+                    : 'No store products matched yet'}
+              </li>
+              <li>
+                <strong>{isAr ? 'حالة صورة الغلاف:' : 'Cover Image Status:'}</strong>{' '}
+                {discoveryReport.coverStatus}
+              </li>
+            </ul>
+
+            {discoveryReport.agentNotes && (
+              <div
+                style={{
+                  marginBlockStart: '0.25rem',
+                  paddingTop: '0.5rem',
+                  borderBlockStart: '1px solid var(--color-border-hairline)',
+                  fontSize: '0.82rem',
+                  whiteSpace: 'pre-wrap',
+                  color: 'var(--color-text-secondary)',
+                }}
+              >
+                {discoveryReport.agentNotes}
+              </div>
+            )}
+          </div>
+        )}
       </section>
 
       <form onSubmit={handleSubmit} className={styles.card}>
@@ -352,7 +880,7 @@ export function AdminArticleFormView({
             label={isAr ? 'المعرف (Slug)' : 'URL Slug'}
             value={slug}
             onChange={(e) => setSlug(e.target.value)}
-            placeholder="e.g. best-noise-cancelling-headphones-2026"
+            placeholder="e.g. anker-prime-power-bank-in-depth-review-2026"
             required
           />
 
@@ -370,7 +898,7 @@ export function AdminArticleFormView({
             label={isAr ? 'العنوان باللغة العربية' : 'Title (Arabic)'}
             value={titleAr}
             onChange={(e) => setTitleAr(e.target.value)}
-            placeholder="مثال: أفضل 5 سماعات رأس لاسلكية لعام 2026"
+            placeholder="مثال: مراجعة شاحن Anker Prime 200W ودليل المقارنة مع بدائل الفئة"
             required
           />
 
@@ -378,41 +906,94 @@ export function AdminArticleFormView({
             label={isAr ? 'العنوان باللغة الإنجليزية' : 'Title (English)'}
             value={titleEn}
             onChange={(e) => setTitleEn(e.target.value)}
-            placeholder="e.g. Top 5 Wireless Noise-Cancelling Headphones in 2026"
+            placeholder="e.g. Anker Prime 200W Hands-On Review & Category Buying Guide"
             required
           />
         </div>
 
-        <div className={styles.formGrid}>
+        <div className={styles.fieldGroup}>
           <Input
-            label={isAr ? 'رابط صورة الغلاف (اختياري)' : 'Cover Image URL (Optional)'}
+            label={
+              isAr
+                ? 'صورة الغلاف (رابط مباشر أو اكتب اسم/slug المنتج لسحب صورته)'
+                : 'Cover Image (Direct URL or type product name/slug)'
+            }
             value={coverImage}
             onChange={(e) => setCoverImage(e.target.value)}
-            placeholder="/images/hero-bg.jpg"
+            placeholder={
+              isAr
+                ? 'ضع رابط صورة أو اكتب اسم المنتج'
+                : '/images/hero-bg.jpg or product name/slug'
+            }
           />
-
-          <div className={styles.fieldGroup}>
-            <label className={styles.fieldLabel}>
-              {isAr
-                ? 'المنتج الفائز / الخيار الأول (Top Pick)'
-                : 'Top Pick Featured Product'}
-            </label>
-            <select
-              value={topPickProductId}
-              onChange={(e) => setTopPickProductId(e.target.value)}
-              className={styles.selectInput}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              flexWrap: 'wrap',
+              marginBlockStart: '0.4rem',
+            }}
+          >
+            <button
+              type="button"
+              className={styles.topBarBtn}
+              style={{ fontSize: '0.78rem', padding: '0.25rem 0.6rem' }}
+              onClick={() => {
+                const candidate =
+                  (coverImage &&
+                    !coverImage.startsWith('http') &&
+                    !coverImage.startsWith('/') &&
+                    findMatchingProduct(coverImage, products)) ||
+                  (activeHandoffBrief?.productSlug &&
+                    findMatchingProduct(activeHandoffBrief.productSlug, products)) ||
+                  products.find((p) => relatedProductIds.includes(p.id));
+                if (candidate?.images?.[0]?.url) {
+                  setCoverImage(candidate.images[0].url);
+                  showToast(
+                    isAr
+                      ? `تم سحب صورة المنتج: ${t(candidate.title)}`
+                      : `Pulled image from: ${t(candidate.title)}`,
+                    'success'
+                  );
+                } else if (activeHandoffBrief?.images?.[0]?.url) {
+                  setCoverImage(activeHandoffBrief.images[0].url);
+                  showToast(
+                    isAr
+                      ? 'تم سحب الصورة الرئيسية من بطاقة تسليم المنتج!'
+                      : 'Pulled primary image from Product Handoff Brief!',
+                    'success'
+                  );
+                } else {
+                  showToast(
+                    isAr
+                      ? 'اختر منتجاً مرتبطاً أولاً أو اكتب اسم منتج متوفر.'
+                      : 'Select a linked product or type a valid product name first.',
+                    'error'
+                  );
+                }
+              }}
             >
-              <option value="">
-                {isAr
-                  ? '— اختيار تلقائي (أول منتج مرتبط) —'
-                  : '— Auto (First linked product) —'}
-              </option>
-              {products.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {t(p.title)}
-                </option>
-              ))}
-            </select>
+              {isAr
+                ? 'سحب صورة المنتج الأساسي تلقائياً'
+                : 'Auto-Pull Primary Product Cover Image'}
+            </button>
+            {(coverImage.startsWith('http://') ||
+              coverImage.startsWith('https://') ||
+              coverImage.startsWith('/')) && (
+              <img
+                src={coverImage}
+                alt="Cover preview"
+                referrerPolicy="no-referrer"
+                style={{
+                  width: '42px',
+                  height: '42px',
+                  objectFit: 'cover',
+                  borderRadius: '6px',
+                  border: '1px solid var(--color-border-hairline)',
+                }}
+              />
+            )}
           </div>
         </div>
 

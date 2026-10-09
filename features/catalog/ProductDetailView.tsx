@@ -7,7 +7,7 @@ import type { Locale, Product } from '@/types';
 import { useI18n } from '@/i18n/I18nProvider';
 import { getDictionary, pickLocalizedText } from '@/i18n';
 import { useSaved } from '@/features/saved/SavedProvider';
-import { formatProductPrice } from '@/lib/format';
+import { formatNumber, formatProductPrice } from '@/lib/format';
 import { SiteHeader } from '@/components/sections/SiteHeader';
 import { SiteFooter } from '@/components/sections/SiteFooter';
 import { SignatureMotif } from '@/components/ui/SignatureMotif';
@@ -256,8 +256,8 @@ export function ProductDetailView({
                 {soldCountValue > 0 && (
                   <span className={`${styles.soldCountInline} tabularNums`}>
                     {isAr
-                      ? `${soldCountValue.toLocaleString('en-US')}+ تم بيعه`
-                      : `${soldCountValue.toLocaleString('en-US')}+ sold`}
+                      ? `${formatNumber(soldCountValue, locale)}+ تم بيعه`
+                      : `${formatNumber(soldCountValue, locale)}+ sold`}
                   </span>
                 )}
               </div>

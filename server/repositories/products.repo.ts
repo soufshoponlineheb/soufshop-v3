@@ -3,7 +3,7 @@ import { getAdminDb, getCloudFallbackDb } from '@/server/config/firebase-admin';
 import type { Product } from '@/types';
 import { validateProductInput } from '@/server/validators';
 import { getSourceById } from './sources.repo';
-import { getCategoryBySlug, listAllCategoriesAdmin } from './categories.repo';
+import { getCategoryBySlug, listAllCategoriesAdmin, upsertCategoryAdmin } from './categories.repo';
 
 const COLLECTION = 'products';
 
@@ -35,18 +35,54 @@ function normalizeProductDoc(id: string, raw: Record<string, any>): Product {
       : { ar: String(descriptionObj || ''), en: String(descriptionObj || '') };
 
   const rawImages = Array.isArray(raw.images) ? raw.images : [];
-  const normalizedImages = rawImages.map((img: any) => {
-    if (typeof img === 'string') {
-      return { url: img, alt: parsedTitle, width: 800, height: 800 };
+  const normalizedImages = rawImages
+    .map((img: any) => {
+      if (typeof img === 'string') {
+        return { url: img.trim(), alt: parsedTitle, width: 800, height: 800 };
+      }
+      return {
+        url: String(img?.url || img?.src || img?.secure_url || '').trim(),
+        publicId: img?.publicId,
+        alt: img?.alt || parsedTitle,
+        width: img?.width || 800,
+        height: img?.height || 800,
+      };
+    })
+    .filter((img) => Boolean(img.url));
+
+  if (normalizedImages.length === 0) {
+    const singleUrl = String(raw.imageUrl || raw.image || raw.thumbnail || '').trim();
+    if (singleUrl) {
+      normalizedImages.push({
+        url: singleUrl,
+        alt: parsedTitle,
+        width: 800,
+        height: 800,
+      });
     }
-    return {
-      url: img.url || '',
-      publicId: img.publicId,
-      alt: img.alt || parsedTitle,
-      width: img.width || 800,
-      height: img.height || 800,
-    };
-  });
+  }
+
+  const normalizedVideoUrls: string[] = [];
+  if (Array.isArray(raw.videoUrls)) {
+    for (const vu of raw.videoUrls) {
+      if (typeof vu === 'string' && vu.trim() && !normalizedVideoUrls.includes(vu.trim())) {
+        normalizedVideoUrls.push(vu.trim());
+      }
+    }
+  }
+  if (Array.isArray(raw.videos)) {
+    for (const v of raw.videos) {
+      const u = typeof v === 'string' ? v.trim() : String(v?.url || '').trim();
+      if (u && !normalizedVideoUrls.includes(u)) {
+        normalizedVideoUrls.push(u);
+      }
+    }
+  }
+  if (typeof raw.videoUrl === 'string' && raw.videoUrl.trim()) {
+    if (!normalizedVideoUrls.includes(raw.videoUrl.trim())) {
+      normalizedVideoUrls.unshift(raw.videoUrl.trim());
+    }
+  }
 
   return {
     id,
@@ -56,6 +92,8 @@ function normalizeProductDoc(id: string, raw: Record<string, any>): Product {
     shortSummary: parsedSummary,
     description: parsedDesc,
     images: normalizedImages,
+    videoUrl: normalizedVideoUrls[0] || undefined,
+    videoUrls: normalizedVideoUrls.length > 0 ? normalizedVideoUrls : undefined,
     priceAmount: typeof raw.priceAmount === 'number' ? raw.priceAmount : (raw.priceAmount ? Number(raw.priceAmount) : null),
     priceCurrency: raw.priceCurrency || 'USD',
     slug: raw.slug || id,
@@ -236,12 +274,36 @@ export async function createOrUpdateProductAdmin(
   }
 
   const allCategories = await listAllCategoriesAdmin();
-  const category =
+  let category =
     allCategories.find((c) => c.id === validated.categoryId || c.slug === validated.categoryId) ||
     (await getCategoryBySlug(validated.categoryId));
 
-  const categoryName = category ? category.name : { en: 'General', ar: 'عام' };
+  if (!category && validated.categoryId) {
+    const fallbackEn = validated.newCategoryName?.en || validated.categoryId.replace(/-/g, ' ');
+    const fallbackAr = validated.newCategoryName?.ar || fallbackEn;
+    try {
+      category = await upsertCategoryAdmin({
+        slug: validated.categoryId,
+        name: { ar: fallbackAr, en: fallbackEn },
+        description: {
+          ar: `منتجات مختارة بعناية في قسم ${fallbackAr}`,
+          en: `Carefully curated picks in ${fallbackEn}`,
+        },
+        icon: validated.newCategoryIcon || '📦',
+        order: allCategories.length + 1,
+        isActive: true,
+      });
+    } catch {
+      // Fallback if category creation fails
+    }
+  }
+
+  const categoryName = category
+    ? category.name
+    : validated.newCategoryName || { en: 'General', ar: 'عام' };
   const categorySlug = category ? category.slug : validated.categoryId;
+
+  const { newCategoryName: _ncName, newCategoryIcon: _ncIcon, ...cleanValidated } = validated;
 
   const now = new Date().toISOString();
   const docId = existingId || validated.slug;
@@ -250,7 +312,7 @@ export async function createOrUpdateProductAdmin(
   const existingData = existingDoc.exists ? (existingDoc.data() as Partial<Product>) : null;
 
   const record: Omit<Product, 'id'> = {
-    ...validated,
+    ...cleanValidated,
     sourceId: source.id,
     sourceSlug: source.slug,
     sourceName: source.name,

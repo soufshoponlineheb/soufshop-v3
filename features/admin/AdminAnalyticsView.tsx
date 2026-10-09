@@ -23,9 +23,9 @@ export function AdminAnalyticsView({
 
   const [daysWindow, setDaysWindow] = useState<'7' | '30' | 'all'>('30');
   const [sourceFilter, setSourceFilter] = useState<string>('all');
+  const [nowMs] = useState(() => Date.now());
 
   const filteredClicks = useMemo(() => {
-    const nowMs = Date.now();
     const dayMs = 24 * 60 * 60 * 1000;
 
     return clicks.filter((c) => {
@@ -37,7 +37,7 @@ export function AdminAnalyticsView({
       }
       return true;
     });
-  }, [clicks, daysWindow, sourceFilter]);
+  }, [clicks, daysWindow, sourceFilter, nowMs]);
 
   const bySource = useMemo(() => {
     const map = new Map<string, number>();

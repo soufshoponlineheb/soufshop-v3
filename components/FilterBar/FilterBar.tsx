@@ -1,8 +1,23 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
-import { ArrowUpDown, Check, ChevronDown, Search, X } from 'lucide-react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import Link from 'next/link';
+import {
+  ArrowUpDown,
+  ArrowUpLeft,
+  BookOpen,
+  Check,
+  ChevronDown,
+  Search,
+  X,
+} from 'lucide-react';
+import type { Article, Product } from '@/types';
 import { useI18n } from '@/i18n/I18nProvider';
+import { formatNumber, formatProductPrice } from '@/lib/format';
+import {
+  findMatchingProducts,
+  searchAndRankArticles,
+} from '@/lib/productSearch';
 import styles from './FilterBar.module.css';
 
 export interface FilterBarProps {
@@ -16,6 +31,8 @@ export interface FilterBarProps {
   filteredCount: number;
   initialQuery?: string;
   initialStore?: string;
+  products?: Product[];
+  articles?: Article[];
 }
 
 interface SortOptionItem {
@@ -40,8 +57,10 @@ export function FilterBar({
   filteredCount,
   initialQuery = '',
   initialStore = 'all',
+  products = [],
+  articles = [],
 }: FilterBarProps) {
-  const { locale } = useI18n();
+  const { locale, t, currency } = useI18n();
   const isAr = locale === 'ar';
   const inputRef = useRef<HTMLInputElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -51,6 +70,21 @@ export function FilterBar({
   const [maxPrice, setMaxPrice] = useState<number | null>(null);
   const [activeStore, setActiveStore] = useState<string>(initialStore);
   const [openDropdown, setOpenDropdown] = useState<'sort' | 'price' | null>(null);
+  const [isSearchDropdownOpen, setIsSearchDropdownOpen] = useState(false);
+
+  const trimmedQuery = searchQuery.trim();
+
+  const liveArticleMatches = useMemo(() => {
+    if (!trimmedQuery || articles.length === 0) return [];
+    return searchAndRankArticles(articles, trimmedQuery, products).slice(0, 4);
+  }, [articles, products, trimmedQuery]);
+
+  const liveProductMatches = useMemo(() => {
+    if (!trimmedQuery || products.length === 0) return [];
+    return findMatchingProducts(products, trimmedQuery, articles).slice(0, 5);
+  }, [products, articles, trimmedQuery]);
+
+  const totalLiveMatches = liveArticleMatches.length + liveProductMatches.length;
 
   // Close dropdowns when clicking anywhere outside
   useEffect(() => {
@@ -60,6 +94,7 @@ export function FilterBar({
         !containerRef.current.contains(event.target as Node)
       ) {
         setOpenDropdown(null);
+        setIsSearchDropdownOpen(false);
       }
     };
 
@@ -80,20 +115,20 @@ export function FilterBar({
         maxPrice,
         store: activeStore,
       });
-    }, 300);
+    }, 200);
 
     return () => window.clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchQuery]);
 
   const handleSearchActionClick = () => {
+    setIsSearchDropdownOpen(false);
     onFilterChange({
       query: searchQuery,
       sortBy: sortBy || 'newest',
       maxPrice,
       store: activeStore,
     });
-    inputRef.current?.focus();
   };
 
   const handleSortSelect = (nextSort: string) => {
@@ -149,42 +184,196 @@ export function FilterBar({
 
   return (
     <div ref={containerRef} className={styles.filterBarContainer}>
-      {/* 1. Prominent Search Bar with Solid Action Pill Button */}
-      <div className={styles.searchRow}>
-        <input
-          ref={inputRef}
-          type="search"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder={
-            isAr ? 'ابحث عن منتجات، ماركات...' : 'Search products, brands...'
-          }
-          aria-label={
-            isAr ? 'ابحث عن منتجات، ماركات...' : 'Search products, brands...'
-          }
-          className={styles.searchInput}
-        />
+      {/* 1. Prominent Search Bar with Solid Action Pill Button + Instant Live Dropdown */}
+      <div className={styles.searchOuterWrap}>
+        <div className={styles.searchRow}>
+          <input
+            ref={inputRef}
+            type="search"
+            value={searchQuery}
+            onFocus={() => {
+              if (trimmedQuery.length > 0) setIsSearchDropdownOpen(true);
+            }}
+            onChange={(e) => {
+              const val = e.target.value;
+              setSearchQuery(val);
+              setIsSearchDropdownOpen(val.trim().length > 0);
+            }}
+            placeholder={
+              isAr
+                ? 'ابحث عن منتج، مقالة مراجعة، أو ماركة...'
+                : 'Search products, buying guides, or brands...'
+            }
+            aria-label={
+              isAr
+                ? 'ابحث عن منتج، مقالة مراجعة، أو ماركة...'
+                : 'Search products, buying guides, or brands...'
+            }
+            className={styles.searchInput}
+          />
 
-        {searchQuery.length > 0 && (
+          {searchQuery.length > 0 && (
+            <button
+              type="button"
+              onClick={() => {
+                handleClearSearch();
+                setIsSearchDropdownOpen(false);
+              }}
+              className={styles.clearBtn}
+              aria-label={isAr ? 'مسح البحث' : 'Clear search'}
+            >
+              <X size={14} aria-hidden="true" />
+            </button>
+          )}
+
           <button
             type="button"
-            onClick={handleClearSearch}
-            className={styles.clearBtn}
-            aria-label={isAr ? 'مسح البحث' : 'Clear search'}
+            onClick={handleSearchActionClick}
+            className={styles.searchActionBtn}
+            aria-label={isAr ? 'بحث' : 'Search'}
           >
-            <X size={14} aria-hidden="true" />
+            <Search size={16} aria-hidden="true" />
+            <span>{isAr ? 'بحث' : 'Search'}</span>
           </button>
-        )}
+        </div>
 
-        <button
-          type="button"
-          onClick={handleSearchActionClick}
-          className={styles.searchActionBtn}
-          aria-label={isAr ? 'بحث' : 'Search'}
-        >
-          <Search size={16} aria-hidden="true" />
-          <span>{isAr ? 'بحث' : 'Search'}</span>
-        </button>
+        {isSearchDropdownOpen && trimmedQuery.length > 0 && totalLiveMatches > 0 && (
+          <div
+            className={styles.liveDropdown}
+            role="listbox"
+            aria-label={isAr ? 'نتائج البحث المباشرة' : 'Live search results'}
+          >
+            <div className={styles.liveScrollArea}>
+              {liveArticleMatches.length > 0 && (
+                <div className={styles.liveGroupBlock}>
+                  <div className={styles.liveGroupTitle}>
+                    <BookOpen size={13} aria-hidden="true" />
+                    <span>
+                      {isAr
+                        ? `أدلة الشراء والمقالات (${formatNumber(liveArticleMatches.length, locale)})`
+                        : `Buying Guides & Reviews (${formatNumber(liveArticleMatches.length, locale)})`}
+                    </span>
+                  </div>
+                  <ul className={styles.liveList}>
+                    {liveArticleMatches.map((art) => {
+                      const artTitle = t(art.title);
+                      const artCat = t(art.categoryName);
+                      const artImg = art.coverImage || '/images/hero-bg.jpg';
+
+                      return (
+                        <li key={`fbar-art-${art.id}`} className={styles.liveListItem}>
+                          <Link
+                            href={`/${locale}/guides/${encodeURIComponent(art.slug)}`}
+                            onClick={() => setIsSearchDropdownOpen(false)}
+                            className={styles.liveResultLink}
+                          >
+                            <div className={styles.liveThumbWrap}>
+                              <img
+                                src={artImg}
+                                alt={artTitle}
+                                width={40}
+                                height={40}
+                                className={styles.liveThumbCover}
+                                referrerPolicy="no-referrer"
+                              />
+                            </div>
+                            <div className={styles.liveInfoCol}>
+                              <span className={styles.liveItemTitle}>{artTitle}</span>
+                              <span className={styles.liveItemMeta}>
+                                {artCat} · {formatNumber(art.readingTimeMinutes || 5, locale)}{' '}
+                                {isAr ? 'دقائق قراءة' : 'min read'}
+                              </span>
+                            </div>
+                            <div className={styles.livePriceCol}>
+                              <span className={styles.liveGuideTag}>
+                                {isAr ? 'مقالة ومقارنة' : 'Guide'}
+                              </span>
+                              <ArrowUpLeft size={14} className={styles.liveArrow} />
+                            </div>
+                          </Link>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              )}
+
+              {liveProductMatches.length > 0 && (
+                <div className={styles.liveGroupBlock}>
+                  {liveArticleMatches.length > 0 && (
+                    <div className={styles.liveGroupTitle}>
+                      <span>
+                        {isAr
+                          ? `المنتجات (${formatNumber(liveProductMatches.length, locale)})`
+                          : `Products (${formatNumber(liveProductMatches.length, locale)})`}
+                      </span>
+                    </div>
+                  )}
+                  <ul className={styles.liveList}>
+                    {liveProductMatches.map((item) => {
+                      const itemTitle = t(item.title);
+                      const itemSource = t(item.sourceName) || item.sourceSlug || 'Amazon';
+                      const itemImage = item.images?.[0]?.url || '';
+                      const itemPrice =
+                        item.priceAmount !== null && item.priceAmount > 0
+                          ? formatProductPrice(
+                              item.priceAmount,
+                              item.priceCurrency,
+                              locale,
+                              currency
+                            )
+                          : null;
+
+                      return (
+                        <li key={`fbar-prod-${item.id}`} className={styles.liveListItem}>
+                          <Link
+                            href={`/${locale}/products/${encodeURIComponent(item.slug)}`}
+                            onClick={() => setIsSearchDropdownOpen(false)}
+                            className={styles.liveResultLink}
+                          >
+                            <div className={styles.liveThumbWrap}>
+                              {itemImage ? (
+                                <img
+                                  src={itemImage}
+                                  alt={itemTitle}
+                                  width={40}
+                                  height={40}
+                                  className={styles.liveThumb}
+                                  referrerPolicy="no-referrer"
+                                />
+                              ) : (
+                                <span className={styles.liveThumbFallback}>
+                                  {itemTitle.slice(0, 1)}
+                                </span>
+                              )}
+                            </div>
+                            <div className={styles.liveInfoCol}>
+                              <span className={styles.liveItemTitle}>{itemTitle}</span>
+                              <span className={styles.liveItemMeta}>
+                                {itemSource} · {t(item.categoryName)}
+                              </span>
+                            </div>
+                            <div className={styles.livePriceCol}>
+                              {itemPrice && (
+                                <span
+                                  dir="ltr"
+                                  className={`${styles.livePriceBadge} tabularNums`}
+                                >
+                                  {itemPrice}
+                                </span>
+                              )}
+                              <ArrowUpLeft size={14} className={styles.liveArrow} />
+                            </div>
+                          </Link>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* 2. Harmonized Filter Strip (Sort + Price) */}

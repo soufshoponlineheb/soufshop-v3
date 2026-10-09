@@ -113,5 +113,5 @@ export async function listUsersAdmin(): Promise<UserProfileRecord[]> {
   if (!db) return [];
 
   const snap = await db.collection(COLLECTION).orderBy('lastLoginAt', 'desc').limit(200).get();
-  return snap.docs.map((doc) => doc.data() as UserProfileRecord);
+  return snap.docs.map((doc) => doc.data() as unknown as UserProfileRecord);
 }

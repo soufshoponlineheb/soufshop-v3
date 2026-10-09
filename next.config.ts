@@ -98,6 +98,7 @@ const nextConfig: NextConfig = {
       config.watchOptions = {
         ignored: /.*/,
       };
+      config.cache = false;
     }
     return config;
   },

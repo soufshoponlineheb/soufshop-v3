@@ -3,13 +3,14 @@
 import React, { useMemo, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowLeft, ArrowRight, Clock, Search, Sparkles, X } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Clock, Search, X } from 'lucide-react';
 import type { Article, Category } from '@/types';
 import { useI18n } from '@/i18n/I18nProvider';
-import { formatCalendarDate } from '@/lib/format';
+import { searchAndRankArticles } from '@/lib/productSearch';
 import { SiteHeader } from '@/components/sections/SiteHeader';
 import { SiteFooter } from '@/components/sections/SiteFooter';
 import { SignatureMotif } from '@/components/ui/SignatureMotif';
+import { EditorialIssueCard } from '@/components/ui/EditorialIssueCard';
 import { EmptyState } from '@/components/ui/EmptyState';
 import styles from './GuidesView.module.css';
 
@@ -32,23 +33,8 @@ export function GuidesView({ articles, categories }: GuidesViewProps) {
           a.categorySlug === selectedCategory || a.categoryId === selectedCategory
       );
     }
-    const q = searchQuery.trim().toLowerCase();
-    if (q) {
-      list = list.filter((a) => {
-        const haystack = [
-          a.title.ar,
-          a.title.en,
-          a.excerpt.ar,
-          a.excerpt.en,
-          a.contentHtml.ar,
-          a.contentHtml.en,
-          ...(a.seoKeywords || []),
-        ]
-          .filter(Boolean)
-          .join(' ')
-          .toLowerCase();
-        return haystack.includes(q);
-      });
+    if (searchQuery.trim()) {
+      return searchAndRankArticles(list, searchQuery);
     }
     return list;
   }, [articles, selectedCategory, searchQuery]);
@@ -138,95 +124,9 @@ export function GuidesView({ articles, categories }: GuidesViewProps) {
           </div>
         </header>
 
-        {/* Featured Hero Guide (if available) */}
-        {featuredArticle && (
-          <article className={styles.featuredHeroCard}>
-            <div className={styles.featuredContentZone}>
-              <span className={styles.featuredHeroBadge}>
-                <Sparkles size={13} aria-hidden="true" />
-                <span>{isAr ? 'دليل مميز' : 'Featured Guide'}</span>
-              </span>
-
-              <div className={styles.metaRow}>
-                <span className={styles.categoryTag}>{t(featuredArticle.categoryName)}</span>
-                <span aria-hidden="true">·</span>
-                <span className={`${styles.readTime} tabularNums`}>
-                  <Clock size={13} aria-hidden="true" />
-                  <span>
-                    {featuredArticle.readingTimeMinutes}{' '}
-                    {isAr ? 'دقائق قراءة' : 'min read'}
-                  </span>
-                </span>
-                {featuredArticle.publishedAt && (
-                  <>
-                    <span aria-hidden="true">·</span>
-                    <span className="tabularNums">
-                      {formatCalendarDate(featuredArticle.publishedAt, locale)}
-                    </span>
-                  </>
-                )}
-              </div>
-
-              <h2 className={styles.featuredTitle}>
-                <Link
-                  href={`/${locale}/guides/${encodeURIComponent(featuredArticle.slug)}`}
-                  className={styles.featuredTitleLink}
-                >
-                  {t(featuredArticle.title)}
-                </Link>
-              </h2>
-
-              <p className={styles.featuredExcerpt}>{t(featuredArticle.excerpt)}</p>
-
-              <Link
-                href={`/${locale}/guides/${encodeURIComponent(featuredArticle.slug)}`}
-                className={styles.readMoreLink}
-              >
-                <span>{isAr ? 'قراءة الدليل بالكامل' : 'Read Full Guide'}</span>
-                {isAr ? (
-                  <ArrowLeft size={16} aria-hidden="true" />
-                ) : (
-                  <ArrowRight size={16} aria-hidden="true" />
-                )}
-              </Link>
-            </div>
-
-            <div className={styles.featuredImageWrap}>
-              {featuredArticle.coverImage ? (
-                <Image
-                  src={featuredArticle.coverImage}
-                  alt={t(featuredArticle.title)}
-                  fill
-                  className={styles.featuredImage}
-                  sizes="(max-width: 768px) 100vw, 50vw"
-                  priority
-                  referrerPolicy="no-referrer"
-                />
-              ) : (
-                <div
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    backgroundColor: 'var(--color-surface-hover)',
-                    color: 'var(--color-primary)',
-                    fontSize: '2rem',
-                    fontWeight: 'bold',
-                  }}
-                >
-                  AQURIVO Guide
-                </div>
-              )}
-            </div>
-          </article>
-        )}
-
         {/* All Guides Grid */}
         <section className={styles.articlesSection} aria-live="polite">
           <SignatureMotif
-            index="02"
             label={isAr ? 'جميع الأدلة والمراجعات' : 'All Buying Guides'}
           />
 
@@ -247,7 +147,7 @@ export function GuidesView({ articles, categories }: GuidesViewProps) {
               secondaryActionLabel={messages.nav.ourMethod}
               secondaryActionHref={`/${locale}/about`}
             />
-          ) : restArticles.length === 0 && !featuredArticle ? (
+          ) : filteredArticles.length === 0 ? (
             <EmptyState
               title={
                 isAr
@@ -267,72 +167,9 @@ export function GuidesView({ articles, categories }: GuidesViewProps) {
             />
           ) : (
             <div className={styles.grid}>
-              {restArticles.map((article) => {
-                const formattedDate = formatCalendarDate(article.publishedAt, locale);
-                return (
-                  <article key={article.id} className={styles.card}>
-                    <Link
-                      href={`/${locale}/guides/${encodeURIComponent(article.slug)}`}
-                      className={styles.cardCoverWrap}
-                      tabIndex={-1}
-                    >
-                      <Image
-                        src={article.coverImage || '/images/hero-bg.jpg'}
-                        alt={t(article.title)}
-                        fill
-                        sizes="(max-width: 768px) 100vw, 33vw"
-                        className={styles.cardCoverImage}
-                        referrerPolicy="no-referrer"
-                      />
-                    </Link>
-
-                    <div className={styles.cardBody}>
-                      <div className={styles.metaRow}>
-                        <span className={styles.categoryTag}>{t(article.categoryName)}</span>
-                        <span aria-hidden="true">·</span>
-                        <span className={`${styles.readTime} tabularNums`}>
-                          <Clock size={13} aria-hidden="true" />
-                          <span>
-                            {article.readingTimeMinutes}{' '}
-                            {isAr ? 'دقائق قراءة' : 'min read'}
-                          </span>
-                        </span>
-                        {formattedDate && (
-                          <>
-                            <span aria-hidden="true">·</span>
-                            <span className="tabularNums">{formattedDate}</span>
-                          </>
-                        )}
-                      </div>
-
-                      <h2 className={styles.cardTitle}>
-                        <Link
-                          href={`/${locale}/guides/${encodeURIComponent(article.slug)}`}
-                          className={styles.cardTitleLink}
-                        >
-                          {t(article.title)}
-                        </Link>
-                      </h2>
-
-                      <p className={styles.cardExcerpt}>{t(article.excerpt)}</p>
-
-                      <div className={styles.cardFooter}>
-                        <Link
-                          href={`/${locale}/guides/${encodeURIComponent(article.slug)}`}
-                          className={styles.readMoreLink}
-                        >
-                          <span>{isAr ? 'اقرأ الدليل الكامل' : 'Read full guide'}</span>
-                          {isAr ? (
-                            <ArrowLeft size={15} aria-hidden="true" />
-                          ) : (
-                            <ArrowRight size={15} aria-hidden="true" />
-                          )}
-                        </Link>
-                      </div>
-                    </div>
-                  </article>
-                );
-              })}
+              {filteredArticles.map((article) => (
+                <EditorialIssueCard key={article.id} article={article} />
+              ))}
             </div>
           )}
         </section>

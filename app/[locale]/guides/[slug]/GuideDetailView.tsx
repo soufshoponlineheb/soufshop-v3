@@ -2,15 +2,11 @@
 
 import React, { useMemo } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import {
   ArrowUpRight,
   ChevronDown,
   Clock,
   List,
-  ShoppingCart,
-  Sparkles,
-  Star,
 } from 'lucide-react';
 import type { Article, Product } from '@/types';
 import { useI18n } from '@/i18n/I18nProvider';
@@ -20,6 +16,7 @@ import { SiteHeader } from '@/components/sections/SiteHeader';
 import { SiteFooter } from '@/components/sections/SiteFooter';
 import { SignatureMotif } from '@/components/ui/SignatureMotif';
 import { ProductCard } from '@/components/ui/ProductCard';
+import { ProductComparisonMatrix } from '@/components/ui/ProductComparisonMatrix';
 import styles from './GuideDetailView.module.css';
 
 interface GuideDetailViewProps {
@@ -32,14 +29,23 @@ interface TocItem {
   text: string;
 }
 
-function buildContentChunksWithToc(rawHtml: string): {
+function buildContentChunksWithToc(
+  rawHtml: string,
+  locale: string
+): {
   chunks: string[];
   toc: TocItem[];
 } {
   const toc: TocItem[] = [];
   let index = 0;
 
-  const htmlWithIds = rawHtml.replace(
+  // Normalize full aqurivo.store / aqurivo.com product links to current locale relative paths
+  const normalizedLinksHtml = rawHtml.replace(
+    /https?:\/\/(?:www\.)?aqurivo\.(?:store|com)\/(?:(?:ar|en)\/)?products\/([^/?#\s"'<>]+)/gi,
+    `/${locale}/products/$1`
+  );
+
+  const htmlWithIds = normalizedLinksHtml.replace(
     /<(h[23])([^>]*)>([\s\S]*?)<\/\1>/gi,
     (_match, tag: string, attrs: string, inner: string) => {
       index += 1;
@@ -76,22 +82,9 @@ export function GuideDetailView({
   const faqItems = article.faqItems || [];
 
   const { chunks, toc } = useMemo(
-    () => buildContentChunksWithToc(rawBody),
-    [rawBody]
+    () => buildContentChunksWithToc(rawBody, locale),
+    [rawBody, locale]
   );
-
-  // Top pick product: either explicitly set or the first in related list
-  const topPickProduct = useMemo(() => {
-    if (article.topPickProductId) {
-      const match = relatedProducts.find(
-        (p) =>
-          p.id === article.topPickProductId ||
-          p.slug === article.topPickProductId
-      );
-      if (match) return match;
-    }
-    return relatedProducts[0] || null;
-  }, [article.topPickProductId, relatedProducts]);
 
   const editorVerdictText = useMemo(() => {
     if (article.editorVerdict) {
@@ -151,73 +144,6 @@ export function GuideDetailView({
           <h1 className={styles.articleTitle}>{title}</h1>
           <p className={styles.articleExcerpt}>{excerpt}</p>
         </header>
-
-        {/* Quick Top Pick Callout Box (High Conversion for Mobile & Busy Shoppers) */}
-        {topPickProduct && (
-          <aside
-            className={styles.topPickBox}
-            aria-label={isAr ? 'خيارنا الأفضل سريعاً' : 'Our Top Pick'}
-          >
-            <div className={styles.topPickImageWrap}>
-              {topPickProduct.images?.[0]?.url ? (
-                <Image
-                  src={topPickProduct.images[0].url}
-                  alt={t(topPickProduct.title)}
-                  fill
-                  className={styles.topPickImage}
-                  sizes="90px"
-                  referrerPolicy="no-referrer"
-                />
-              ) : null}
-            </div>
-
-            <div className={styles.topPickDetails}>
-              <div>
-                <span className={styles.topPickHeaderBadge}>
-                  <Sparkles size={12} aria-hidden="true" />
-                  <span>
-                    {isAr ? 'خيارنا الأفضل سريعاً' : 'Our #1 Top Pick'}
-                  </span>
-                </span>
-              </div>
-              <h2 className={styles.topPickTitle}>{t(topPickProduct.title)}</h2>
-              <div className={styles.topPickPriceRow}>
-                {topPickProduct.priceAmount !== null && (
-                  <span className={`${styles.topPickPrice} tabularNums`}>
-                    {formatProductPrice(
-                      topPickProduct.priceAmount,
-                      topPickProduct.priceCurrency,
-                      locale
-                    )}
-                  </span>
-                )}
-                <span
-                  className="tabularNums"
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '0.25rem',
-                    color: '#f59e0b',
-                    fontSize: '0.85rem',
-                  }}
-                >
-                  <Star size={13} fill="currentColor" />
-                  <span>{(topPickProduct.stars || 4.5).toFixed(1)}</span>
-                </span>
-              </div>
-            </div>
-
-            <a
-              href={`/go/${encodeURIComponent(topPickProduct.slug)}?ref=guide_top_pick`}
-              target="_blank"
-              rel="sponsored noopener noreferrer"
-              className={styles.topPickCtaBtn}
-            >
-              <ShoppingCart size={15} aria-hidden="true" />
-              <span>{isAr ? 'اشتري الآن ↗' : 'Buy Now ↗'}</span>
-            </a>
-          </aside>
-        )}
 
         {/* Editorial Layout: Table of Contents + Prose */}
         <div className={styles.editorialLayout}>
@@ -326,83 +252,11 @@ export function GuideDetailView({
               );
             })}
 
-            {/* Interactive Comparison Table (3 to 5+ products: Product, Key Feature, Rating, Price, Buy CTA) */}
+            {/* Interactive Smart Comparison Matrix */}
             {relatedProducts.length > 1 && (
-              <section id="quick-comparison" className={styles.comparisonSection}>
-                <h2 className={styles.comparisonHeading}>
-                  {isAr
-                    ? 'جدول المقارنة التفاعلي بين المنتجات'
-                    : 'Interactive Product Comparison Table'}
-                </h2>
-                <div className={styles.tableWrap}>
-                  <table className={styles.table}>
-                    <thead>
-                      <tr>
-                        <th>{isAr ? 'المنتج' : 'Product'}</th>
-                        <th>{isAr ? 'الميزة الأساسية' : 'Key Feature'}</th>
-                        <th>{isAr ? 'التقييم' : 'Rating'}</th>
-                        <th>{isAr ? 'السعر' : 'Price'}</th>
-                        <th>{isAr ? 'رابط الشراء' : 'Action'}</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {relatedProducts.map((p) => (
-                        <tr key={p.id} className={styles.tableRow}>
-                          <td>
-                            <Link
-                              href={`/${locale}/products/${encodeURIComponent(p.slug)}`}
-                              className={styles.tableProductThumb}
-                            >
-                              {p.images?.[0]?.url && (
-                                <img
-                                  src={p.images[0].url}
-                                  alt={t(p.title)}
-                                  className={styles.tableThumbImg}
-                                  referrerPolicy="no-referrer"
-                                />
-                              )}
-                              <span>{t(p.title)}</span>
-                            </Link>
-                          </td>
-                          <td>
-                            <span
-                              style={{
-                                fontSize: '0.8rem',
-                                color: 'var(--color-text-secondary)',
-                              }}
-                            >
-                              {t(p.shortSummary) || t(p.whyWePickedIt)}
-                            </span>
-                          </td>
-                          <td className="tabularNums">
-                            ★ {(p.stars || 4.5).toFixed(1)}
-                          </td>
-                          <td className="tabularNums">
-                            {p.priceAmount !== null
-                              ? formatProductPrice(
-                                  p.priceAmount,
-                                  p.priceCurrency,
-                                  locale
-                                )
-                              : '-'}
-                          </td>
-                          <td>
-                            <a
-                              href={`/go/${encodeURIComponent(p.slug)}?ref=guide_table`}
-                              target="_blank"
-                              rel="sponsored noopener noreferrer"
-                              className={styles.tableBuyBtn}
-                            >
-                              <span>{isAr ? 'اشترِ الآن' : 'Buy Now'}</span>
-                              <ArrowUpRight size={13} aria-hidden="true" />
-                            </a>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </section>
+              <ProductComparisonMatrix
+                products={relatedProducts}
+              />
             )}
 
             {/* Editor's Verdict / Final Recommendation */}

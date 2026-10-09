@@ -1,9 +1,8 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
-import { ArrowLeft, ArrowRight, Clock } from 'lucide-react';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 import type { Article, Category, Locale, PartnerSource, Product } from '@/types';
 import { useI18n } from '@/i18n/I18nProvider';
 import { useSaved } from '@/features/saved/SavedProvider';
@@ -12,10 +11,18 @@ import { SiteFooter } from '@/components/sections/SiteFooter';
 import { HeroSection } from '@/components/sections/HeroSection';
 import { SignatureMotif } from '@/components/ui/SignatureMotif';
 import { ProductCard } from '@/components/ui/ProductCard';
+import { EditorialIssueCard } from '@/components/ui/EditorialIssueCard';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Testimonials } from '@/components/Testimonials/Testimonials';
 import type { Testimonial } from '@/lib/testimonials';
-import { searchAndRankProducts } from '@/lib/productSearch';
+import {
+  buildInterleavedProductFeed,
+  rankProductsForVisitor,
+  recordVisitorInterest,
+  searchAndRankArticles,
+  searchAndRankProducts,
+} from '@/lib/productSearch';
+import { seedBrowserSeenProducts } from '@/lib/viewedProductsStorage';
 import styles from '@/app/page.module.css';
 
 interface HomeClientProps {
@@ -35,11 +42,31 @@ export function HomeClient({
   testimonials,
   heroBackgroundImageUrl,
 }: HomeClientProps) {
-  const { locale, messages, t } = useI18n();
+  const { locale, messages } = useI18n();
   const { isSaved, toggleSave } = useSaved();
   const isAr = locale === 'ar';
   const [heroSearch, setHeroSearch] = useState('');
   const [selectedCategorySlug, setSelectedCategorySlug] = useState('');
+  const [visitorReady, setVisitorReady] = useState(false);
+  const [randomSeed, setRandomSeed] = useState(1);
+
+  useEffect(() => {
+    setVisitorReady(true);
+    setRandomSeed(Math.floor(Math.random() * 1000000) + 2);
+  }, []);
+
+  useEffect(() => {
+    const trimmed = heroSearch.trim();
+    if (!trimmed && !selectedCategorySlug) return;
+    const timer = window.setTimeout(() => {
+      recordVisitorInterest({
+        query: trimmed || undefined,
+        categorySlug: selectedCategorySlug || undefined,
+        products,
+      });
+    }, 350);
+    return () => window.clearTimeout(timer);
+  }, [heroSearch, selectedCategorySlug, products]);
 
   const handleChipSelect = (query: string, slug?: string) => {
     const targetSlug = slug || query;
@@ -49,37 +76,60 @@ export function HomeClient({
     } else {
       setSelectedCategorySlug(targetSlug);
       setHeroSearch('');
+      recordVisitorInterest({ categorySlug: targetSlug, products });
     }
   };
 
-  const filteredProducts = useMemo(() => {
-    let list = products;
+  const matchedArticles = useMemo(() => {
+    const trimmed = heroSearch.trim();
+    if (!trimmed || articles.length === 0) return [];
+    return searchAndRankArticles(articles, trimmed, products);
+  }, [articles, heroSearch, products]);
+
+  const displayProducts = useMemo(() => {
+    if (heroSearch.trim()) {
+      const searched = searchAndRankProducts(products, heroSearch, articles);
+      if (selectedCategorySlug) {
+        const catMatches = searched.filter(
+          (p) =>
+            p.categorySlug === selectedCategorySlug ||
+            p.categoryId === selectedCategorySlug
+        );
+        const otherMatches = searched.filter(
+          (p) =>
+            p.categorySlug !== selectedCategorySlug &&
+            p.categoryId !== selectedCategorySlug
+        );
+        return catMatches.length > 0 ? [...catMatches, ...otherMatches] : searched;
+      }
+      return searched.length > 0 ? searched : products;
+    }
+
     if (selectedCategorySlug) {
-      list = list.filter(
+      const exactCategoryProducts = products.filter(
         (p) =>
           p.categorySlug === selectedCategorySlug ||
           p.categoryId === selectedCategorySlug
       );
+      return exactCategoryProducts.length > 0 ? exactCategoryProducts : products;
     }
-    if (heroSearch.trim()) {
-      list = searchAndRankProducts(list, heroSearch);
-    }
-    return list;
-  }, [products, heroSearch, selectedCategorySlug]);
 
-  const featuredProducts = useMemo(
-    () => filteredProducts.filter((p) => p.isFeatured),
-    [filteredProducts]
+    if (visitorReady) {
+      return rankProductsForVisitor(products).slice(0, 24);
+    }
+
+    return products.slice(0, 24);
+  }, [products, articles, heroSearch, selectedCategorySlug, visitorReady]);
+
+  const interleavedFeed = useMemo(
+    () => buildInterleavedProductFeed(displayProducts, articles, randomSeed),
+    [displayProducts, articles, randomSeed]
   );
 
-  const displayProducts = useMemo(() => {
-    if (heroSearch.trim() || selectedCategorySlug) {
-      return filteredProducts;
-    }
-    return featuredProducts.length > 0
-      ? featuredProducts.slice(0, 16)
-      : filteredProducts.slice(0, 16);
-  }, [filteredProducts, featuredProducts, heroSearch, selectedCategorySlug]);
+  useEffect(() => {
+    if (!visitorReady || displayProducts.length === 0) return;
+    seedBrowserSeenProducts(displayProducts.slice(0, 8));
+  }, [visitorReady, displayProducts]);
 
   return (
     <div className={styles.pageShell}>
@@ -89,6 +139,7 @@ export function HomeClient({
       <HeroSection
         backgroundImageUrl={heroBackgroundImageUrl}
         products={products}
+        articles={articles}
         categories={categories}
         searchQuery={heroSearch}
         onSearchChange={(q) => {
@@ -101,15 +152,20 @@ export function HomeClient({
       />
 
       <main id="main-content" className={`siteContainer ${styles.main}`}>
-        {/* Section 01: Curated Featured Products (Directly below Hero) */}
+        {/* Section 01: Dynamic Products & Search Results Feed (Directly below Hero) */}
         <section id="home-products-section" className={styles.catalogSection}>
           <SignatureMotif
-            index="01"
             label={
-              selectedCategorySlug
-                ? categories.find((c) => c.slug === selectedCategorySlug)?.name?.[locale] ||
-                  messages.filters.sortFeatured
-                : messages.filters.sortFeatured
+              heroSearch.trim()
+                ? isAr
+                  ? `نتائج البحث والتوصيات لـ "${heroSearch.trim()}"`
+                  : `Search Results & Picks for "${heroSearch.trim()}"`
+                : selectedCategorySlug
+                  ? categories.find((c) => c.slug === selectedCategorySlug)?.name?.[locale] ||
+                    messages.nav.products
+                  : isAr
+                    ? 'أحدث المنتجات والعروض'
+                    : 'Products & Live Deals'
             }
             subtleText={
               products.length > 0
@@ -120,17 +176,47 @@ export function HomeClient({
             }
           />
 
+          {/* Matching Buying Guides & Review Articles when searching */}
+          {heroSearch.trim().length > 0 && matchedArticles.length > 0 && (
+            <div className={styles.searchMatchedGuidesBlock}>
+              <div className={styles.searchMatchedGuidesHeader}>
+                <span>
+                  {isAr
+                    ? `مقالات وأدلة شراء مطابقة لبحثك (${matchedArticles.length})`
+                    : `Matching Buying Guides & Articles (${matchedArticles.length})`}
+                </span>
+              </div>
+              <div className={styles.guidesGrid}>
+                {matchedArticles.slice(0, 3).map((article) => (
+                  <EditorialIssueCard key={`search-art-${article.id}`} article={article} />
+                ))}
+              </div>
+            </div>
+          )}
+
           {displayProducts.length > 0 ? (
             <div className={styles.productGrid}>
-              {displayProducts.map((product) => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  isSaved={isSaved(product.id)}
-                  onToggleSave={toggleSave}
-                  refContext="home_featured"
-                />
-              ))}
+              {interleavedFeed.map((entry, idx) =>
+                entry.type === 'product' ? (
+                  <ProductCard
+                    key={entry.product.id}
+                    product={entry.product}
+                    isSaved={isSaved(entry.product.id)}
+                    onToggleSave={toggleSave}
+                    refContext="home_featured"
+                  />
+                ) : (
+                  <div
+                    key={`inline-guide-${entry.article.id}-${idx}`}
+                    className={styles.inlineGuideRow}
+                  >
+                    <EditorialIssueCard
+                      article={entry.article}
+                      matchedProduct={entry.matchedProduct}
+                    />
+                  </div>
+                )
+              )}
             </div>
           ) : (
             <EmptyState
@@ -149,7 +235,6 @@ export function HomeClient({
           <section className={styles.guidesSection} aria-labelledby="home-guides-heading">
             <div className={styles.sectionHeaderRow}>
               <SignatureMotif
-                index="02"
                 label={isAr ? 'أدلة الشراء والمقارنات' : 'Buying Guides & Reviews'}
                 subtleText={isAr ? 'مراجعات متأنية قبل الشراء' : 'In-depth product deep dives'}
               />
@@ -160,54 +245,12 @@ export function HomeClient({
             </div>
 
             <div className={styles.guidesGrid}>
-              {articles.slice(0, 3).map((article) => (
-                <article key={article.id} className={styles.guideCard}>
-                  <Link
-                    href={`/${locale}/guides/${encodeURIComponent(article.slug)}`}
-                    className={styles.guideCoverWrap}
-                    tabIndex={-1}
-                  >
-                    <Image
-                      src={article.coverImage || '/images/hero-bg.jpg'}
-                      alt={t(article.title)}
-                      fill
-                      sizes="(max-width: 768px) 100vw, 33vw"
-                      className={styles.guideCoverImage}
-                      referrerPolicy="no-referrer"
-                    />
-                  </Link>
-
-                  <div className={styles.guideBody}>
-                    <div className={styles.guideMeta}>
-                      <span className={styles.guideCategory}>{t(article.categoryName)}</span>
-                      <span aria-hidden="true">·</span>
-                      <span className="tabularNums" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
-                        <Clock size={12} aria-hidden="true" />
-                        <span>{article.readingTimeMinutes} {isAr ? 'دقائق' : 'min'}</span>
-                      </span>
-                    </div>
-
-                    <h3 className={styles.guideTitle}>
-                      <Link
-                        href={`/${locale}/guides/${encodeURIComponent(article.slug)}`}
-                        className={styles.guideTitleLink}
-                      >
-                        {t(article.title)}
-                      </Link>
-                    </h3>
-
-                    <p className={styles.guideExcerpt}>{t(article.excerpt)}</p>
-
-                    <Link
-                      href={`/${locale}/guides/${encodeURIComponent(article.slug)}`}
-                      className={styles.viewAllLink}
-                      style={{ fontSize: '0.8rem', marginTop: 'auto' }}
-                    >
-                      <span>{isAr ? 'اقرأ الدليل' : 'Read Guide'}</span>
-                      {isAr ? <ArrowLeft size={13} aria-hidden="true" /> : <ArrowRight size={13} aria-hidden="true" />}
-                    </Link>
-                  </div>
-                </article>
+              {articles.slice(0, 3).map((article, idx) => (
+                <EditorialIssueCard
+                  key={article.id}
+                  article={article}
+                  indexNumber={idx + 1}
+                />
               ))}
             </div>
           </section>

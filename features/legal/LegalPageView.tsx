@@ -26,19 +26,15 @@ export function LegalPageView({ docType }: { docType: LegalDocType }) {
   const isAr = locale === 'ar';
 
   const [analyticsConsent, setAnalyticsConsent] = useState<'accepted' | 'essential_only'>(
-    'essential_only'
-  );
-
-  useEffect(() => {
-    try {
-      const stored = window.localStorage.getItem(COOKIE_CONSENT_STORAGE_KEY);
-      if (stored === 'accepted' || stored === 'essential_only') {
-        setAnalyticsConsent(stored);
-      }
-    } catch {
-      // Ignore storage read errors
+    () => {
+      if (typeof window === 'undefined') return 'essential_only';
+      try {
+        const stored = window.localStorage.getItem(COOKIE_CONSENT_STORAGE_KEY);
+        if (stored === 'accepted' || stored === 'essential_only') return stored;
+      } catch {}
+      return 'essential_only';
     }
-  }, []);
+  );
 
   const handleSaveCookiePref = (choice: 'accepted' | 'essential_only') => {
     setAnalyticsConsent(choice);

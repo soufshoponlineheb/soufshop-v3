@@ -2,8 +2,10 @@ import 'server-only';
 import type {
   LocalizedText,
   PriceDisplayPolicy,
+  ProductComparisonDna,
   ProductImage,
   ProductStatus,
+  ProductVideo,
   PromoBadgeType,
 } from '@/types';
 import { generateSlug } from '@/lib/seoSlug';
@@ -28,6 +30,14 @@ export function sanitizePlainText(input: unknown, maxLength: number): string {
     .replace(/<[^>]*>/g, '')
     .trim()
     .slice(0, maxLength);
+}
+
+export function sanitizeEmail(input: unknown): string {
+  const cleaned = sanitizePlainText(input, 160).toLowerCase();
+  if (!cleaned || !EMAIL_REGEX.test(cleaned)) {
+    return '';
+  }
+  return cleaned;
 }
 
 /**
@@ -186,8 +196,13 @@ export interface ValidatedProductPayload {
   affiliateUrl: string;
   sourceId: string;
   categoryId: string;
+  newCategoryName?: LocalizedText;
+  newCategoryIcon?: string;
   images: ProductImage[];
   videoUrl?: string;
+  videoUrls?: string[];
+  videos?: ProductVideo[];
+  comparisonDna?: ProductComparisonDna;
   tags: string[];
   isFeatured: boolean;
   status: ProductStatus;
@@ -275,8 +290,8 @@ export function validateProductInput(body: unknown): ValidatedProductPayload {
   const badge: PromoBadgeType =
     data.badge === 'توفير' || data.badge === 'اليوم الأخير' ? data.badge : null;
 
-  const rawCurrency = typeof data.priceCurrency === 'string' ? data.priceCurrency.trim().toUpperCase() : 'DH';
-  const priceCurrency = CURRENCY_REGEX.test(rawCurrency) ? rawCurrency : 'DH';
+  const rawCurrency = typeof data.priceCurrency === 'string' ? data.priceCurrency.trim().toUpperCase() : 'USD';
+  const priceCurrency = CURRENCY_REGEX.test(rawCurrency) ? rawCurrency : 'USD';
 
   const affiliateUrl = validateHttpsUrl(data.affiliateUrl, 'affiliateUrl');
   const sourceId = sanitizePlainText(data.sourceId, 128);
@@ -289,7 +304,18 @@ export function validateProductInput(body: unknown): ValidatedProductPayload {
     throw new ValidationError('Please select a category.', 'categoryId');
   }
 
-  const rawImages = Array.isArray(data.images) ? data.images.slice(0, 8) : [];
+  let newCategoryName: LocalizedText | undefined;
+  if (data.newCategoryName && typeof data.newCategoryName === 'object') {
+    const nc = data.newCategoryName as Record<string, unknown>;
+    const ar = sanitizePlainText(nc.ar, 100);
+    const en = sanitizePlainText(nc.en, 100);
+    if (ar || en) {
+      newCategoryName = { ar: ar || en, en: en || ar };
+    }
+  }
+  const newCategoryIcon = sanitizePlainText(data.newCategoryIcon, 16) || undefined;
+
+  const rawImages = Array.isArray(data.images) ? data.images.slice(0, 16) : [];
   const images: ProductImage[] = rawImages
     .map((img): ProductImage | null => {
       if (!img || typeof img !== 'object') return null;
@@ -327,9 +353,125 @@ export function validateProductInput(body: unknown): ValidatedProductPayload {
     }
   }
 
+  const rawVideosInput = Array.isArray(data.videos) ? data.videos.slice(0, 12) : [];
+  const videos: ProductVideo[] = [];
+  const seenVideoUrls = new Set<string>();
+
+  for (const v of rawVideosInput) {
+    if (!v) continue;
+    if (typeof v === 'string' && v.trim()) {
+      try {
+        const cleanUrl = validateHttpsUrl(v.trim(), 'videoUrl');
+        if (!seenVideoUrls.has(cleanUrl)) {
+          seenVideoUrls.add(cleanUrl);
+          videos.push({ url: cleanUrl, title: { ar: title.ar, en: title.en } });
+        }
+      } catch {
+        // Ignore invalid video URL
+      }
+    } else if (typeof v === 'object') {
+      const vObj = v as Record<string, unknown>;
+      if (typeof vObj.url === 'string' && vObj.url.trim()) {
+        try {
+          const cleanUrl = validateHttpsUrl(vObj.url.trim(), 'videoUrl');
+          if (!seenVideoUrls.has(cleanUrl)) {
+            seenVideoUrls.add(cleanUrl);
+            const tObj = (vObj.title as Record<string, unknown>) || {};
+            videos.push({
+              url: cleanUrl,
+              title: {
+                ar: sanitizePlainText(tObj.ar, 160) || title.ar,
+                en: sanitizePlainText(tObj.en, 160) || title.en,
+              },
+            });
+          }
+        } catch {
+          // Ignore invalid video URL
+        }
+      }
+    }
+  }
+
+  if (Array.isArray(data.videoUrls)) {
+    for (const rawVu of data.videoUrls.slice(0, 12)) {
+      if (typeof rawVu === 'string' && rawVu.trim()) {
+        try {
+          const cleanUrl = validateHttpsUrl(rawVu.trim(), 'videoUrl');
+          if (!seenVideoUrls.has(cleanUrl)) {
+            seenVideoUrls.add(cleanUrl);
+            videos.push({ url: cleanUrl, title: { ar: title.ar, en: title.en } });
+          }
+        } catch {
+          // Ignore invalid URL
+        }
+      }
+    }
+  }
+
   let videoUrl: string | undefined;
   if (typeof data.videoUrl === 'string' && data.videoUrl.trim().length > 0) {
-    videoUrl = validateHttpsUrl(data.videoUrl.trim(), 'videoUrl');
+    try {
+      videoUrl = validateHttpsUrl(data.videoUrl.trim(), 'videoUrl');
+      if (!seenVideoUrls.has(videoUrl)) {
+        seenVideoUrls.add(videoUrl);
+        videos.unshift({ url: videoUrl, title: { ar: title.ar, en: title.en } });
+      }
+    } catch {
+      // Ignore invalid URL
+    }
+  }
+  if (!videoUrl && videos.length > 0) {
+    videoUrl = videos[0].url;
+  }
+  const videoUrls = videos.map((v) => v.url);
+
+  let comparisonDna: ProductComparisonDna | undefined;
+  if (data.comparisonDna && typeof data.comparisonDna === 'object') {
+    const rawDna = data.comparisonDna as Record<string, unknown>;
+    const bestFor = validateLocalizedText(rawDna.bestFor, 'bestFor', 0, 180);
+    const rawSpecs = (rawDna.keySpecs && typeof rawDna.keySpecs === 'object'
+      ? rawDna.keySpecs
+      : {}) as Record<string, unknown>;
+    const specsAr = Array.isArray(rawSpecs.ar)
+      ? rawSpecs.ar.slice(0, 5).map((s) => sanitizePlainText(s, 90)).filter(Boolean)
+      : [];
+    const specsEn = Array.isArray(rawSpecs.en)
+      ? rawSpecs.en.slice(0, 5).map((s) => sanitizePlainText(s, 90)).filter(Boolean)
+      : [];
+    const clampScore = (val: unknown): number | undefined => {
+      if (val === null || val === undefined || val === '') return undefined;
+      const n = Number(val);
+      if (Number.isNaN(n)) return undefined;
+      return Math.max(50, Math.min(99, Math.round(n)));
+    };
+    const performanceScore = clampScore(rawDna.performanceScore);
+    const valueScore = clampScore(rawDna.valueScore);
+    const reliabilityScore = clampScore(rawDna.reliabilityScore);
+
+    if (
+      bestFor.ar ||
+      bestFor.en ||
+      specsAr.length > 0 ||
+      specsEn.length > 0 ||
+      performanceScore !== undefined ||
+      valueScore !== undefined ||
+      reliabilityScore !== undefined
+    ) {
+      comparisonDna = {
+        ...(bestFor.ar || bestFor.en ? { bestFor } : {}),
+        ...(specsAr.length > 0 || specsEn.length > 0
+          ? {
+              keySpecs: {
+                ar: specsAr.length > 0 ? specsAr : specsEn,
+                en: specsEn.length > 0 ? specsEn : specsAr,
+              },
+            }
+          : {}),
+        ...(performanceScore !== undefined ? { performanceScore } : {}),
+        ...(valueScore !== undefined ? { valueScore } : {}),
+        ...(reliabilityScore !== undefined ? { reliabilityScore } : {}),
+      };
+    }
   }
 
   return {
@@ -352,8 +494,13 @@ export function validateProductInput(body: unknown): ValidatedProductPayload {
     affiliateUrl,
     sourceId,
     categoryId,
+    newCategoryName,
+    newCategoryIcon,
     images,
-    videoUrl,
+    ...(videoUrl ? { videoUrl } : {}),
+    ...(videoUrls.length > 0 ? { videoUrls } : {}),
+    ...(videos.length > 0 ? { videos } : {}),
+    ...(comparisonDna ? { comparisonDna } : {}),
     tags,
     isFeatured: Boolean(data.isFeatured),
     status,

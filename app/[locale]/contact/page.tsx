@@ -21,12 +21,17 @@ export async function generateMetadata({
 
   const isEn = locale === 'en';
   const canonicalUrl = `${SITE_URL}/${isEn ? 'en' : 'ar'}/contact`;
+  const title = isEn
+    ? 'Contact AQURIVO — Editorial Support & Inquiries | AQURIVO'
+    : 'اتصل بنا — تواصل مع فريق AQURIVO مباشرة';
+  const description = isEn
+    ? 'Get in touch with the AQURIVO team via email (soufshop.online@gmail.com) or WhatsApp (+212 684 063908) for product questions and partnerships.'
+    : 'تواصل مع فريق AQURIVO مباشرة عبر البريد الإلكتروني soufshop.online@gmail.com أو عبر واتساب WhatsApp: +212 684 063908 لأي استفسار.';
 
   return {
     metadataBase: new URL(SITE_URL),
-    title: isEn ? 'Contact Us - AQURIVO' : 'اتصل بنا - AQURIVO',
-    description:
-      'تواصل مع فريق AQURIVO مباشرة عبر البريد الإلكتروني soufshop.online@gmail.com أو عبر واتساب WhatsApp: +212 684 063908.',
+    title,
+    description,
     alternates: {
       canonical: canonicalUrl,
       languages: {
@@ -36,12 +41,17 @@ export async function generateMetadata({
       },
     },
     openGraph: {
-      title: isEn ? 'Contact Us - AQURIVO' : 'اتصل بنا - AQURIVO',
-      description:
-        'البريد الإلكتروني: soufshop.online@gmail.com | واتساب: +212 684 063908 — AQURIVO.',
+      title,
+      description,
       url: canonicalUrl,
       siteName: 'AQURIVO',
+      locale: isEn ? 'en_US' : 'ar_SA',
       type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
     },
   };
 }
@@ -56,11 +66,41 @@ export default async function LocalizedContactPage({
     notFound();
   }
 
+  const isAr = locale === 'ar';
+
   const contactPageJsonLd = {
     '@context': 'https://schema.org',
-    '@type': 'ContactPage',
-    name: 'اتصل بنا - AQURIVO',
-    url: `${SITE_URL}/${locale}/contact`,
+    '@graph': [
+      {
+        '@type': 'ContactPage',
+        name: isAr ? 'اتصل بنا — AQURIVO' : 'Contact Us — AQURIVO',
+        url: `${SITE_URL}/${locale}/contact`,
+        inLanguage: isAr ? 'ar' : 'en',
+        mainEntity: {
+          '@type': 'Organization',
+          name: 'AQURIVO',
+          email: 'soufshop.online@gmail.com',
+          telephone: '+212684063908',
+        },
+      },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          {
+            '@type': 'ListItem',
+            position: 1,
+            name: isAr ? 'الرئيسية' : 'Home',
+            item: `${SITE_URL}/${locale}`,
+          },
+          {
+            '@type': 'ListItem',
+            position: 2,
+            name: isAr ? 'اتصل بنا' : 'Contact Us',
+            item: `${SITE_URL}/${locale}/contact`,
+          },
+        ],
+      },
+    ],
   };
 
   return (

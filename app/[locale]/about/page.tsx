@@ -21,12 +21,17 @@ export async function generateMetadata({
 
   const isEn = locale === 'en';
   const canonicalUrl = `${SITE_URL}/${isEn ? 'en' : 'ar'}/about`;
+  const title = isEn
+    ? 'About AQURIVO — Independent Product Curation & Methodology | AQURIVO'
+    : 'من نحن ومنهجيتنا في اختيار المنتجات — AQURIVO';
+  const description = isEn
+    ? 'Learn how AQURIVO independently researches, evaluates, and compares products across global stores with full transparency.'
+    : 'تعرف على منصة AQURIVO ومنهجيتنا المستقلة في فحص ومقارنة أفضل المنتجات العالمية وتوجيهك للشراء المباشر بأمان وشفافية.';
 
   return {
     metadataBase: new URL(SITE_URL),
-    title: isEn ? 'About Us - AQURIVO' : 'من نحن - AQURIVO',
-    description:
-      'AQURIVO منصة لاختيار وعرض أفضل المنتجات، نوجهك مباشرة للمتجر الأصلي للشراء بأمان',
+    title,
+    description,
     alternates: {
       canonical: canonicalUrl,
       languages: {
@@ -36,12 +41,17 @@ export async function generateMetadata({
       },
     },
     openGraph: {
-      title: isEn ? 'About Us - AQURIVO' : 'من نحن - AQURIVO',
-      description:
-        'AQURIVO منصة لاختيار وعرض أفضل المنتجات، نوجهك مباشرة للمتجر الأصلي للشراء بأمان',
+      title,
+      description,
       url: canonicalUrl,
       siteName: 'AQURIVO',
+      locale: isEn ? 'en_US' : 'ar_SA',
       type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
     },
   };
 }
@@ -56,18 +66,45 @@ export default async function LocalizedAboutPage({
     notFound();
   }
 
+  const isAr = locale === 'ar';
+
   const aboutPageJsonLd = {
     '@context': 'https://schema.org',
-    '@type': 'AboutPage',
-    name: 'من نحن - AQURIVO',
-    url: `${SITE_URL}/${locale}/about`,
-    description:
-      'AQURIVO منصة لاختيار وعرض أفضل المنتجات، نوجهك مباشرة للمتجر الأصلي للشراء بأمان',
-    publisher: {
-      '@type': 'Organization',
-      name: 'AQURIVO',
-      url: SITE_URL,
-    },
+    '@graph': [
+      {
+        '@type': 'AboutPage',
+        name: isAr
+          ? 'من نحن ومنهجيتنا — AQURIVO'
+          : 'About AQURIVO & Our Methodology',
+        url: `${SITE_URL}/${locale}/about`,
+        inLanguage: isAr ? 'ar' : 'en',
+        description: isAr
+          ? 'AQURIVO منصة مستقلة لاختيار ومقارنة أفضل المنتجات وتوجيهك للمتجر الأصلي للشراء بأمان.'
+          : 'AQURIVO is an independent product curation and comparison platform directing shoppers to official partner stores.',
+        publisher: {
+          '@type': 'Organization',
+          name: 'AQURIVO',
+          url: SITE_URL,
+        },
+      },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          {
+            '@type': 'ListItem',
+            position: 1,
+            name: isAr ? 'الرئيسية' : 'Home',
+            item: `${SITE_URL}/${locale}`,
+          },
+          {
+            '@type': 'ListItem',
+            position: 2,
+            name: isAr ? 'من نحن' : 'About Us',
+            item: `${SITE_URL}/${locale}/about`,
+          },
+        ],
+      },
+    ],
   };
 
   return (

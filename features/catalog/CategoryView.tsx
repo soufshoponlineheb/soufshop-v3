@@ -52,7 +52,7 @@ export function CategoryView({ category, products, articles }: CategoryViewProps
               title={messages.empty.catalogTitle}
               description={messages.empty.catalogDescription}
               primaryActionLabel={messages.nav.products}
-              primaryActionHref="/products"
+              primaryActionHref={`/${locale}/products`}
             />
           )}
         </section>
@@ -64,7 +64,7 @@ export function CategoryView({ category, products, articles }: CategoryViewProps
               {articles.map((article) => (
                 <Link
                   key={article.id}
-                  href={`/blog/${encodeURIComponent(article.slug)}`}
+                  href={`/${locale}/guides/${encodeURIComponent(article.slug)}`}
                   className={`${styles.articleCard} hoverLift`}
                 >
                   <h3 className={styles.articleTitle}>{t(article.title)}</h3>

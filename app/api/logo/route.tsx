@@ -5,7 +5,7 @@ import type { NextRequest } from 'next/server';
 export const runtime = 'edge';
 
 /**
- * Generates a high-resolution PNG of the AQURIVO "Royal AQ Monogram" emblem
+ * Generates a high-resolution PNG of the AQURIVO emblem
  * for Google Search SERP favicons, Schema.org Organization logo, and Web App Manifest.
  */
 export async function GET(req: NextRequest) {
@@ -16,7 +16,9 @@ export async function GET(req: NextRequest) {
       ? Math.round(rawSize)
       : 512;
 
-  return new ImageResponse(
+  const innerSize = Math.round(size * 0.75);
+
+  const response = new ImageResponse(
     (
       <div
         style={{
@@ -26,20 +28,16 @@ export async function GET(req: NextRequest) {
           alignItems: 'center',
           justifyContent: 'center',
           backgroundColor: '#0d1117',
-          borderRadius: `${Math.round(size * 0.1875)}px`,
         }}
       >
         <svg
-          width={size}
-          height={size}
+          width={innerSize}
+          height={innerSize}
           viewBox="0 0 32 32"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >
-          <rect width="32" height="32" rx="6" fill="#0d1117" />
           <path
-            fillRule="evenodd"
-            clipRule="evenodd"
             d="M4.5 27.5L12.1 6.4C12.9 4.2 14.3 3.5 16 3.5C17.7 3.5 19.1 4.2 19.9 6.4L27.5 27.5H22.6L17.4 12.1C17.0 10.9 16.5 10.5 16 10.5C15.5 10.5 15.0 10.9 14.6 12.1L9.4 27.5H4.5Z"
             fill="#F9FAFB"
           />
@@ -53,4 +51,10 @@ export async function GET(req: NextRequest) {
       height: size,
     }
   );
+
+  response.headers.set(
+    'Cache-Control',
+    'public, max-age=604800, s-maxage=604800, stale-while-revalidate=86400'
+  );
+  return response;
 }

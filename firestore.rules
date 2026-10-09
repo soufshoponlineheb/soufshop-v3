@@ -103,5 +103,11 @@ service cloud.firestore {
         request.resource.data.productSlug.size() >= 1;
       allow update, delete: if isAdmin();
     }
+
+    // 12. Issue & Help Reports: Created via Server API only; read and update restricted to verified admins.
+    match /reports/{reportId} {
+      allow create: if false;
+      allow read, update, delete: if isAdmin();
+    }
   }
 }

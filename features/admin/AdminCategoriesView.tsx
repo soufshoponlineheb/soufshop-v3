@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Edit3, FolderPlus, FolderTree, Plus, Sparkles, Trash2 } from 'lucide-react';
+import { Edit3, FolderPlus, FolderTree, Plus, Trash2 } from 'lucide-react';
 import type { Category } from '@/types';
 import { useI18n } from '@/i18n/I18nProvider';
 import { useSaved } from '@/features/saved/SavedProvider';

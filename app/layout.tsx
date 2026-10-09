@@ -34,22 +34,20 @@ const siteUrlCom = process.env.NEXT_PUBLIC_SITE_URL_COM || 'https://aqurivo.com'
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: {
-    default: 'AQURIVO — اكتشف أفضل المنتجات المختارة',
-    template: '%s | AQURIVO',
-  },
-  authors: [{ name: 'AQURIVO Team' }],
-  publisher: 'souftools ai',
+  title: 'AQURIVO — اكتشف أفضل المنتجات المختارة بعناية',
+  authors: [{ name: 'AQURIVO Editorial Team' }],
+  publisher: 'AQURIVO',
   other: {
-    author: 'AQURIVO Team',
+    author: 'AQURIVO Editorial Team',
   },
   description:
-    'نبحث عنك ونختار لك أفضل المنتجات بأفضل الأسعار. كل ما عليك هو النقر والشراء من المتجر الأصلي مباشرة.',
-  keywords: 'تسوق اونلاين، منتجات مختارة، افضل اسعار، عروض مميزة',
+    'نبحث عنك ونختار لك أفضل المنتجات العالمية مع مراجعات المواصفات وأدلة الشراء و11 أداة تسوق ذكية مجانية.',
+  keywords:
+    'AQURIVO، تسوق ذكي، منتجات مختارة، مراجعات المنتجات، أدلة الشراء، حاسبة هل يستحق الشراء، أفضل أسعار',
   openGraph: {
-    title: 'AQURIVO — اكتشف أفضل المنتجات المختارة',
+    title: 'AQURIVO — اكتشف أفضل المنتجات المختارة بعناية',
     description:
-      'نبحث عنك ونختار لك أفضل المنتجات بأفضل الأسعار. كل ما عليك هو النقر والشراء من المتجر الأصلي مباشرة.',
+      'نبحث عنك ونختار لك أفضل المنتجات العالمية مع مراجعات المواصفات وأدلة الشراء و11 أداة تسوق ذكية مجانية.',
     url: siteUrl,
     siteName: 'AQURIVO',
     images: [{ url: `${siteUrl}/api/og`, width: 1200, height: 630 }],
@@ -58,9 +56,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'AQURIVO — اكتشف أفضل المنتجات المختارة',
+    title: 'AQURIVO — اكتشف أفضل المنتجات المختارة بعناية',
     description:
-      'نبحث عنك ونختار لك أفضل المنتجات بأفضل الأسعار. كل ما عليك هو النقر والشراء من المتجر الأصلي مباشرة.',
+      'نبحث عنك ونختار لك أفضل المنتجات العالمية مع مراجعات المواصفات وأدلة الشراء و11 أداة تسوق ذكية مجانية.',
     images: [`${siteUrl}/api/og`],
   },
   alternates: {
@@ -73,36 +71,17 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: '/icon', sizes: '96x96', type: 'image/png' },
-      { url: '/api/logo?size=48', sizes: '48x48', type: 'image/png' },
-      { url: '/api/logo?size=96', sizes: '96x96', type: 'image/png' },
-      { url: '/api/logo?size=192', sizes: '192x192', type: 'image/png' },
-      { url: '/api/logo?size=512', sizes: '512x512', type: 'image/png' },
+      { url: '/favicon.ico', sizes: '48x48' },
+      { url: '/icon.svg', type: 'image/svg+xml', sizes: 'any' },
+      { url: '/icon', sizes: '192x192', type: 'image/png' },
     ],
-    shortcut: ['/api/logo?size=48'],
+    shortcut: ['/favicon.ico'],
     apple: [{ url: '/apple-icon', sizes: '180x180', type: 'image/png' }],
   },
   manifest: '/manifest.webmanifest',
   verification: {
     google: 'oS_3HRPs49irqAH5Ey9SwCB9vrNxeshh61SYJSfZP2E',
   },
-};
-
-const organizationContactSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'Organization',
-  name: 'AQURIVO',
-  url: 'https://aqurivo.store',
-  email: 'soufshop.online@gmail.com',
-  telephone: '+212684063908',
-  contactPoint: {
-    '@type': 'ContactPoint',
-    telephone: '+212684063908',
-    email: 'soufshop.online@gmail.com',
-    contactType: 'customer service',
-    availableLanguage: ['English', 'Arabic'],
-  },
-  sameAs: [],
 };
 
 const organizationAndWebsiteJsonLd = {
@@ -126,11 +105,12 @@ const organizationAndWebsiteJsonLd = {
       sameAs: [],
       logo: {
         '@type': 'ImageObject',
-        url: `${siteUrl}/api/logo?size=512`,
-        width: 512,
-        height: 512,
+        url: `${siteUrl}/icon`,
+        contentUrl: `${siteUrl}/icon.svg`,
+        width: 192,
+        height: 192,
       },
-      image: `${siteUrl}/api/logo?size=512`,
+      image: `${siteUrl}/icon`,
     },
     {
       '@type': 'WebSite',
@@ -170,12 +150,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script
           dangerouslySetInnerHTML={{
             __html: `(function(){try{if(window.__soufSafeJsonInstalled)return;window.__soufSafeJsonInstalled=true;var o=JSON.stringify.bind(JSON);JSON.stringify=function(v,r,s){try{return o(v,r,s)}catch(e){var w=new WeakSet();return o(v,function(k,val){if(k&&(k.indexOf('__reactFiber$')===0||k.indexOf('__reactProps$')===0||k.indexOf('__reactEvents$')===0||k==='_owner'||k==='stateNode'))return undefined;if(typeof val==='object'&&val!==null){if(typeof Node!=='undefined'&&val instanceof Node)return '[DOM:'+val.nodeName+']';if(typeof Window!=='undefined'&&val instanceof Window)return '[Window]';if(w.has(val))return undefined;w.add(val)}return typeof r==='function'?r.call(this,k,val):val},s)}}}catch(e){}})();`,
-          }}
-        />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(organizationContactSchema),
           }}
         />
         <script

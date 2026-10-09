@@ -6,6 +6,157 @@
   min-inline-size: 0;
 }
 
+.searchOuterWrap {
+  position: relative;
+  width: 100%;
+  z-index: 60;
+}
+
+.liveDropdown {
+  position: absolute;
+  inset-block-start: calc(100% + 8px);
+  inset-inline: 0;
+  background-color: var(--color-bg-elevated);
+  border: 1px solid var(--color-border-strong);
+  border-radius: 16px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+  text-align: start;
+  z-index: 80;
+}
+
+.liveScrollArea {
+  max-block-size: 320px;
+  overflow-y: auto;
+}
+
+.liveGroupBlock {
+  display: flex;
+  flex-direction: column;
+}
+
+.liveGroupTitle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-accent-primary);
+  background-color: var(--color-accent-subtle);
+  border-block-end: 1px solid var(--color-border-hairline);
+}
+
+.liveList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.liveListItem {
+  border-block-end: 1px solid var(--color-border-hairline);
+}
+
+.liveListItem:last-child {
+  border-block-end: none;
+}
+
+.liveResultLink {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 12px;
+  text-decoration: none;
+  color: var(--color-text-primary);
+  transition: background-color 0.15s ease;
+}
+
+.liveResultLink:hover {
+  background-color: var(--color-accent-subtle);
+}
+
+.liveThumbWrap {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background-color: var(--color-bg-subtle);
+  border: 1px solid var(--color-border-hairline);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.liveThumb {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.liveThumbCover {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.liveThumbFallback {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-accent-primary);
+}
+
+.liveInfoCol {
+  flex: 1;
+  min-inline-size: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.liveItemTitle {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.liveItemMeta {
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+.livePriceCol {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.liveGuideTag {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--color-accent-primary);
+  background-color: var(--color-accent-subtle);
+  border: 1px solid var(--color-accent-border);
+  padding: 2px 7px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+.livePriceBadge {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--color-accent-primary);
+}
+
+.liveArrow {
+  color: var(--color-text-muted);
+}
+
 /* 1. Prominent Temu-Style Search Bar with Solid Brand Pill Button */
 .searchRow {
   position: relative;

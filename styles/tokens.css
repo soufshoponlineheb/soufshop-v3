@@ -26,8 +26,10 @@
   /* Standard Semantic Tokens */
   --color-primary: var(--color-accent-primary);
   --color-surface: var(--color-bg-elevated);
+  --color-surface-hover: var(--color-bg-subtle);
   --color-border: var(--color-border-strong);
   --color-text: var(--color-text-primary);
+  --color-text-tertiary: var(--color-text-muted);
 
   /* Semantic Feedback Colors (Always paired with text + icon) */
   --color-status-success-bg: #e8f5ee;
@@ -63,10 +65,10 @@
   --text-3xl: 2.25rem;    /* 36px - Hero display */
 
   /* Line Heights */
-  --leading-tight: 1.22;
-  --leading-snug: 1.38;
-  --leading-normal: 1.62;
-  --leading-relaxed: 1.75;
+  --leading-tight: 1.38;
+  --leading-snug: 1.48;
+  --leading-normal: 1.65;
+  --leading-relaxed: 1.78;
 
   /* 8px Base Spacing Scale */
   --space-1: 0.25rem;  /* 4px */
@@ -103,44 +105,48 @@
   --letter-spacing-body: 0em;
 }
 
-[data-theme='dark'] {
-  /* 60% Dominant Neutral Canvas (Deep Obsidian Slate) */
-  --color-bg-canvas: #0e1211;
-  --color-bg-elevated: #161c1a;
-  --color-bg-subtle: #1c2421;
-  --color-bg-muted: #242e2b;
-  --color-bg-overlay: rgba(5, 8, 7, 0.72);
+[data-theme='dark'],
+html.dark,
+body.dark {
+  /* 60% Dominant Neutral Canvas (AQURIVO Deep Obsidian #0d1117 & #111827) */
+  --color-bg-canvas: #0d1117;
+  --color-bg-elevated: #111827;
+  --color-bg-subtle: #161f30;
+  --color-bg-muted: #1f2937;
+  --color-bg-overlay: rgba(5, 8, 12, 0.75);
 
   /* 30% Structural Surfaces & Typography */
-  --color-text-primary: #f1f0ec;
-  --color-text-secondary: #b0b8b5;
-  --color-text-muted: #858f8b;
+  --color-text-primary: #F9FAFB;
+  --color-text-secondary: #9CA3AF;
+  --color-text-muted: #6B7280;
   --color-text-on-accent: #081c17;
 
-  --color-border-hairline: #26302d;
-  --color-border-strong: #384642;
+  --color-border-hairline: rgba(249, 250, 251, 0.08);
+  --color-border-strong: rgba(249, 250, 251, 0.16);
 
-  /* 10% Brand Accent Budget (Luminous Botanical Emerald) */
-  --color-accent-primary: #2bc4a3;
+  /* 10% Brand Accent Budget (AQURIVO Teal #2DD4BF) */
+  --color-accent-primary: #2DD4BF;
   --color-accent-hover: #42d4b5;
   --color-accent-active: #1fa88a;
-  --color-accent-subtle: rgba(43, 196, 163, 0.12);
-  --color-accent-border: rgba(43, 196, 163, 0.35);
+  --color-accent-subtle: rgba(45, 212, 191, 0.12);
+  --color-accent-border: rgba(45, 212, 191, 0.35);
 
   /* Standard Semantic Tokens */
   --color-primary: var(--color-accent-primary);
   --color-surface: var(--color-bg-elevated);
+  --color-surface-hover: var(--color-bg-subtle);
   --color-border: var(--color-border-strong);
   --color-text: var(--color-text-primary);
+  --color-text-tertiary: var(--color-text-muted);
 
-  /* Semantic Feedback Colors (Dark Mode calibrated) */
-  --color-status-success-bg: rgba(24, 148, 96, 0.16);
-  --color-status-success-text: #5ce0a8;
-  --color-status-success-border: rgba(92, 224, 168, 0.3);
+  /* Semantic Feedback Colors (Dark Mode calibrated with Gold #F59E0B) */
+  --color-status-success-bg: rgba(45, 212, 191, 0.14);
+  --color-status-success-text: #2DD4BF;
+  --color-status-success-border: rgba(45, 212, 191, 0.35);
 
-  --color-status-warning-bg: rgba(217, 142, 24, 0.16);
-  --color-status-warning-text: #f6c163;
-  --color-status-warning-border: rgba(246, 193, 99, 0.3);
+  --color-status-warning-bg: rgba(245, 158, 11, 0.14);
+  --color-status-warning-text: #F59E0B;
+  --color-status-warning-border: rgba(245, 158, 11, 0.35);
 
   --color-status-danger-bg: rgba(214, 58, 58, 0.16);
   --color-status-danger-text: #f78b8b;

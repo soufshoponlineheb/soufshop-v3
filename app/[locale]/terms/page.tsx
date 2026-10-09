@@ -21,13 +21,15 @@ export async function generateMetadata({
 
   const isEn = locale === 'en';
   const canonicalUrl = `${SITE_URL}/${isEn ? 'en' : 'ar'}/terms`;
+  const title = isEn ? 'Terms of Use | AQURIVO' : 'شروط الاستخدام | AQURIVO';
+  const description = isEn
+    ? 'Terms of use for browsing AQURIVO and purchasing products through partner stores.'
+    : 'شروط الاستخدام لتصفح منصة AQURIVO والتسوق بأمان.';
 
   return {
     metadataBase: new URL(SITE_URL),
-    title: isEn ? 'Terms of Use - AQURIVO' : 'شروط الاستخدام - AQURIVO',
-    description: isEn
-      ? 'Terms of use for browsing AQURIVO and purchasing products through partner stores.'
-      : 'شروط الاستخدام لتصفح منصة AQURIVO والتسوق بأمان.',
+    title,
+    description,
     alternates: {
       canonical: canonicalUrl,
       languages: {
@@ -37,10 +39,17 @@ export async function generateMetadata({
       },
     },
     openGraph: {
-      title: isEn ? 'Terms of Use - AQURIVO' : 'شروط الاستخدام - AQURIVO',
+      title,
+      description,
       url: canonicalUrl,
       siteName: 'AQURIVO',
+      locale: isEn ? 'en_US' : 'ar_SA',
       type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
     },
   };
 }
@@ -55,11 +64,35 @@ export default async function LocalizedTermsPage({
     notFound();
   }
 
+  const isAr = locale === 'ar';
+
   const termsJsonLd = {
     '@context': 'https://schema.org',
-    '@type': 'WebPage',
-    name: 'شروط الاستخدام - AQURIVO',
-    url: `${SITE_URL}/${locale}/terms`,
+    '@graph': [
+      {
+        '@type': 'WebPage',
+        name: isAr ? 'شروط الاستخدام — AQURIVO' : 'Terms of Use — AQURIVO',
+        url: `${SITE_URL}/${locale}/terms`,
+        inLanguage: isAr ? 'ar' : 'en',
+      },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          {
+            '@type': 'ListItem',
+            position: 1,
+            name: isAr ? 'الرئيسية' : 'Home',
+            item: `${SITE_URL}/${locale}`,
+          },
+          {
+            '@type': 'ListItem',
+            position: 2,
+            name: isAr ? 'شروط الاستخدام' : 'Terms of Use',
+            item: `${SITE_URL}/${locale}/terms`,
+          },
+        ],
+      },
+    ],
   };
 
   return (

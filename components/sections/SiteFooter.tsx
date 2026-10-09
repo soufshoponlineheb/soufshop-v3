@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Mail, MessageCircle, Phone } from 'lucide-react';
 import { useI18n } from '@/i18n/I18nProvider';
 import { BrandLogo } from '@/components/ui/BrandLogo';
+import { TOOLS_DATA } from '@/lib/tools-data';
 import styles from './SiteFooter.module.css';
 
 const OFFICIAL_EMAIL = 'soufshop.online@gmail.com';
@@ -20,7 +21,7 @@ export function SiteFooter({ productsCount }: SiteFooterProps = {}) {
   const { locale, messages } = useI18n();
   const isAr = locale === 'ar';
 
-  const displayCount =
+  const _displayCount =
     typeof productsCount === 'number' && productsCount > 0
       ? String(productsCount)
       : '500+';
@@ -31,7 +32,7 @@ export function SiteFooter({ productsCount }: SiteFooterProps = {}) {
         <div className={styles.topGrid}>
           {/* Column 1: Brand & Single Small Disclosure */}
           <div className={styles.brandCol}>
-            <Link href="/" className={styles.brandLink}>
+            <Link href={`/${locale}`} className={styles.brandLink}>
               <BrandLogo size="md" />
             </Link>
             <p className={styles.amazonDisclosure}>
@@ -51,6 +52,11 @@ export function SiteFooter({ productsCount }: SiteFooterProps = {}) {
               <li>
                 <Link href={`/${locale}/guides`} className={styles.footerLink}>
                   {messages.nav.guides}
+                </Link>
+              </li>
+              <li>
+                <Link href={`/${locale}/tools`} className={styles.footerLink}>
+                  {isAr ? 'أدوات AQURIVO المجانية' : 'AQURIVO Free Tools'}
                 </Link>
               </li>
               <li>
@@ -128,18 +134,31 @@ export function SiteFooter({ productsCount }: SiteFooterProps = {}) {
                   {OFFICIAL_PHONE_DISPLAY}
                 </span>
               </a>
-              <a
-                href={OFFICIAL_WHATSAPP_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={styles.whatsappButton}
-              >
-                <MessageCircle size={15} aria-hidden="true" />
-                <span>{messages.footer.whatsappCta}</span>
-              </a>
             </address>
           </div>
         </div>
+
+        {/* Crawlable SEO Mesh for All 11 Free Smart Tools */}
+        <nav
+          className={styles.toolsSeoStrip}
+          aria-label={isAr ? 'الأدوات والحاسبات الذكية المجانية' : 'Free Smart Calculators & Tools'}
+        >
+          <span className={styles.toolsSeoLabel}>
+            {isAr ? 'أدوات وحاسبات مجانية:' : 'Free Smart Tools:'}
+          </span>
+          <ul className={styles.toolsSeoList}>
+            {TOOLS_DATA.map((tool) => (
+              <li key={tool.slug}>
+                <Link
+                  href={`/${locale}/tools/${tool.slug}`}
+                  className={styles.toolsSeoLink}
+                >
+                  {isAr ? tool.nameAr : tool.nameEn}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
 
         <div className={styles.bottomBar}>
           <p className={`${styles.copyright} tabularNums`}>

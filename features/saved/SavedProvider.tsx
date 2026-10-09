@@ -47,6 +47,30 @@ export function SavedProvider({ children }: { children: React.ReactNode }) {
   const [authLoading, setAuthLoading] = useState<boolean>(true);
   const [csrfToken, setCsrfToken] = useState<string | null>(null);
 
+  useEffect(() => {
+    queueMicrotask(() => {
+      try {
+        const rawSaved = window.localStorage.getItem(SAVED_STORAGE_KEY);
+        if (rawSaved) {
+          const parsed = JSON.parse(rawSaved);
+          if (Array.isArray(parsed)) setSavedIds(parsed.filter((x) => typeof x === 'string'));
+        }
+        const rawRecent = window.localStorage.getItem(RECENT_STORAGE_KEY);
+        if (rawRecent) {
+          const parsed = JSON.parse(rawRecent);
+          if (Array.isArray(parsed)) setRecentlyViewedIds(parsed.filter((x) => typeof x === 'string'));
+        }
+        const rawPrice = window.localStorage.getItem(PRICE_SNAPSHOT_KEY);
+        if (rawPrice) {
+          const parsed = JSON.parse(rawPrice);
+          if (parsed && typeof parsed === 'object') setPriceHistoryMap(parsed);
+        }
+        const rawToken = window.sessionStorage.getItem(SESSION_TOKEN_STORAGE_KEY);
+        if (rawToken) setCsrfToken(rawToken);
+      } catch {}
+    });
+  }, []);
+
   const { showToast } = useToast();
   const { messages } = useI18n();
 
@@ -221,40 +245,24 @@ export function SavedProvider({ children }: { children: React.ReactNode }) {
   }, [csrfToken, refreshSession]);
 
   useEffect(() => {
+    let isMounted = true;
     getFirebaseClientApp();
     void getFirebaseClientAnalytics();
 
-    try {
-      const rawSaved = window.localStorage.getItem(SAVED_STORAGE_KEY);
-      if (rawSaved) {
-        const parsed = JSON.parse(rawSaved);
-        if (Array.isArray(parsed)) setSavedIds(parsed.filter((x) => typeof x === 'string'));
-      }
-      const rawRecent = window.localStorage.getItem(RECENT_STORAGE_KEY);
-      if (rawRecent) {
-        const parsed = JSON.parse(rawRecent);
-        if (Array.isArray(parsed)) setRecentlyViewedIds(parsed.filter((x) => typeof x === 'string'));
-      }
-      const rawPrices = window.localStorage.getItem(PRICE_SNAPSHOT_KEY);
-      if (rawPrices) {
-        const parsed = JSON.parse(rawPrices);
-        if (parsed && typeof parsed === 'object') setPriceHistoryMap(parsed);
-      }
-      const cachedToken = window.sessionStorage.getItem(SESSION_TOKEN_STORAGE_KEY);
-      if (cachedToken) {
-        setCsrfToken(cachedToken);
-      }
-    } catch {
-      // Ignore storage read errors
-    }
-
     const auth = getFirebaseClientAuth();
     if (!auth) {
-      void refreshSession().finally(() => setAuthLoading(false));
-      return;
+      const initVisitor = async () => {
+        await refreshSession();
+        if (isMounted) setAuthLoading(false);
+      };
+      void initVisitor();
+      return () => {
+        isMounted = false;
+      };
     }
 
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      if (!isMounted) return;
       if (firebaseUser && firebaseUser.email) {
         const normalizedEmail = firebaseUser.email.trim().toLowerCase();
         const role = DEFAULT_ADMIN_EMAILS.includes(normalizedEmail) ? 'admin' : 'visitor';
@@ -264,11 +272,14 @@ export function SavedProvider({ children }: { children: React.ReactNode }) {
         await refreshSession();
       } else {
         await refreshSession();
-        setAuthLoading(false);
+        if (isMounted) setAuthLoading(false);
       }
     });
 
-    return () => unsubscribe();
+    return () => {
+      isMounted = false;
+      unsubscribe();
+    };
   }, [refreshSession]);
 
   const isSaved = useCallback(

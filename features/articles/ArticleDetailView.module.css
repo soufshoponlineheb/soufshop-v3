@@ -101,20 +101,24 @@
 
 .editorialLayout {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--space-8);
   align-items: start;
+  width: 100%;
+  max-inline-size: 100%;
+  min-inline-size: 0;
 }
 
 @media (min-width: 960px) {
   .editorialLayout {
-    grid-template-columns: 260px 1fr;
+    grid-template-columns: 260px minmax(0, 1fr);
     gap: var(--space-12);
   }
 }
 
 .tocSidebar {
   position: static;
+  min-inline-size: 0;
 }
 
 @media (min-width: 960px) {
@@ -160,6 +164,7 @@
   display: block;
   padding-block: 2px;
   transition: color var(--duration-fast) var(--ease-out-quart);
+  overflow-wrap: break-word;
 }
 
 .tocLink:hover {
@@ -168,7 +173,10 @@
 
 .proseColumn {
   width: 100%;
-  max-inline-size: var(--measure-reading);
+  min-inline-size: 0;
+  max-inline-size: min(100%, var(--container-reading-width));
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .proseContent {
@@ -178,6 +186,11 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-5);
+  width: 100%;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .proseContent h2 {

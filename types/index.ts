@@ -49,6 +49,22 @@ export interface ProductImage {
   height: number;
 }
 
+export interface ProductVideo {
+  url: string;
+  title?: LocalizedText;
+}
+
+export interface ProductComparisonDna {
+  bestFor?: LocalizedText;
+  keySpecs?: {
+    ar: string[];
+    en: string[];
+  };
+  performanceScore?: number;
+  valueScore?: number;
+  reliabilityScore?: number;
+}
+
 export interface Product {
   id: string;
   slug: string;
@@ -79,6 +95,9 @@ export interface Product {
   priceUpdatedAt: string;
   images: ProductImage[];
   videoUrl?: string;
+  videoUrls?: string[];
+  videos?: ProductVideo[];
+  comparisonDna?: ProductComparisonDna;
   affiliateUrl: string;
   sourceId: string;
   sourceSlug: string;
@@ -144,3 +163,31 @@ export interface SiteSettings {
   whatsappUrl: string;
   updatedAt: string;
 }
+
+export type ReportType = 'product_issue' | 'order_issue';
+
+export type ReportReason =
+  | 'broken_link'
+  | 'price_mismatch'
+  | 'wrong_info'
+  | 'unavailable'
+  | 'other'
+  | 'order_issue';
+
+export type ReportStatus = 'new' | 'in_progress' | 'resolved';
+
+export interface ReportRecord {
+  id: string;
+  type: ReportType;
+  reason: ReportReason;
+  productSlug: string;
+  productName: string;
+  email: string;
+  message: string;
+  orderRef: string;
+  locale: Locale;
+  status: ReportStatus;
+  createdAt: string;
+  ipHash?: string;
+}
+

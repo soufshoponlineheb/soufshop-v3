@@ -2,7 +2,7 @@
 
 import React, { useMemo, useState } from 'react';
 import Link from 'next/link';
-import { Edit3, Plus, RefreshCw, Trash2 } from 'lucide-react';
+import { AlertTriangle, Edit3, Plus, RefreshCw, Trash2 } from 'lucide-react';
 import type { PartnerSource, Product, ProductStatus } from '@/types';
 import { useI18n } from '@/i18n/I18nProvider';
 import { useSaved } from '@/features/saved/SavedProvider';
@@ -17,14 +17,23 @@ import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
 import styles from './AdminShell.module.css';
 
+interface ProductWarningInfo {
+  brokenLinkCount: number;
+  unavailableCount: number;
+  totalCriticalCount: number;
+  hasWarning: boolean;
+}
+
 interface AdminProductsListViewProps {
   initialProducts: Product[];
   sources: PartnerSource[];
+  productWarnings?: Record<string, ProductWarningInfo>;
 }
 
 export function AdminProductsListView({
   initialProducts,
   sources,
+  productWarnings = {},
 }: AdminProductsListViewProps) {
   const { locale, t } = useI18n();
   const { csrfToken } = useSaved();
@@ -238,11 +247,26 @@ export function AdminProductsListView({
                 </tr>
               </thead>
               <tbody>
-                {filtered.map((item) => (
+                {filtered.map((item) => {
+                  const warnStats =
+                    productWarnings[item.slug.trim().toLowerCase()] ||
+                    productWarnings[item.title.ar.trim().toLowerCase()] ||
+                    productWarnings[item.title.en.trim().toLowerCase()];
+                  return (
                   <tr key={item.id}>
                     <td>
                       <strong>{t(item.title)}</strong>
                       <div className={styles.kpiLabel}>/{item.slug}</div>
+                      {warnStats?.hasWarning && (
+                        <div className={styles.productWarningBadge}>
+                          <AlertTriangle size={12} aria-hidden="true" />
+                          <span>
+                            {isAr
+                              ? `تحذير: ${warnStats.totalCriticalCount} بلاغات (رابط/توفر)`
+                              : `Warning: ${warnStats.totalCriticalCount} reports (link/stock)`}
+                          </span>
+                        </div>
+                      )}
                     </td>
                     <td>{t(item.sourceName)}</td>
                     <td className="tabularNums">
@@ -298,7 +322,8 @@ export function AdminProductsListView({
                       </div>
                     </td>
                   </tr>
-                ))}
+                  );
+                })}
               </tbody>
             </table>
           </div>

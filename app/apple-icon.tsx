@@ -15,23 +15,19 @@ export default function AppleIcon() {
           width: 180,
           height: 180,
           backgroundColor: '#0d1117',
-          borderRadius: 36,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
         }}
       >
         <svg
-          width="180"
-          height="180"
+          width="136"
+          height="136"
           viewBox="0 0 32 32"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >
-          <rect width="32" height="32" rx="6" fill="#0d1117" />
           <path
-            fillRule="evenodd"
-            clipRule="evenodd"
             d="M4.5 27.5L12.1 6.4C12.9 4.2 14.3 3.5 16 3.5C17.7 3.5 19.1 4.2 19.9 6.4L27.5 27.5H22.6L17.4 12.1C17.0 10.9 16.5 10.5 16 10.5C15.5 10.5 15.0 10.9 14.6 12.1L9.4 27.5H4.5Z"
             fill="#F9FAFB"
           />

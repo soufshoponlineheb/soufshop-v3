@@ -81,17 +81,18 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     try {
       const saved = window.localStorage.getItem(THEME_STORAGE_KEY);
-      if (saved === 'light' || saved === 'dark') {
-        setThemeState(saved);
-        applyThemeToDom(saved);
-        return;
-      }
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      const initial: ResolvedTheme = prefersDark ? 'dark' : 'light';
-      setThemeState(initial);
-      applyThemeToDom(initial);
+      const targetTheme: ResolvedTheme =
+        saved === 'light' || saved === 'dark'
+          ? saved
+          : window.matchMedia('(prefers-color-scheme: dark)').matches
+            ? 'dark'
+            : 'light';
+      applyThemeToDom(targetTheme);
+      queueMicrotask(() => {
+        setThemeState(targetTheme);
+      });
     } catch {
-      applyThemeToDom('light');
+      // Ignore storage errors
     }
   }, []);
 

@@ -6,6 +6,10 @@ import { Heart, ShoppingCart } from 'lucide-react';
 import type { LocalizedText, Product, PromoBadgeType } from '@/types';
 import { useI18n } from '@/i18n/I18nProvider';
 import { formatNumber, formatProductPrice } from '@/lib/format';
+import {
+  buildSnapshotFromProduct,
+  recordBrowserProductView,
+} from '@/lib/viewedProductsStorage';
 import { ProductArtwork } from './ProductArtwork';
 import styles from './ProductCard.module.css';
 
@@ -61,8 +65,9 @@ export function ProductCard({
   onToggleSave,
   refContext = 'catalog_card',
 }: ProductCardProps) {
-  const { locale, messages, t } = useI18n();
+  const { locale, messages, t, currency } = useI18n();
   const isAr = locale === 'ar';
+  const [imgError, setImgError] = React.useState(false);
 
   const resolvedTitle =
     typeof propTitle === 'string'
@@ -93,7 +98,7 @@ export function ProductCard({
         ? Math.round((resolvedPrice / (1 - (explicitDiscount || 30) / 100)) * 100) / 100
         : null;
 
-  const resolvedCurrency = propCurrency || product?.priceCurrency || 'DH';
+  const resolvedCurrency = propCurrency || product?.priceCurrency || 'USD';
 
   const computedDiscount =
     explicitDiscount !== null && explicitDiscount > 0
@@ -136,12 +141,15 @@ export function ProductCard({
       ? t(product.sourceName)
       : rawSource.toUpperCase();
 
+  const validProductImg = product?.images?.find((img) => Boolean(img?.url && img.url.trim()));
   const resolvedImageUrl =
-    propImageUrl || product?.images?.[0]?.url || '';
+    (propImageUrl && propImageUrl.trim()) || validProductImg?.url?.trim() || '';
   const resolvedImageAlt =
-    product?.images?.[0]?.alt ? t(product.images[0].alt) : resolvedTitle;
+    validProductImg?.alt ? t(validProductImg.alt) : resolvedTitle;
 
-  const resolvedBadge: PromoBadgeType =
+  const showImage = Boolean(resolvedImageUrl && !imgError);
+
+  const _resolvedBadge: PromoBadgeType =
     propBadge !== undefined ? propBadge : product?.badge ?? null;
 
   const detailHref = product?.slug
@@ -156,31 +164,45 @@ export function ProductCard({
 
   const formattedPrice =
     resolvedPrice !== null && resolvedPrice !== undefined && resolvedPrice > 0
-      ? formatProductPrice(resolvedPrice, resolvedCurrency, locale)
+      ? formatProductPrice(resolvedPrice, resolvedCurrency, locale, currency)
       : '';
 
   const formattedOldPrice =
     resolvedOldPrice !== null &&
     resolvedOldPrice !== undefined &&
     resolvedOldPrice > 0
-      ? formatProductPrice(resolvedOldPrice, resolvedCurrency, locale)
+      ? formatProductPrice(resolvedOldPrice, resolvedCurrency, locale, currency)
       : '';
 
   const productId = product?.id || product?.slug || resolvedTitle;
 
+  const handleRecordView = () => {
+    if (!product) return;
+    const snap = buildSnapshotFromProduct(product, true);
+    if (snap) {
+      recordBrowserProductView(snap);
+    }
+  };
+
   return (
     <article className={styles.card}>
-      {/* 1. Image Area (55% of card height) */}
+      {/* 1. Image Area */}
       <div className={styles.mediaZone}>
         {detailHref ? (
-          <Link href={detailHref} className={styles.mediaLink} aria-label={resolvedTitle}>
-            {resolvedImageUrl ? (
+          <Link
+            href={detailHref}
+            onClick={handleRecordView}
+            className={styles.mediaLink}
+            aria-label={resolvedTitle}
+          >
+            {showImage ? (
               <img
                 src={resolvedImageUrl}
                 alt={resolvedImageAlt || resolvedTitle}
                 className={styles.productImage}
                 referrerPolicy="no-referrer"
                 loading="lazy"
+                onError={() => setImgError(true)}
               />
             ) : (
               <div className={styles.artworkWrap}>
@@ -200,13 +222,14 @@ export function ProductCard({
             className={styles.mediaLink}
             aria-label={resolvedTitle}
           >
-            {resolvedImageUrl ? (
+            {showImage ? (
               <img
                 src={resolvedImageUrl}
                 alt={resolvedImageAlt || resolvedTitle}
                 className={styles.productImage}
                 referrerPolicy="no-referrer"
                 loading="lazy"
+                onError={() => setImgError(true)}
               />
             ) : (
               <div className={styles.artworkWrap}>
@@ -220,7 +243,7 @@ export function ProductCard({
           </a>
         )}
 
-        {/* Badge — Top Start (shows category in product_related context to avoid external store names) */}
+        {/* Badge — Top Start */}
         {(refContext === 'product_related'
           ? Boolean(product?.categoryName && t(product.categoryName))
           : Boolean(sourceLabel)) && (
@@ -245,7 +268,7 @@ export function ProductCard({
             aria-label={isSaved ? messages.product.savedItem : messages.product.saveItem}
           >
             <Heart
-              size={15}
+              size={14}
               fill={isSaved ? 'currentColor' : 'none'}
               aria-hidden="true"
             />
@@ -253,17 +276,18 @@ export function ProductCard({
         )}
       </div>
 
-      {/* 2. Info Section (flex-direction: column + justify-content: space-between) */}
+      {/* 2. Info Section */}
       <div className={styles.infoZone}>
         <div className={styles.topInfoGroup}>
           <h3 className={styles.title}>
             {detailHref ? (
-              <Link href={detailHref} className={styles.titleLink}>
+              <Link href={detailHref} onClick={handleRecordView} className={styles.titleLink}>
                 {resolvedTitle}
               </Link>
             ) : (
               <a
                 href={outboundHref}
+                onClick={handleRecordView}
                 target="_blank"
                 rel="sponsored noopener noreferrer"
                 className={styles.titleLink}
@@ -273,7 +297,7 @@ export function ProductCard({
             )}
           </h3>
 
-          {/* 2. Stars Rating directly below product name: ★★★★☆ 4.3 (120 تقييم) */}
+          {/* Stars Rating directly below product name */}
           <div className={styles.ratingRow}>
             <span className={styles.starsText} aria-label={`${resolvedStars} / 5`}>
               {renderStarString(resolvedStars)}
@@ -283,25 +307,25 @@ export function ProductCard({
             </span>
             <span className={`${styles.soldText} tabularNums`}>
               {isAr
-                ? `(${formatNumber(resolvedSoldCount, locale)} تقييم)`
-                : `(${formatNumber(resolvedSoldCount, locale)} reviews)`}
+                ? `(${formatNumber(resolvedSoldCount, locale)})`
+                : `(${formatNumber(resolvedSoldCount, locale)})`}
             </span>
           </div>
         </div>
 
-        {/* 3, 4 & 5. Single-line Price + Inline Discount Badge + Full-width Buy Now Button */}
+        {/* Single-line Price + Inline Discount Badge + Full-width Buy Now Button */}
         <div className={styles.bottomActionArea}>
           <div className={styles.priceLine}>
             {formattedPrice ? (
               <>
+                <span dir="ltr" className={`${styles.currentPrice} tabularNums`}>
+                  {formattedPrice}
+                </span>
                 {formattedOldPrice && (
                   <span dir="ltr" className={`${styles.oldPrice} tabularNums`}>
                     {formattedOldPrice}
                   </span>
                 )}
-                <span dir="ltr" className={`${styles.currentPrice} tabularNums`}>
-                  {formattedPrice}
-                </span>
                 {computedDiscount !== null && computedDiscount > 0 && (
                   <span dir="ltr" className={`${styles.inlineDiscountBadge} tabularNums`}>
                     -{computedDiscount}%
@@ -321,7 +345,7 @@ export function ProductCard({
             rel="sponsored noopener noreferrer"
             className={styles.fullBuyBtn}
           >
-            <ShoppingCart size={15} aria-hidden="true" />
+            <ShoppingCart size={14} aria-hidden="true" />
             <span>{messages.product.buyNow}</span>
           </a>
         </div>

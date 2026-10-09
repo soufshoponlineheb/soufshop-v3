@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
@@ -8,6 +8,7 @@ import {
   ArrowRight,
   BarChart3,
   FileText,
+  Flag,
   FolderTree,
   Globe,
   Inbox,
@@ -29,6 +30,7 @@ export interface AdminShellProps {
   adminEmail: string;
   firebaseAdminReady: boolean;
   cloudinaryReady: boolean;
+  initialNewReportsCount?: number;
   children: React.ReactNode;
 }
 
@@ -36,6 +38,7 @@ export function AdminShell({
   adminEmail,
   firebaseAdminReady,
   cloudinaryReady,
+  initialNewReportsCount = 0,
   children,
 }: AdminShellProps) {
   const pathname = usePathname();
@@ -44,6 +47,27 @@ export function AdminShell({
   const { theme, toggleTheme } = useTheme();
   const { user, authLoading } = useSaved();
   const isAr = locale === 'ar';
+
+  const [newReportsCount, setNewReportsCount] = useState<number>(
+    initialNewReportsCount
+  );
+
+  useEffect(() => {
+    setNewReportsCount(initialNewReportsCount);
+  }, [initialNewReportsCount]);
+
+  useEffect(() => {
+    const handleReportsCount = (e: Event) => {
+      const custom = e as CustomEvent<{ newCount?: number }>;
+      if (typeof custom.detail?.newCount === 'number') {
+        setNewReportsCount(custom.detail.newCount);
+      }
+    };
+    window.addEventListener('aqurivo-reports-count', handleReportsCount);
+    return () => {
+      window.removeEventListener('aqurivo-reports-count', handleReportsCount);
+    };
+  }, []);
 
   const effectiveEmail = adminEmail || (user?.role === 'admin' ? user.email : '');
 
@@ -62,7 +86,13 @@ export function AdminShell({
     return null;
   }
 
-  const navItems = [
+  const navItems: Array<{
+    href: string;
+    label: string;
+    icon: React.ComponentType<{ size?: number; 'aria-hidden'?: boolean | 'true' | 'false' }>;
+    exact?: boolean;
+    badgeCount?: number;
+  }> = [
     {
       href: '/admin',
       label: isAr ? 'لوحة المعلومات' : 'Overview',
@@ -93,6 +123,12 @@ export function AdminShell({
       href: '/admin/articles',
       label: isAr ? 'أدلة الشراء' : 'Buying Guides',
       icon: FileText,
+    },
+    {
+      href: '/admin/reports',
+      label: isAr ? 'البلاغات والمساعدة' : 'Issue Reports',
+      icon: Flag,
+      badgeCount: newReportsCount,
     },
     {
       href: '/admin/messages',
@@ -156,6 +192,11 @@ export function AdminShell({
               >
                 <Icon size={17} aria-hidden="true" />
                 <span>{item.label}</span>
+                {typeof item.badgeCount === 'number' && item.badgeCount > 0 && (
+                  <span className={styles.navCountBadge}>
+                    {item.badgeCount}
+                  </span>
+                )}
               </Link>
             );
           })}

@@ -24,7 +24,7 @@
 
 .heroContent {
   position: relative;
-  z-index: 2;
+  z-index: 25;
 }
 
 .heroBanner {
@@ -35,7 +35,8 @@
   align-items: center;
   justify-content: center;
   padding-block: var(--space-12);
-  overflow: hidden;
+  overflow: visible;
+  z-index: 20;
 }
 
 /* Subtle pattern layer with CSS dots in #2DD4BF with 0.03 opacity */
@@ -60,19 +61,19 @@
   margin-inline: auto;
 }
 
-/* 2. Massive Centered White Headline — Cairo Bold, clamp(2rem, 6vw, 4rem) */
+/* 2. Massive Centered White Headline — Cairo Bold, clamp(2rem, 5.5vw, 3.75rem) */
 .heroHeadline {
   font-family: var(--font-cairo), 'Cairo', var(--font-body-latin), sans-serif;
-  font-size: clamp(2rem, 6vw, 4rem);
+  font-size: clamp(1.95rem, 5.2vw, 3.65rem);
   font-weight: 700;
-  line-height: 1.18;
+  line-height: 1.38;
   color: #ffffff;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
+  gap: 6px;
   margin: 0;
-  letter-spacing: -0.01em;
+  letter-spacing: 0em;
 }
 
 .headlineLine {
@@ -187,6 +188,13 @@
   color: #6c7571;
 }
 
+.searchInput::-webkit-search-cancel-button,
+.searchInput::-webkit-search-decoration {
+  -webkit-appearance: none;
+  appearance: none;
+  display: none;
+}
+
 .clearSearchBtn {
   flex-shrink: 0;
   width: 28px;
@@ -227,7 +235,7 @@
   box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
   overflow: hidden;
   text-align: start;
-  z-index: 40;
+  z-index: 80;
 }
 
 .liveDropdownHeader {
@@ -240,12 +248,32 @@
   border-block-end: 1px solid var(--color-border-hairline);
 }
 
+.liveScrollArea {
+  max-block-size: 330px;
+  overflow-y: auto;
+}
+
+.liveGroupBlock {
+  display: flex;
+  flex-direction: column;
+}
+
+.liveGroupTitle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-accent-primary);
+  background-color: var(--color-accent-subtle);
+  border-block-end: 1px solid var(--color-border-hairline);
+}
+
 .liveList {
   list-style: none;
   margin: 0;
   padding: 0;
-  max-block-size: 310px;
-  overflow-y: auto;
 }
 
 .liveListItem {
@@ -289,6 +317,23 @@
   width: 100%;
   height: 100%;
   object-fit: contain;
+}
+
+.liveThumbCover {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.liveGuideTag {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--color-accent-primary);
+  background-color: var(--color-accent-subtle);
+  border: 1px solid var(--color-accent-border);
+  padding: 2px 7px;
+  border-radius: 6px;
+  white-space: nowrap;
 }
 
 .liveThumbFallback {

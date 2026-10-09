@@ -216,6 +216,30 @@
   }
 }
 
+.inlineGuideRow {
+  grid-column: 1 / -1;
+  margin-block: 4px;
+}
+
+.searchMatchedGuidesBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  background-color: var(--color-bg-subtle);
+  border: 1px solid var(--color-accent-border);
+  border-radius: var(--radius-md);
+}
+
+.searchMatchedGuidesHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--color-accent-primary);
+}
+
 /* Home Buying Guides Section */
 .guidesSection {
   display: flex;
@@ -252,13 +276,20 @@
 .guidesGrid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: var(--space-4);
+  gap: 10px;
 }
 
 @media (min-width: 768px) {
   .guidesGrid {
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--space-5);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+}
+
+@media (min-width: 1120px) {
+  .guidesGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
   }
 }
 

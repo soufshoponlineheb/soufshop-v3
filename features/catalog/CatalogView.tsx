@@ -1,22 +1,31 @@
 'use client';
 
-import React, { useCallback, useMemo, useState } from 'react';
-import type { Category, PartnerSource, Product } from '@/types';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import type { Article, Category, PartnerSource, Product } from '@/types';
 import { useI18n } from '@/i18n/I18nProvider';
 import { useSaved } from '@/features/saved/SavedProvider';
 import { SiteHeader } from '@/components/sections/SiteHeader';
 import { SiteFooter } from '@/components/sections/SiteFooter';
 import { SignatureMotif } from '@/components/ui/SignatureMotif';
 import { ProductCard } from '@/components/ui/ProductCard';
+import { EditorialIssueCard } from '@/components/ui/EditorialIssueCard';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { FilterBar } from '@/components/FilterBar/FilterBar';
-import { searchAndRankProducts } from '@/lib/productSearch';
+import {
+  buildInterleavedProductFeed,
+  rankProductsForVisitor,
+  recordVisitorInterest,
+  searchAndRankArticles,
+  searchAndRankProducts,
+} from '@/lib/productSearch';
+import { seedBrowserSeenProducts } from '@/lib/viewedProductsStorage';
 import styles from './CatalogView.module.css';
 
 interface CatalogViewProps {
   initialProducts: Product[];
   categories: Category[];
   sources: PartnerSource[];
+  articles?: Article[];
   initialCategorySlug?: string;
   initialSourceSlug?: string;
   initialSearchQuery?: string;
@@ -25,6 +34,7 @@ interface CatalogViewProps {
 export function CatalogView({
   initialProducts,
   categories,
+  articles = [],
   initialCategorySlug = 'all',
   initialSourceSlug = 'all',
   initialSearchQuery = '',
@@ -38,6 +48,29 @@ export function CatalogView({
   const [maxPrice, setMaxPrice] = useState<number | null>(null);
   const [sortBy, setSortBy] = useState<string>('newest');
   const [filterBarKey, setFilterBarKey] = useState(0);
+  const [visitorReady, setVisitorReady] = useState(false);
+  const [randomSeed, setRandomSeed] = useState(1);
+
+  useEffect(() => {
+    setVisitorReady(true);
+    setRandomSeed(Math.floor(Math.random() * 1000000) + 2);
+    if (initialProducts.length > 0) {
+      seedBrowserSeenProducts(initialProducts.slice(0, 12));
+    }
+  }, [initialProducts]);
+
+  useEffect(() => {
+    const trimmed = searchQuery.trim();
+    if (!trimmed && selectedCategory === 'all') return;
+    const timer = window.setTimeout(() => {
+      recordVisitorInterest({
+        query: trimmed || undefined,
+        categorySlug: selectedCategory !== 'all' ? selectedCategory : undefined,
+        products: initialProducts,
+      });
+    }, 350);
+    return () => window.clearTimeout(timer);
+  }, [searchQuery, selectedCategory, initialProducts]);
 
   const handleFilterChange = useCallback(
     (filters: {
@@ -54,12 +87,26 @@ export function CatalogView({
     []
   );
 
+  const matchedArticles = useMemo(() => {
+    const trimmed = searchQuery.trim();
+    if (!trimmed || articles.length === 0) return [];
+    return searchAndRankArticles(articles, trimmed, initialProducts);
+  }, [articles, searchQuery, initialProducts]);
+
   const filteredProducts = useMemo(() => {
-    const baseList = initialProducts.filter((product) => {
-      if (selectedCategory !== 'all' && product.categorySlug !== selectedCategory) {
+    const strictBase = initialProducts.filter((product) => {
+      if (
+        selectedCategory !== 'all' &&
+        product.categorySlug !== selectedCategory &&
+        product.categoryId !== selectedCategory
+      ) {
         return false;
       }
-      if (selectedSource !== 'all' && product.sourceSlug !== selectedSource) {
+      if (
+        selectedSource !== 'all' &&
+        product.sourceSlug !== selectedSource &&
+        product.sourceId !== selectedSource
+      ) {
         return false;
       }
       if (
@@ -74,11 +121,45 @@ export function CatalogView({
       return true;
     });
 
-    const searchedList = searchAndRankProducts(baseList, searchQuery);
+    const baseList = strictBase.length > 0 ? strictBase : initialProducts;
 
-    return [...searchedList].sort((a, b) => {
+    if (searchQuery.trim()) {
+      const searchedList = searchAndRankProducts(baseList, searchQuery, articles);
       if (sortBy === 'newest') {
-        return b.createdAt.localeCompare(a.createdAt);
+        return searchedList;
+      }
+      return [...searchedList].sort((a, b) => {
+        if (sortBy === 'price_asc') {
+          const pa = a.priceAmount ?? Number.MAX_SAFE_INTEGER;
+          const pb = b.priceAmount ?? Number.MAX_SAFE_INTEGER;
+          return pa - pb;
+        }
+        if (sortBy === 'price_desc') {
+          const pa = a.priceAmount ?? -1;
+          const pb = b.priceAmount ?? -1;
+          return pb - pa;
+        }
+        if (sortBy === 'rating_desc') {
+          const ra = a.stars ?? 4.3;
+          const rb = b.stars ?? 4.3;
+          return rb - ra;
+        }
+        if (sortBy === 'sold_desc') {
+          const sa = a.soldCount ?? 120;
+          const sb = b.soldCount ?? 120;
+          return sb - sa;
+        }
+        return 0;
+      });
+    }
+
+    if (sortBy === 'newest' && visitorReady && selectedCategory === 'all') {
+      return rankProductsForVisitor(baseList);
+    }
+
+    return [...baseList].sort((a, b) => {
+      if (sortBy === 'newest') {
+        return String(b.createdAt || '').localeCompare(String(a.createdAt || ''));
       }
       if (sortBy === 'price_asc') {
         const pa = a.priceAmount ?? Number.MAX_SAFE_INTEGER;
@@ -102,7 +183,21 @@ export function CatalogView({
       }
       return 0;
     });
-  }, [initialProducts, maxPrice, searchQuery, selectedCategory, selectedSource, sortBy]);
+  }, [
+    initialProducts,
+    articles,
+    maxPrice,
+    searchQuery,
+    selectedCategory,
+    selectedSource,
+    sortBy,
+    visitorReady,
+  ]);
+
+  const interleavedFeed = useMemo(
+    () => buildInterleavedProductFeed(filteredProducts, articles, randomSeed),
+    [filteredProducts, articles, randomSeed]
+  );
 
   const resetAllFilters = () => {
     setSearchQuery('');
@@ -137,6 +232,8 @@ export function CatalogView({
             filteredCount={filteredProducts.length}
             initialQuery={initialSearchQuery}
             initialStore={initialSourceSlug}
+            products={initialProducts}
+            articles={articles}
           />
 
           {categories.length > 0 && (
@@ -170,14 +267,30 @@ export function CatalogView({
 
         {/* Results Grid or Empty State */}
         <section className={styles.resultsSection} aria-live="polite">
+          {searchQuery.trim().length > 0 && matchedArticles.length > 0 && (
+            <div className={styles.searchMatchedGuidesBlock}>
+              <div className={styles.searchMatchedGuidesHeader}>
+                <span>
+                  {locale === 'ar'
+                    ? `مقالات وأدلة شراء مطابقة لبحثك (${matchedArticles.length})`
+                    : `Matching Buying Guides & Articles (${matchedArticles.length})`}
+                </span>
+              </div>
+              <div className={styles.searchMatchedGuidesGrid}>
+                {matchedArticles.slice(0, 3).map((article) => (
+                  <EditorialIssueCard key={`cat-search-art-${article.id}`} article={article} />
+                ))}
+              </div>
+            </div>
+          )}
           {initialProducts.length === 0 ? (
             <EmptyState
               title={messages.empty.catalogTitle}
               description={messages.empty.catalogDescription}
               primaryActionLabel={messages.nav.ourMethod}
-              primaryActionHref="/about"
+              primaryActionHref={`/${locale}/about`}
               secondaryActionLabel={messages.nav.contact}
-              secondaryActionHref="/contact"
+              secondaryActionHref={`/${locale}/contact`}
             />
           ) : filteredProducts.length === 0 ? (
             <EmptyState
@@ -188,15 +301,27 @@ export function CatalogView({
             />
           ) : (
             <div className={styles.productGrid}>
-              {filteredProducts.map((product) => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  isSaved={isSaved(product.id)}
-                  onToggleSave={toggleSave}
-                  refContext="catalog_directory"
-                />
-              ))}
+              {interleavedFeed.map((entry, idx) =>
+                entry.type === 'product' ? (
+                  <ProductCard
+                    key={entry.product.id}
+                    product={entry.product}
+                    isSaved={isSaved(entry.product.id)}
+                    onToggleSave={toggleSave}
+                    refContext="catalog_directory"
+                  />
+                ) : (
+                  <div
+                    key={`inline-guide-${entry.article.id}-${idx}`}
+                    className={styles.inlineGuideRow}
+                  >
+                    <EditorialIssueCard
+                      article={entry.article}
+                      matchedProduct={entry.matchedProduct}
+                    />
+                  </div>
+                )
+              )}
             </div>
           )}
         </section>

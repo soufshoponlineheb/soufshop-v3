@@ -35,8 +35,7 @@ export function AdminOverviewView({
 
   const [products, setProducts] = useState(initialProducts);
   const [refreshingId, setRefreshingId] = useState<string | null>(null);
-
-  const nowMs = Date.now();
+  const [nowMs] = useState(() => Date.now());
   const dayMs = 24 * 60 * 60 * 1000;
 
   const clicksToday = clicks.filter(

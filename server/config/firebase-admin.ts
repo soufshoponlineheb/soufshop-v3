@@ -15,8 +15,7 @@ const TMP_TOKEN_PATH = path.join('/tmp', 'soufshopstore-idtoken.txt');
 const CLOUD_FETCH_TIMEOUT_MS = 3500;
 const COLLECTION_CACHE_TTL_MS = 0;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type CloudDocumentData = { [field: string]: any };
+export type CloudDocumentData = Record<string, unknown>;
 
 export interface CloudDocSnapshot {
   id: string;

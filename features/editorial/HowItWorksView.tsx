@@ -26,7 +26,7 @@ export function HowItWorksView() {
         <div className={styles.stepsStream}>
           <section className={styles.stepRow}>
             <div className={styles.stepMarker}>
-              <span className={`${styles.stepNumber} tabularNums`}>01</span>
+              <span className={`${styles.stepNumber} tabularNums`}>1</span>
               <Search size={20} className={styles.stepIcon} aria-hidden="true" />
             </div>
             <div className={styles.stepBody}>
@@ -37,7 +37,7 @@ export function HowItWorksView() {
 
           <section className={styles.stepRow}>
             <div className={styles.stepMarker}>
-              <span className={`${styles.stepNumber} tabularNums`}>02</span>
+              <span className={`${styles.stepNumber} tabularNums`}>2</span>
               <CheckCircle2 size={20} className={styles.stepIcon} aria-hidden="true" />
             </div>
             <div className={styles.stepBody}>
@@ -48,7 +48,7 @@ export function HowItWorksView() {
 
           <section className={styles.stepRow}>
             <div className={styles.stepMarker}>
-              <span className={`${styles.stepNumber} tabularNums`}>03</span>
+              <span className={`${styles.stepNumber} tabularNums`}>3</span>
               <ShoppingCart size={20} className={styles.stepIcon} aria-hidden="true" />
             </div>
             <div className={styles.stepBody}>

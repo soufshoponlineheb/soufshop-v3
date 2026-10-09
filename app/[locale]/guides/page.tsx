@@ -31,10 +31,28 @@ export async function generateMetadata({
     : 'Comprehensive buying guides, specs comparisons, and candid product recommendations from the AQURIVO editorial team.';
 
   const canonicalUrl = `${BASE_URL}/${locale}/guides`;
+  const keywords = isAr
+    ? [
+        'أدلة الشراء',
+        'مراجعات المنتجات',
+        'مقارنة المنتجات',
+        'أفضل المنتجات 2026',
+        'نصائح تسوق ذكية',
+        'AQURIVO',
+      ]
+    : [
+        'buying guides',
+        'product reviews',
+        'side by side product comparison',
+        'best products 2026',
+        'smart shopping guides',
+        'AQURIVO',
+      ];
 
   return {
     title,
     description: description.slice(0, 155),
+    keywords,
     alternates: {
       canonical: canonicalUrl,
       languages: {
@@ -48,6 +66,7 @@ export async function generateMetadata({
       description: description.slice(0, 155),
       url: canonicalUrl,
       siteName: 'AQURIVO',
+      locale: isAr ? 'ar_SA' : 'en_US',
       type: 'website',
       images: [
         {

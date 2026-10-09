@@ -25,6 +25,7 @@ function formatTestimonialDate(iso: string, locale: 'ar' | 'en'): string {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
+      timeZone: 'UTC',
     }).format(d);
   } catch {
     return '';
