@@ -53,6 +53,11 @@ export async function generateMetadata({
 
   const canonicalSlug = encodeURIComponent(category.slug || decodedSlug);
   const canonicalUrl = `${BASE_URL}/${locale}/categories/${canonicalSlug}`;
+  const ogImageUrl = `${BASE_URL}/api/og?title=${encodeURIComponent(
+    displayName
+  )}&subtitle=${encodeURIComponent(description)}&category=${encodeURIComponent(
+    isAr ? 'فئة المنتجات' : 'Product Category'
+  )}&source=AQURIVO`;
 
   const keywords = isAr
     ? [
@@ -76,6 +81,13 @@ export async function generateMetadata({
     title,
     description,
     keywords,
+    other: {
+      thumbnail: ogImageUrl,
+      'og:image:secure_url': ogImageUrl,
+      'og:image:type': 'image/png',
+      'twitter:label1': isAr ? 'القسم' : 'Category',
+      'twitter:data1': displayName,
+    },
     alternates: {
       canonical: canonicalUrl,
       languages: {
@@ -90,21 +102,31 @@ export async function generateMetadata({
       url: canonicalUrl,
       siteName: 'AQURIVO',
       locale: isAr ? 'ar_SA' : 'en_US',
+      alternateLocale: isAr ? ['en_US'] : ['ar_SA'],
       type: 'website',
       images: [
         {
-          url: `${BASE_URL}/images/hero-bg.jpg`,
+          url: ogImageUrl,
+          secureUrl: ogImageUrl,
           width: 1200,
           height: 630,
+          type: 'image/png',
           alt: displayName,
         },
       ],
     },
     twitter: {
       card: 'summary_large_image',
+      site: '@aqurivo',
+      creator: '@aqurivo',
       title,
       description,
-      images: [`${BASE_URL}/images/hero-bg.jpg`],
+      images: [
+        {
+          url: ogImageUrl,
+          alt: displayName,
+        },
+      ],
     },
   };
 }
@@ -161,15 +183,51 @@ export default async function LocalizedCategoryPage({
         '@type': 'ItemList',
         name: categoryName,
         numberOfItems: categoryProducts.length,
-        itemListElement: categoryProducts.slice(0, 30).map((product, idx) => ({
-          '@type': 'ListItem',
-          position: idx + 1,
-          url: `${BASE_URL}/${locale}/products/${encodeURIComponent(product.slug)}`,
-          name: isAr
+        itemListElement: categoryProducts.slice(0, 30).map((product, idx) => {
+          const prodSlug = encodeURIComponent(product.slug || product.id);
+          const prodUrl = `${BASE_URL}/${locale}/products/${prodSlug}`;
+          const prodName = isAr
             ? product.title?.ar || product.title?.en || product.name?.ar || product.slug
-            : product.title?.en || product.title?.ar || product.name?.en || product.slug,
-          ...(product.images?.[0]?.url ? { image: product.images[0].url } : {}),
-        })),
+            : product.title?.en || product.title?.ar || product.name?.en || product.slug;
+          const prodDesc = isAr
+            ? product.shortSummary?.ar || product.description?.ar || prodName
+            : product.shortSummary?.en || product.description?.en || prodName;
+          const rawImg = product.images?.[0]?.url?.trim() || '';
+          const prodImg = rawImg
+            ? rawImg.startsWith('http')
+              ? rawImg
+              : `${BASE_URL}${rawImg.startsWith('/') ? rawImg : `/${rawImg}`}`
+            : `${BASE_URL}/api/og?title=${encodeURIComponent(prodName)}`;
+
+          return {
+            '@type': 'ListItem',
+            position: idx + 1,
+            url: prodUrl,
+            name: prodName,
+            image: prodImg,
+            item: {
+              '@type': 'Product',
+              '@id': `${prodUrl}#product`,
+              mainEntityOfPage: prodUrl,
+              url: prodUrl,
+              name: prodName,
+              description: prodDesc.slice(0, 155),
+              image: [prodImg],
+              thumbnailUrl: prodImg,
+              ...(typeof product.priceAmount === 'number' && product.priceAmount > 0
+                ? {
+                    offers: {
+                      '@type': 'Offer',
+                      url: prodUrl,
+                      price: product.priceAmount,
+                      priceCurrency: product.priceCurrency || 'USD',
+                      availability: 'https://schema.org/InStock',
+                    },
+                  }
+                : {}),
+            },
+          };
+        }),
       },
       {
         '@type': 'BreadcrumbList',

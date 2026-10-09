@@ -479,10 +479,7 @@ export function FilterBar({
             )}
           </div>
         </div>
-      </div>
 
-      {/* 3. Results Count directly below filters */}
-      <div className={styles.resultsMetaRow}>
         <p className={`${styles.resultsCountText} tabularNums`} aria-live="polite">
           {isAr
             ? `عرض ${filteredCount} منتج من أصل ${totalProducts}`

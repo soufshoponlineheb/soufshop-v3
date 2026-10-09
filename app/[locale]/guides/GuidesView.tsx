@@ -3,9 +3,23 @@
 import React, { useMemo, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowLeft, ArrowRight, Clock, Search, X } from 'lucide-react';
+import {
+  ArrowLeft,
+  ArrowRight,
+  Clock,
+  Cpu,
+  Dumbbell,
+  HeartPulse,
+  Home,
+  LayoutGrid,
+  Search,
+  Shirt,
+  Sparkles,
+  X,
+} from 'lucide-react';
 import type { Article, Category } from '@/types';
 import { useI18n } from '@/i18n/I18nProvider';
+import { formatNumber } from '@/lib/format';
 import { searchAndRankArticles } from '@/lib/productSearch';
 import { SiteHeader } from '@/components/sections/SiteHeader';
 import { SiteFooter } from '@/components/sections/SiteFooter';
@@ -13,6 +27,53 @@ import { SignatureMotif } from '@/components/ui/SignatureMotif';
 import { EditorialIssueCard } from '@/components/ui/EditorialIssueCard';
 import { EmptyState } from '@/components/ui/EmptyState';
 import styles from './GuidesView.module.css';
+
+function renderGuideCategoryIcon(slug: string, nameAr = '', nameEn = '') {
+  const key = `${slug} ${nameAr} ${nameEn}`.toLowerCase();
+  if (
+    key.includes('electron') ||
+    key.includes('tech') ||
+    key.includes('إلكترونيات') ||
+    key.includes('تقنية')
+  ) {
+    return <Cpu size={14} aria-hidden="true" />;
+  }
+  if (
+    key.includes('home') ||
+    key.includes('kitchen') ||
+    key.includes('منزل') ||
+    key.includes('مطبخ')
+  ) {
+    return <Home size={14} aria-hidden="true" />;
+  }
+  if (
+    key.includes('health') ||
+    key.includes('beauty') ||
+    key.includes('care') ||
+    key.includes('صحة') ||
+    key.includes('عناية')
+  ) {
+    return <HeartPulse size={14} aria-hidden="true" />;
+  }
+  if (
+    key.includes('sport') ||
+    key.includes('fitness') ||
+    key.includes('رياضة') ||
+    key.includes('لياقة')
+  ) {
+    return <Dumbbell size={14} aria-hidden="true" />;
+  }
+  if (
+    key.includes('fashion') ||
+    key.includes('apparel') ||
+    key.includes('style') ||
+    key.includes('موضة') ||
+    key.includes('أزياء')
+  ) {
+    return <Shirt size={14} aria-hidden="true" />;
+  }
+  return <Sparkles size={14} aria-hidden="true" />;
+}
 
 interface GuidesViewProps {
   articles: Article[];
@@ -93,32 +154,63 @@ export function GuidesView({ articles, categories }: GuidesViewProps) {
             {categories.length > 0 && (
               <div
                 className={styles.filterBar}
-                role="group"
+                role="tablist"
                 aria-label={
                   isAr ? 'تصفية الأدلة حسب الفئة' : 'Filter guides by category'
                 }
               >
                 <button
                   type="button"
+                  role="tab"
+                  aria-selected={selectedCategory === 'all'}
                   onClick={() => setSelectedCategory('all')}
                   className={`${styles.filterBtn} ${
                     selectedCategory === 'all' ? styles.filterBtnActive : ''
                   }`}
                 >
-                  {messages.filters.allCategories}
+                  <span className={styles.filterBtnIcon}>
+                    <LayoutGrid size={14} aria-hidden="true" />
+                  </span>
+                  <span>{messages.filters.allCategories}</span>
+                  <span className={`${styles.filterBtnCount} tabularNums`}>
+                    {formatNumber(articles.length, locale)}
+                  </span>
                 </button>
-                {categories.map((cat) => (
-                  <button
-                    key={cat.id}
-                    type="button"
-                    onClick={() => setSelectedCategory(cat.slug)}
-                    className={`${styles.filterBtn} ${
-                      selectedCategory === cat.slug ? styles.filterBtnActive : ''
-                    }`}
-                  >
-                    {t(cat.name)}
-                  </button>
-                ))}
+                {categories.map((cat) => {
+                  const isActive = selectedCategory === cat.slug;
+                  const count = articles.filter(
+                    (a) =>
+                      a.categorySlug === cat.slug ||
+                      a.categoryId === cat.slug ||
+                      a.categoryId === cat.id
+                  ).length;
+                  return (
+                    <button
+                      key={cat.id}
+                      type="button"
+                      role="tab"
+                      aria-selected={isActive}
+                      onClick={() =>
+                        setSelectedCategory((prev) =>
+                          prev === cat.slug ? 'all' : cat.slug
+                        )
+                      }
+                      className={`${styles.filterBtn} ${
+                        isActive ? styles.filterBtnActive : ''
+                      }`}
+                    >
+                      <span className={styles.filterBtnIcon}>
+                        {renderGuideCategoryIcon(cat.slug, cat.name?.ar, cat.name?.en)}
+                      </span>
+                      <span>{t(cat.name)}</span>
+                      {count > 0 && (
+                        <span className={`${styles.filterBtnCount} tabularNums`}>
+                          {formatNumber(count, locale)}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
               </div>
             )}
           </div>

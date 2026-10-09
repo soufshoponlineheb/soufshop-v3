@@ -1,8 +1,21 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Check, Copy, HelpCircle, Link2, Plus, Trash2 } from 'lucide-react';
+import {
+  Check,
+  ChevronDown,
+  ChevronUp,
+  Copy,
+  HelpCircle,
+  Link2,
+  Package,
+  Palette,
+  Plus,
+  Search,
+  Trash2,
+  X,
+} from 'lucide-react';
 import { SmartAutoDistributeIcon } from '@/components/ui/AqurivoContextIcons';
 import type { Article, ArticleFaqItem, Category, Product } from '@/types';
 import { useI18n } from '@/i18n/I18nProvider';
@@ -11,11 +24,14 @@ import { useToast } from '@/components/ui/Toast';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import {
+  AFFILIATE_CTA_COLOR_PRESETS,
   type AgentHandoffBrief,
+  applyAffiliateCtaStylingToHtml,
   buildDynamicArticleAiPrompt,
   clearSavedAgentHandoffBrief,
   formatAgentHandoffBriefText,
   getSavedAgentHandoffBrief,
+  normalizeHexColor,
   parseMagicArticleContent,
   saveAgentHandoffBrief,
 } from '@/lib/magicContentParser';
@@ -126,13 +142,84 @@ export function AdminArticleFormView({
   const [activeHandoffBrief, setActiveHandoffBrief] = useState<AgentHandoffBrief | null>(
     null
   );
+  const [affiliateCtaUrl, setAffiliateCtaUrl] = useState<string>(() => {
+    const initialAr = existingArticle?.contentHtml?.ar || '';
+    const hrefMatch = initialAr.match(
+      /<a\b[^>]*data-affiliate-cta\s*=\s*(['"]?)true\1[^>]*href\s*=\s*(['"])(.*?)\2/i
+    ) || initialAr.match(
+      /<a\b[^>]*href\s*=\s*(['"])(.*?)\1[^>]*data-affiliate-cta\s*=\s*(['"]?)true\3/i
+    );
+    return hrefMatch ? (hrefMatch[3] || hrefMatch[2] || '').trim() : '';
+  });
+  const [affiliateCtaColor, setAffiliateCtaColor] = useState<string>(() => {
+    const initialAr = existingArticle?.contentHtml?.ar || '';
+    const colorMatch = initialAr.match(/data-cta-color\s*=\s*(['"])(#[0-9a-fA-F]{3,6})\1/i);
+    return colorMatch ? normalizeHexColor(colorMatch[2], '#EA580C') : '#EA580C';
+  });
   const [showPromptPreview, setShowPromptPreview] = useState(false);
   const [copiedPrompt, setCopiedPrompt] = useState(false);
+
+  // Searchable Visual Product Picker state (Handoff Brief)
+  const [isHandoffPickerOpen, setIsHandoffPickerOpen] = useState(false);
+  const [handoffSearchQuery, setHandoffSearchQuery] = useState('');
+  const [handoffCategoryFilter, setHandoffCategoryFilter] = useState('all');
+
+  // Searchable Visual Product Picker state (Bottom Recommended Products)
+  const [linkedSearchQuery, setLinkedSearchQuery] = useState('');
+  const [linkedCategoryFilter, setLinkedCategoryFilter] = useState('all');
+
+  const filteredHandoffProducts = useMemo(() => {
+    const q = handoffSearchQuery.trim().toLowerCase();
+    return products.filter((p) => {
+      if (
+        handoffCategoryFilter !== 'all' &&
+        p.categoryId !== handoffCategoryFilter &&
+        p.categorySlug !== handoffCategoryFilter
+      ) {
+        return false;
+      }
+      if (q) {
+        const hay = `${p.title.ar || ''} ${p.title.en || ''} ${p.slug} ${
+          p.sourceName?.ar || ''
+        } ${p.sourceName?.en || ''}`.toLowerCase();
+        if (!hay.includes(q)) return false;
+      }
+      return true;
+    });
+  }, [products, handoffSearchQuery, handoffCategoryFilter]);
+
+  const filteredLinkedProducts = useMemo(() => {
+    const q = linkedSearchQuery.trim().toLowerCase();
+    return products.filter((p) => {
+      if (
+        linkedCategoryFilter !== 'all' &&
+        p.categoryId !== linkedCategoryFilter &&
+        p.categorySlug !== linkedCategoryFilter
+      ) {
+        return false;
+      }
+      if (q) {
+        const hay = `${p.title.ar || ''} ${p.title.en || ''} ${p.slug} ${
+          p.sourceName?.ar || ''
+        } ${p.sourceName?.en || ''}`.toLowerCase();
+        if (!hay.includes(q)) return false;
+      }
+      return true;
+    });
+  }, [products, linkedSearchQuery, linkedCategoryFilter]);
+
+  const selectedHandoffProduct = useMemo(() => {
+    if (!activeHandoffBrief?.productSlug) return undefined;
+    return products.find((p) => p.slug === activeHandoffBrief.productSlug);
+  }, [products, activeHandoffBrief]);
 
   useEffect(() => {
     const saved = getSavedAgentHandoffBrief();
     if (saved) {
       setActiveHandoffBrief(saved);
+      if (saved.sourceProductUrl) {
+        setAffiliateCtaUrl((prev) => prev || saved.sourceProductUrl || '');
+      }
     }
   }, []);
 
@@ -194,21 +281,21 @@ export function AdminArticleFormView({
       whyEn: found.whyWePickedIt?.en,
       considerAr: found.whatToConsider?.ar,
       considerEn: found.whatToConsider?.en,
+      summaryAr: found.shortSummary?.ar || undefined,
+      summaryEn: found.shortSummary?.en || undefined,
+      descriptionAr: found.description?.ar || undefined,
+      descriptionEn: found.description?.en || undefined,
       updatedAt: new Date().toISOString(),
     };
     saveAgentHandoffBrief(brief);
     setActiveHandoffBrief(brief);
+    if (found.affiliateUrl) {
+      setAffiliateCtaUrl(found.affiliateUrl);
+    }
 
-    // Also pre-link this product and its category alternatives for algorithmic comparison
-    const sameCatProducts = products
-      .filter(
-        (p) =>
-          p.id !== found.id &&
-          (p.categorySlug === found.categorySlug || p.categoryId === found.categoryId)
-      )
-      .slice(0, 3);
+    // Link only the selected primary product (and any already explicitly selected products) without forcing random category items
     const nextLinkedIds = Array.from(
-      new Set([found.id, ...sameCatProducts.map((p) => p.id), ...relatedProductIds])
+      new Set([found.id, ...relatedProductIds])
     );
     setRelatedProductIds(nextLinkedIds);
     if (!coverImage && found.images?.[0]?.url) {
@@ -232,8 +319,35 @@ export function AdminArticleFormView({
   const dynamicArticlePromptText = buildDynamicArticleAiPrompt(
     products,
     categories,
-    activeHandoffBrief
+    activeHandoffBrief,
+    {
+      affiliateUrl: affiliateCtaUrl,
+      highlightColor: affiliateCtaColor,
+    }
   );
+
+  const handleApplyAffiliateCtaToCurrentContent = (customColor?: string) => {
+    const colorToUse = normalizeHexColor(customColor || affiliateCtaColor, '#EA580C');
+    const urlToUse =
+      affiliateCtaUrl.trim() || activeHandoffBrief?.sourceProductUrl?.trim() || '';
+    let updatedAny = false;
+    if (contentAr.trim()) {
+      setContentAr(applyAffiliateCtaStylingToHtml(contentAr, urlToUse, colorToUse));
+      updatedAny = true;
+    }
+    if (contentEn.trim()) {
+      setContentEn(applyAffiliateCtaStylingToHtml(contentEn, urlToUse, colorToUse));
+      updatedAny = true;
+    }
+    if (updatedAny) {
+      showToast(
+        isAr
+          ? `تم تحديث لون ورابط الكلمات التحفيزية (${colorToUse}) في محتوى المقال فوراً!`
+          : `Updated affiliate CTA highlight color (${colorToUse}) & link in article content!`,
+        'success'
+      );
+    }
+  };
 
   const handleCopyAiPrompt = async () => {
     try {
@@ -241,8 +355,8 @@ export function AdminArticleFormView({
       setCopiedPrompt(true);
       showToast(
         isAr
-          ? 'تم نسخ برومبت وكيل المقالات والمراجعات (مُدمج معه بطاقة المنتج وفهرس المتجر)!'
-          : 'Article & Review Agent prompt copied (with Product Handoff & live catalog)!',
+          ? 'تم نسخ برومبت وكيل المقالات (مُدمج معه رابط العمولة واللون المميز وبطاقة المنتج)!'
+          : 'Article Agent prompt copied (with Affiliate CTA link, highlight color & Handoff Brief)!',
         'success'
       );
       setTimeout(() => setCopiedPrompt(false), 2500);
@@ -255,7 +369,10 @@ export function AdminArticleFormView({
   };
 
   const handleMagicParse = () => {
-    const { draft, fieldsFoundCount } = parseMagicArticleContent(magicRawText);
+    const { draft, fieldsFoundCount } = parseMagicArticleContent(magicRawText, {
+      affiliateUrl: affiliateCtaUrl,
+      highlightColor: affiliateCtaColor,
+    });
     if (fieldsFoundCount === 0) {
       showToast(
         isAr
@@ -264,6 +381,13 @@ export function AdminArticleFormView({
         'error'
       );
       return;
+    }
+
+    if (draft.affiliateCtaUrl && !affiliateCtaUrl.trim()) {
+      setAffiliateCtaUrl(draft.affiliateCtaUrl);
+    }
+    if (draft.affiliateCtaColor) {
+      setAffiliateCtaColor(normalizeHexColor(draft.affiliateCtaColor, affiliateCtaColor));
     }
 
     if (draft.slug) setSlug(draft.slug);
@@ -333,15 +457,15 @@ export function AdminArticleFormView({
       }
     }
 
-    // Ensure same-category store products are included so the Algorithmic Comparison Matrix has peers to compare
-    if (resolvedCategoryId && matchedRelatedSet.size < 3) {
+    // Fallback to same-category products ONLY if no specific product was identified in the article or handoff brief
+    if (resolvedCategoryId && matchedRelatedSet.size === 0) {
       const categoryProducts = products
         .filter(
           (p) =>
             p.categoryId === resolvedCategoryId ||
             p.categorySlug === resolvedCategoryId
         )
-        .slice(0, 4);
+        .slice(0, 3);
       for (const cp of categoryProducts) {
         matchedRelatedSet.add(cp.id);
       }
@@ -628,16 +752,277 @@ export function AdminArticleFormView({
         </div>
 
         {/* Connected Product Agent Handoff Panel */}
+        <div className={styles.agentSubPanel}>
+          <div className={styles.agentSubPanelHeader}>
+            <div className={styles.agentSubPanelTitle}>
+              <Link2 size={16} />
+              <span>
+                {isAr
+                  ? '🤝 الترابط مع وكيل المنتج (بطاقة تسليم المنتج للمقال):'
+                  : '🤝 Product Agent Handoff Connection:'}
+              </span>
+            </div>
+
+            {activeHandoffBrief && (
+              <div className={styles.actionRow}>
+                <button
+                  type="button"
+                  onClick={() => setIsHandoffPickerOpen((prev) => !prev)}
+                  className={styles.topBarBtn}
+                  style={{ fontSize: '11.5px', padding: '4px 10px' }}
+                >
+                  <Search size={13} />
+                  <span>
+                    {isHandoffPickerOpen
+                      ? isAr
+                        ? 'إغلاق القائمة'
+                        : 'Close Picker'
+                      : isAr
+                        ? 'تغيير المنتج'
+                        : 'Change Product'}
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    clearSavedAgentHandoffBrief();
+                    setActiveHandoffBrief(null);
+                  }}
+                  className={styles.topBarBtn}
+                  style={{ fontSize: '11.5px', padding: '4px 10px' }}
+                >
+                  <X size={13} />
+                  <span>{isAr ? 'إلغاء الربط' : 'Clear Handoff'}</span>
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Selected Product Card OR Search Trigger Button */}
+          {activeHandoffBrief ? (
+            <div className={styles.selectedHandoffCard}>
+              <div className={styles.selectedHandoffMain}>
+                {selectedHandoffProduct?.primaryImage ||
+                activeHandoffBrief.images?.[0]?.url ? (
+                  /* eslint-disable-next-line @next/next/no-img-element */
+                  <img
+                    src={
+                      selectedHandoffProduct?.primaryImage ||
+                      activeHandoffBrief.images[0].url
+                    }
+                    alt={
+                      isAr
+                        ? activeHandoffBrief.titleAr
+                        : activeHandoffBrief.titleEn
+                    }
+                    className={styles.pickerThumb}
+                    loading="lazy"
+                  />
+                ) : (
+                  <div className={styles.pickerThumbPlaceholder}>
+                    <Package size={20} />
+                  </div>
+                )}
+
+                <div className={styles.pickerItemDetails}>
+                  <div className={styles.pickerItemTitle}>
+                    {isAr ? activeHandoffBrief.titleAr : activeHandoffBrief.titleEn}
+                  </div>
+                  <div className={styles.pickerItemSubRow}>
+                    {selectedHandoffProduct?.sourceName && (
+                      <span className={styles.pickerStoreBadge}>
+                        {t(selectedHandoffProduct.sourceName)}
+                      </span>
+                    )}
+                    <span>
+                      🖼️{' '}
+                      {isAr
+                        ? `${activeHandoffBrief.images.length} صور معتمدة`
+                        : `${activeHandoffBrief.images.length} images`}
+                    </span>
+                    <span>•</span>
+                    <span>
+                      🎬{' '}
+                      {isAr
+                        ? `${activeHandoffBrief.videoUrls.length} فيديو`
+                        : `${activeHandoffBrief.videoUrls.length} video(s)`}
+                    </span>
+                    <span className={styles.pickerItemSlug}>
+                      /{activeHandoffBrief.productSlug}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setIsHandoffPickerOpen((prev) => !prev)}
+              className={`${styles.pickerTriggerBtn} ${
+                isHandoffPickerOpen ? styles.pickerTriggerBtnActive : ''
+              }`}
+            >
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                <Search size={16} color="var(--color-accent-primary)" />
+                <span>
+                  {isAr
+                    ? 'ابحث واختر منتجاً من المتجر لتوليد بطاقة تسليمه للمقال...'
+                    : 'Search & select a store product to generate its Handoff Brief...'}
+                </span>
+              </span>
+              {isHandoffPickerOpen ? (
+                <ChevronUp size={18} />
+              ) : (
+                <ChevronDown size={18} />
+              )}
+            </button>
+          )}
+
+          {/* Custom Searchable Visual Dropdown Panel */}
+          {isHandoffPickerOpen && (
+            <div className={styles.pickerDropdownPanel}>
+              <div className={styles.pickerSearchBox}>
+                <Search size={16} className={styles.pickerSearchIcon} />
+                <input
+                  type="search"
+                  value={handoffSearchQuery}
+                  onChange={(e) => setHandoffSearchQuery(e.target.value)}
+                  placeholder={
+                    isAr
+                      ? 'ابحث باسم المنتج أو المتجر أو المعرّف (Slug)...'
+                      : 'Search by product title, store, or slug...'
+                  }
+                  className={styles.pickerSearchInput}
+                  autoFocus
+                />
+                {handoffSearchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setHandoffSearchQuery('')}
+                    className={styles.pickerSearchClearBtn}
+                    aria-label={isAr ? 'مسح البحث' : 'Clear search'}
+                  >
+                    <X size={13} />
+                  </button>
+                )}
+              </div>
+
+              {categories.length > 0 && (
+                <div className={styles.pickerCategoryPills}>
+                  <button
+                    type="button"
+                    onClick={() => setHandoffCategoryFilter('all')}
+                    className={`${styles.pickerCategoryPill} ${
+                      handoffCategoryFilter === 'all'
+                        ? styles.pickerCategoryPillActive
+                        : ''
+                    }`}
+                  >
+                    {isAr ? `الكل (${products.length})` : `All (${products.length})`}
+                  </button>
+                  {categories.map((cat) => (
+                    <button
+                      key={cat.id}
+                      type="button"
+                      onClick={() => setHandoffCategoryFilter(cat.id)}
+                      className={`${styles.pickerCategoryPill} ${
+                        handoffCategoryFilter === cat.id
+                          ? styles.pickerCategoryPillActive
+                          : ''
+                      }`}
+                    >
+                      {t(cat.name)}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              <div className={styles.pickerListScroll}>
+                {filteredHandoffProducts.length === 0 ? (
+                  <div
+                    style={{
+                      padding: '16px',
+                      textAlign: 'center',
+                      fontSize: '12.5px',
+                      color: 'var(--color-text-muted)',
+                    }}
+                  >
+                    {isAr
+                      ? 'لا توجد منتجات مطابقة لبحثك حالياً.'
+                      : 'No matching products found.'}
+                  </div>
+                ) : (
+                  filteredHandoffProducts.map((p) => {
+                    const isSelected = activeHandoffBrief?.productSlug === p.slug;
+                    return (
+                      <button
+                        key={p.id}
+                        type="button"
+                        onClick={() => {
+                          handleSelectProductForHandoff(p.slug);
+                          setIsHandoffPickerOpen(false);
+                        }}
+                        className={`${styles.pickerOptionRow} ${
+                          isSelected ? styles.pickerOptionRowSelected : ''
+                        }`}
+                      >
+                        <div className={styles.selectedHandoffMain}>
+                          {p.primaryImage || p.images?.[0]?.url ? (
+                            /* eslint-disable-next-line @next/next/no-img-element */
+                            <img
+                              src={p.primaryImage || p.images[0].url}
+                              alt={t(p.title)}
+                              className={styles.pickerThumb}
+                              loading="lazy"
+                            />
+                          ) : (
+                            <div className={styles.pickerThumbPlaceholder}>
+                              <Package size={18} />
+                            </div>
+                          )}
+
+                          <div className={styles.pickerItemDetails}>
+                            <div className={styles.pickerItemTitle}>{t(p.title)}</div>
+                            <div className={styles.pickerItemSubRow}>
+                              {p.sourceName && (
+                                <span className={styles.pickerStoreBadge}>
+                                  {t(p.sourceName)}
+                                </span>
+                              )}
+                              <span className={styles.pickerItemSlug}>/{p.slug}</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <span
+                          className={`${styles.pickerCheckCircle} ${
+                            isSelected ? styles.pickerCheckCircleSelected : ''
+                          }`}
+                        >
+                          <Check size={13} />
+                        </span>
+                      </button>
+                    );
+                  })
+                )}
+              </div>
+            </div>
+          )}
+
+          {!activeHandoffBrief && !isHandoffPickerOpen && (
+            <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)' }}>
+              {isAr
+                ? 'اضغط على زر البحث أعلاه لاختيار أي منتج بالصورة والاسم، أو أضف منتجاً جديداً في صفحة المنتجات ليتم إرسال بطاقة تسليمه إلى هنا تلقائياً.'
+                : 'Click the search button above to pick a product visually, or add a product first in the Product Agent to auto-receive its Handoff Brief here.'}
+            </div>
+          )}
+        </div>
+
+        {/* Contextual Affiliate CTA Link & Highlight Color Panel */}
         <div
+          className={styles.agentSubPanel}
           style={{
-            padding: '12px 14px',
-            borderRadius: '12px',
-            background: 'rgba(15, 23, 42, 0.35)',
-            border: '1px solid rgba(45, 212, 191, 0.25)',
-            marginBlockEnd: '12px',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '10px',
+            borderColor: `${affiliateCtaColor}66`,
           }}
         >
           <div
@@ -649,89 +1034,201 @@ export function AdminArticleFormView({
               gap: '8px',
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', fontWeight: 700, color: '#2DD4BF' }}>
-              <Link2 size={15} />
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                fontSize: '13px',
+                fontWeight: 700,
+                color: affiliateCtaColor,
+              }}
+            >
+              <Palette size={15} />
               <span>
                 {isAr
-                  ? '🤝 الترابط مع وكيل المنتج (بطاقة تسليم المنتج للمقال):'
-                  : '🤝 Product Agent Handoff Connection:'}
+                  ? '🎨 دمج رابط العمولة وتلوين الكلمات التحفيزية للشراء (Contextual Affiliate CTA):'
+                  : '🎨 Contextual Affiliate Link & Buying-Phrase Highlight Color:'}
               </span>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-              <select
-                value={activeHandoffBrief?.productSlug || ''}
-                onChange={(e) => handleSelectProductForHandoff(e.target.value)}
-                className={styles.selectInput}
-                style={{ fontSize: '12px', padding: '5px 10px', maxWidth: '320px' }}
+            {(contentAr.trim() || contentEn.trim()) && (
+              <button
+                type="button"
+                onClick={() => handleApplyAffiliateCtaToCurrentContent()}
+                className={styles.topBarBtn}
+                style={{
+                  fontSize: '11.5px',
+                  padding: '4px 10px',
+                  borderColor: affiliateCtaColor,
+                  color: affiliateCtaColor,
+                }}
               >
-                <option value="">
-                  {isAr
-                    ? '— اختر منتجاً من المتجر لتوليد بطاقة تسليمه للمقال —'
-                    : '— Select a store product to generate its Handoff Brief —'}
-                </option>
-                {products.map((p) => (
-                  <option key={p.id} value={p.slug}>
-                    {t(p.title)} ({p.slug})
-                  </option>
-                ))}
-              </select>
+                {isAr
+                  ? 'تطبيق اللون والرابط على المقال الحالي ⚡'
+                  : 'Apply Color & Link to Current Article ⚡'}
+              </button>
+            )}
+          </div>
 
-              {activeHandoffBrief && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    clearSavedAgentHandoffBrief();
-                    setActiveHandoffBrief(null);
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+              gap: '12px',
+              alignItems: 'end',
+            }}
+          >
+            {/* Affiliate URL Input */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+              <label style={{ fontSize: '12px', fontWeight: 600, color: 'var(--color-text-secondary)' }}>
+                {isAr
+                  ? 'رابط العمولة المراد دمجه داخل العبارات المحفزة للشراء:'
+                  : 'Affiliate URL to embed inside motivating buying phrases:'}
+              </label>
+              <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                <input
+                  type="url"
+                  dir="ltr"
+                  value={affiliateCtaUrl}
+                  onChange={(e) => setAffiliateCtaUrl(e.target.value)}
+                  className={styles.textInput}
+                  style={{ flex: 1, fontSize: '12.5px', padding: '7px 10px' }}
+                  placeholder={
+                    activeHandoffBrief?.sourceProductUrl ||
+                    (activeHandoffBrief?.productSlug
+                      ? `/go/${activeHandoffBrief.productSlug}?ref=article_cta`
+                      : 'https://...')
+                  }
+                />
+                {activeHandoffBrief?.sourceProductUrl &&
+                  affiliateCtaUrl !== activeHandoffBrief.sourceProductUrl && (
+                    <button
+                      type="button"
+                      onClick={() => setAffiliateCtaUrl(activeHandoffBrief.sourceProductUrl || '')}
+                      className={styles.topBarBtn}
+                      style={{ fontSize: '11px', padding: '6px 9px', whiteSpace: 'nowrap' }}
+                    >
+                      {isAr ? 'سحب رابط المنتج' : 'Use Product URL'}
+                    </button>
+                  )}
+              </div>
+            </div>
+
+            {/* Highlight Color Presets + Custom Picker */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <label style={{ fontSize: '12px', fontWeight: 600, color: 'var(--color-text-secondary)' }}>
+                {isAr
+                  ? 'اللون المميز للكلمات التحفيزية داخل المقال:'
+                  : 'Highlight color for motivating phrases:'}
+              </label>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                {AFFILIATE_CTA_COLOR_PRESETS.map((preset) => {
+                  const isSelected =
+                    affiliateCtaColor.toUpperCase() === preset.hex.toUpperCase();
+                  return (
+                    <button
+                      key={preset.hex}
+                      type="button"
+                      title={isAr ? preset.nameAr : preset.nameEn}
+                      onClick={() => {
+                        setAffiliateCtaColor(preset.hex);
+                        if (contentAr.trim() || contentEn.trim()) {
+                          handleApplyAffiliateCtaToCurrentContent(preset.hex);
+                        }
+                      }}
+                      style={{
+                        width: '26px',
+                        height: '26px',
+                        borderRadius: '9999px',
+                        backgroundColor: preset.hex,
+                        border: isSelected
+                          ? '2.5px solid var(--color-text-primary)'
+                          : '1px solid rgba(255,255,255,0.25)',
+                        boxShadow: isSelected ? `0 0 0 3px ${preset.hex}44` : 'none',
+                        cursor: 'pointer',
+                        transition: 'transform 0.15s ease',
+                        transform: isSelected ? 'scale(1.12)' : 'scale(1)',
+                      }}
+                      aria-label={isAr ? preset.nameAr : preset.nameEn}
+                    />
+                  );
+                })}
+
+                <label
+                  title={isAr ? 'اختيار لون مخصص' : 'Custom color'}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '5px',
+                    padding: '3px 8px',
+                    borderRadius: '8px',
+                    border: '1px solid var(--color-border)',
+                    background: 'var(--color-bg-subtle)',
+                    cursor: 'pointer',
+                    fontSize: '11.5px',
+                    fontFamily: 'monospace',
                   }}
-                  className={styles.topBarBtn}
-                  style={{ fontSize: '11px', padding: '4px 8px' }}
                 >
-                  {isAr ? 'إلغاء ربط البطاقة' : 'Clear Handoff'}
-                </button>
-              )}
+                  <input
+                    type="color"
+                    value={normalizeHexColor(affiliateCtaColor, '#EA580C')}
+                    onChange={(e) => {
+                      const nextHex = normalizeHexColor(e.target.value, '#EA580C');
+                      setAffiliateCtaColor(nextHex);
+                    }}
+                    style={{
+                      width: '18px',
+                      height: '18px',
+                      border: 'none',
+                      padding: 0,
+                      background: 'transparent',
+                      cursor: 'pointer',
+                    }}
+                  />
+                  <span>{affiliateCtaColor}</span>
+                </label>
+              </div>
             </div>
           </div>
 
-          {activeHandoffBrief ? (
-            <div
-              style={{
-                fontSize: '12px',
-                color: 'var(--color-text-secondary)',
-                display: 'flex',
-                flexWrap: 'wrap',
-                gap: '10px',
-                lineHeight: 1.6,
-              }}
-            >
-              <span>
-                📦 <strong style={{ color: 'var(--color-text-primary)' }}>{isAr ? activeHandoffBrief.titleAr : activeHandoffBrief.titleEn}</strong>{' '}
-                (<code>{activeHandoffBrief.productSlug}</code>)
-              </span>
-              <span>•</span>
-              <span>
-                🖼️ {isAr ? `${activeHandoffBrief.images.length} صور معتمدة مع أوصافها` : `${activeHandoffBrief.images.length} verified images`}
-              </span>
-              <span>•</span>
-              <span>
-                🎬 {isAr ? `${activeHandoffBrief.videoUrls.length} فيديو` : `${activeHandoffBrief.videoUrls.length} video(s)`}
-              </span>
-              {activeHandoffBrief.bestForAr && (
-                <>
-                  <span>•</span>
-                  <span>
-                    🎯 {isAr ? activeHandoffBrief.bestForAr : activeHandoffBrief.bestForEn}
-                  </span>
-                </>
-              )}
-            </div>
-          ) : (
-            <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)' }}>
+          {/* Live Preview of how the motivating phrase will appear to readers */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: '8px',
+              padding: '8px 12px',
+              borderRadius: '8px',
+              background: 'var(--color-bg-elevated)',
+              border: '1px dashed var(--color-border)',
+              fontSize: '12.5px',
+              color: 'var(--color-text-secondary)',
+            }}
+          >
+            <span>
+              {isAr ? '👁️ معاينة ظهور الكلمة المحفزة للقارئ داخل الفقرة: ' : '👁️ Live in-article reader preview: '}
+              {isAr ? '...ويمكنك ' : '...and you can '}
+              <span
+                style={{
+                  color: affiliateCtaColor,
+                  fontWeight: 700,
+                }}
+              >
+                {isAr
+                  ? 'التحقق من السعر الحالي وتوفر النسخة الأصلية'
+                  : 'check live official pricing and availability'}
+              </span>{' '}
+              {isAr ? 'مباشرة من المتجر المعتمد.' : 'directly from the official store.'}
+            </span>
+            <span style={{ fontSize: '11px', opacity: 0.8 }}>
               {isAr
-                ? 'يمكنك اختيار أي منتج من القائمة أعلاه (أو إضافة منتج جديد أولاً في صفحة المنتجات ليتم إرسال بطاقة تسليمه إلى هنا تلقائياً).'
-                : 'Select any store product above (or add a product first in the Product Agent to auto-receive its Handoff Brief here).'}
-            </div>
-          )}
+                ? '✓ تدمج 2 إلى 3 مرات فقط في المقال بتناسق تام ودون مبالغة'
+                : '✓ Embedded 2–3 times naturally without spam'}
+            </span>
+          </div>
         </div>
 
         {showPromptPreview && (
@@ -1311,27 +1808,134 @@ export function AdminArticleFormView({
 
         {products.length > 0 && (
           <div className={styles.fieldGroup}>
-            <label className={styles.fieldLabel}>
-              {isAr
-                ? 'المنتجات الموصى بها داخل هذا الدليل (تظهر في جدول المقارنة وبين الفقرات وفي أسفل المقال)'
-                : 'Recommended Products Linked to This Guide (Shown in comparison table, inline cards & footer)'}
-            </label>
-            <div className={styles.actionRow} style={{ flexWrap: 'wrap', gap: '8px' }}>
-              {products.map((p) => (
-                <label
-                  key={p.id}
-                  className={styles.topBarBtn}
-                  style={{ cursor: 'pointer' }}
-                >
-                  <input
-                    type="checkbox"
-                    checked={relatedProductIds.includes(p.id)}
-                    onChange={() => toggleProductSelection(p.id)}
-                    style={{ marginInlineEnd: '6px' }}
-                  />
-                  <span>{t(p.title)}</span>
-                </label>
-              ))}
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                flexWrap: 'wrap',
+                gap: '8px',
+              }}
+            >
+              <label className={styles.fieldLabel}>
+                {isAr
+                  ? 'المنتجات الموصى بها داخل هذا الدليل (تظهر في جدول المقارنة وبين الفقرات وفي أسفل المقال)'
+                  : 'Recommended Products Linked to This Guide (Shown in comparison table, inline cards & footer)'}
+              </label>
+              <span className={styles.badgeSuccess}>
+                {isAr
+                  ? `تم اختيار ${relatedProductIds.length} منتج`
+                  : `${relatedProductIds.length} selected`}
+              </span>
+            </div>
+
+            <div className={styles.pickerDropdownPanel}>
+              <div className={styles.pickerSearchBox}>
+                <Search size={16} className={styles.pickerSearchIcon} />
+                <input
+                  type="search"
+                  value={linkedSearchQuery}
+                  onChange={(e) => setLinkedSearchQuery(e.target.value)}
+                  placeholder={
+                    isAr
+                      ? 'ابحث لإضافة أو إزالة منتجات المقارنة داخل الدليل...'
+                      : 'Search to add or remove comparison products...'
+                  }
+                  className={styles.pickerSearchInput}
+                />
+                {linkedSearchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setLinkedSearchQuery('')}
+                    className={styles.pickerSearchClearBtn}
+                    aria-label={isAr ? 'مسح البحث' : 'Clear search'}
+                  >
+                    <X size={13} />
+                  </button>
+                )}
+              </div>
+
+              {categories.length > 0 && (
+                <div className={styles.pickerCategoryPills}>
+                  <button
+                    type="button"
+                    onClick={() => setLinkedCategoryFilter('all')}
+                    className={`${styles.pickerCategoryPill} ${
+                      linkedCategoryFilter === 'all'
+                        ? styles.pickerCategoryPillActive
+                        : ''
+                    }`}
+                  >
+                    {isAr ? `الكل (${products.length})` : `All (${products.length})`}
+                  </button>
+                  {categories.map((cat) => (
+                    <button
+                      key={cat.id}
+                      type="button"
+                      onClick={() => setLinkedCategoryFilter(cat.id)}
+                      className={`${styles.pickerCategoryPill} ${
+                        linkedCategoryFilter === cat.id
+                          ? styles.pickerCategoryPillActive
+                          : ''
+                      }`}
+                    >
+                      {t(cat.name)}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              <div className={styles.pickerListScroll}>
+                {filteredLinkedProducts.map((p) => {
+                  const isChecked = relatedProductIds.includes(p.id);
+                  return (
+                    <button
+                      key={p.id}
+                      type="button"
+                      onClick={() => toggleProductSelection(p.id)}
+                      className={`${styles.pickerOptionRow} ${
+                        isChecked ? styles.pickerOptionRowSelected : ''
+                      }`}
+                    >
+                      <div className={styles.selectedHandoffMain}>
+                        {p.primaryImage || p.images?.[0]?.url ? (
+                          /* eslint-disable-next-line @next/next/no-img-element */
+                          <img
+                            src={p.primaryImage || p.images[0].url}
+                            alt={t(p.title)}
+                            className={styles.pickerThumb}
+                            loading="lazy"
+                          />
+                        ) : (
+                          <div className={styles.pickerThumbPlaceholder}>
+                            <Package size={18} />
+                          </div>
+                        )}
+
+                        <div className={styles.pickerItemDetails}>
+                          <div className={styles.pickerItemTitle}>{t(p.title)}</div>
+                          <div className={styles.pickerItemSubRow}>
+                            {p.sourceName && (
+                              <span className={styles.pickerStoreBadge}>
+                                {t(p.sourceName)}
+                              </span>
+                            )}
+                            <span className={styles.pickerItemSlug}>/{p.slug}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <span
+                        className={`${styles.pickerCheckCircle} ${
+                          isChecked ? styles.pickerCheckCircleSelected : ''
+                        }`}
+                      >
+                        <Check size={13} />
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           </div>
         )}

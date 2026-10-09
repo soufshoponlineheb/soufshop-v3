@@ -152,8 +152,9 @@ export function ProductCard({
   const _resolvedBadge: PromoBadgeType =
     propBadge !== undefined ? propBadge : product?.badge ?? null;
 
-  const detailHref = product?.slug
-    ? `/${locale}/products/${encodeURIComponent(product.slug)}`
+  const targetSlug = (product?.slug || product?.id || '').trim();
+  const detailHref = targetSlug
+    ? `/${locale}/products/${encodeURIComponent(targetSlug)}`
     : undefined;
 
   const outboundHref =

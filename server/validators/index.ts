@@ -49,7 +49,19 @@ export function sanitizeEditorialHtml(rawHtml: unknown, maxLength = 50000): stri
   return rawHtml
     .slice(0, maxLength)
     .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-    .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '')
+    .replace(/<iframe\b([^>]*)>(?:[\s\S]*?<\/iframe>)?/gi, (_fullMatch, attrs: string) => {
+      const srcMatch = String(attrs || '').match(/\bsrc\s*=\s*["']([^"']+)["']/i);
+      if (!srcMatch) return '';
+      const src = srcMatch[1].trim();
+      if (
+        /^https:\/\/(?:www\.)?(?:youtube\.com\/embed\/|youtube-nocookie\.com\/embed\/|player\.vimeo\.com\/video\/)[A-Za-z0-9_-]+/i.test(
+          src
+        )
+      ) {
+        return `<iframe src="${src}" title="Product Video" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="width:100%;aspect-ratio:16/9;border:0;border-radius:12px;"></iframe>`;
+      }
+      return '';
+    })
     .replace(/<object\b[^<]*(?:(?!<\/object>)<[^<]*)*<\/object>/gi, '')
     .replace(/<embed\b[^>]*>/gi, '')
     .replace(/\son[a-z]+\s*=\s*(['"]).*?\1/gi, '')

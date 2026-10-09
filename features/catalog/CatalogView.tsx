@@ -1,9 +1,19 @@
 'use client';
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  Cpu,
+  Dumbbell,
+  HeartPulse,
+  Home,
+  LayoutGrid,
+  Shirt,
+  Sparkles,
+} from 'lucide-react';
 import type { Article, Category, PartnerSource, Product } from '@/types';
 import { useI18n } from '@/i18n/I18nProvider';
 import { useSaved } from '@/features/saved/SavedProvider';
+import { formatNumber } from '@/lib/format';
 import { SiteHeader } from '@/components/sections/SiteHeader';
 import { SiteFooter } from '@/components/sections/SiteFooter';
 import { SignatureMotif } from '@/components/ui/SignatureMotif';
@@ -20,6 +30,53 @@ import {
 } from '@/lib/productSearch';
 import { seedBrowserSeenProducts } from '@/lib/viewedProductsStorage';
 import styles from './CatalogView.module.css';
+
+function renderCategoryIcon(slug: string, nameAr = '', nameEn = '') {
+  const key = `${slug} ${nameAr} ${nameEn}`.toLowerCase();
+  if (
+    key.includes('electron') ||
+    key.includes('tech') ||
+    key.includes('إلكترونيات') ||
+    key.includes('تقنية')
+  ) {
+    return <Cpu size={14} aria-hidden="true" />;
+  }
+  if (
+    key.includes('home') ||
+    key.includes('kitchen') ||
+    key.includes('منزل') ||
+    key.includes('مطبخ')
+  ) {
+    return <Home size={14} aria-hidden="true" />;
+  }
+  if (
+    key.includes('health') ||
+    key.includes('beauty') ||
+    key.includes('care') ||
+    key.includes('صحة') ||
+    key.includes('عناية')
+  ) {
+    return <HeartPulse size={14} aria-hidden="true" />;
+  }
+  if (
+    key.includes('sport') ||
+    key.includes('fitness') ||
+    key.includes('رياضة') ||
+    key.includes('لياقة')
+  ) {
+    return <Dumbbell size={14} aria-hidden="true" />;
+  }
+  if (
+    key.includes('fashion') ||
+    key.includes('apparel') ||
+    key.includes('style') ||
+    key.includes('موضة') ||
+    key.includes('أزياء')
+  ) {
+    return <Shirt size={14} aria-hidden="true" />;
+  }
+  return <Sparkles size={14} aria-hidden="true" />;
+}
 
 interface CatalogViewProps {
   initialProducts: Product[];
@@ -194,6 +251,16 @@ export function CatalogView({
     visitorReady,
   ]);
 
+  const categoryProductCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const cat of categories) {
+      counts[cat.slug] = initialProducts.filter(
+        (p) => p.categorySlug === cat.slug || p.categoryId === cat.slug || p.categoryId === cat.id
+      ).length;
+    }
+    return counts;
+  }, [categories, initialProducts]);
+
   const interleavedFeed = useMemo(
     () => buildInterleavedProductFeed(filteredProducts, articles, randomSeed),
     [filteredProducts, articles, randomSeed]
@@ -223,7 +290,7 @@ export function CatalogView({
           <p className={styles.pageSubtitle}>{messages.meta.defaultDescription}</p>
         </header>
 
-        {/* Redesigned Noon/Temu-style Search & Filter Bar */}
+        {/* Unified Compact Search, Filter & Sleek Category Pills Strip */}
         <section className={styles.filterPanel} aria-label="Product Filters">
           <FilterBar
             key={filterBarKey}
@@ -237,29 +304,68 @@ export function CatalogView({
           />
 
           {categories.length > 0 && (
-            <div className={styles.filterSegmentsRow}>
-              <div className={styles.segmentedGroup} role="group" aria-label="Filter by category">
+            <div className={styles.categoryRibbonWrap}>
+              <div
+                className={styles.categoryRibbonTrack}
+                role="tablist"
+                aria-label="Filter by category"
+              >
                 <button
                   type="button"
+                  role="tab"
+                  aria-selected={selectedCategory === 'all'}
                   onClick={() => setSelectedCategory('all')}
-                  className={`${styles.segmentBtn} ${
-                    selectedCategory === 'all' ? styles.segmentBtnActive : ''
+                  className={`${styles.categoryPill} ${
+                    selectedCategory === 'all' ? styles.categoryPillActive : ''
                   }`}
                 >
-                  {messages.filters.allCategories}
+                  <span className={styles.categoryPillIcon}>
+                    <LayoutGrid size={14} aria-hidden="true" />
+                  </span>
+                  <span className={styles.categoryPillLabel}>
+                    {messages.filters.allCategories}
+                  </span>
+                  <span className={`${styles.categoryPillCount} tabularNums`}>
+                    {formatNumber(initialProducts.length, locale)}
+                  </span>
                 </button>
-                {categories.map((cat) => (
-                  <button
-                    key={cat.id}
-                    type="button"
-                    onClick={() => setSelectedCategory(cat.slug)}
-                    className={`${styles.segmentBtn} ${
-                      selectedCategory === cat.slug ? styles.segmentBtnActive : ''
-                    }`}
-                  >
-                    {t(cat.name)}
-                  </button>
-                ))}
+
+                {categories.map((cat) => {
+                  const isActive = selectedCategory === cat.slug;
+                  const count = categoryProductCounts[cat.slug] ?? 0;
+                  return (
+                    <button
+                      key={cat.id}
+                      type="button"
+                      role="tab"
+                      aria-selected={isActive}
+                      onClick={() =>
+                        setSelectedCategory((prev) =>
+                          prev === cat.slug ? 'all' : cat.slug
+                        )
+                      }
+                      className={`${styles.categoryPill} ${
+                        isActive ? styles.categoryPillActive : ''
+                      }`}
+                    >
+                      <span className={styles.categoryPillIcon}>
+                        {renderCategoryIcon(
+                          cat.slug,
+                          cat.name?.ar,
+                          cat.name?.en
+                        )}
+                      </span>
+                      <span className={styles.categoryPillLabel}>
+                        {t(cat.name)}
+                      </span>
+                      {count > 0 && (
+                        <span className={`${styles.categoryPillCount} tabularNums`}>
+                          {formatNumber(count, locale)}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           )}

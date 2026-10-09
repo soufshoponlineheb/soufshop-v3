@@ -77,11 +77,23 @@ export async function generateMetadata({
 
   const canonical = `${SITE_URL}/${locale}/tools/${tool.slug}`;
   const ogImageUrl = `${SITE_URL}${seo?.ogImagePath || `/api/og/tools/${tool.slug}`}?locale=${locale}`;
+  const toolCategoryLabel = isAr ? 'أداة ذكية تفاعلية مجانية' : 'Free Interactive Smart Tool';
+  const toolBadgeLabel = isAr ? tool.badgeAr : tool.badgeEn;
 
   return {
     title,
     description,
     keywords,
+    other: {
+      thumbnail: ogImageUrl,
+      'og:image:secure_url': ogImageUrl,
+      'og:image:type': 'image/png',
+      'og:image:alt': title,
+      'twitter:label1': isAr ? 'نوع الأداة' : 'Tool Type',
+      'twitter:data1': toolBadgeLabel || toolCategoryLabel,
+      'twitter:label2': isAr ? 'التكلفة' : 'Access',
+      'twitter:data2': isAr ? 'مجانية 100% بدون تسجيل' : '100% Free — No Sign-Up',
+    },
     alternates: {
       canonical,
       languages: {
@@ -96,21 +108,31 @@ export async function generateMetadata({
       url: canonical,
       siteName: 'AQURIVO',
       locale: isAr ? 'ar_SA' : 'en_US',
+      alternateLocale: isAr ? ['en_US'] : ['ar_SA'],
       type: 'website',
       images: [
         {
           url: ogImageUrl,
+          secureUrl: ogImageUrl,
           width: 1200,
           height: 630,
+          type: 'image/png',
           alt: title,
         },
       ],
     },
     twitter: {
       card: 'summary_large_image',
+      site: '@aqurivo',
+      creator: '@aqurivo',
       title,
       description,
-      images: [ogImageUrl],
+      images: [
+        {
+          url: ogImageUrl,
+          alt: title,
+        },
+      ],
     },
   };
 }

@@ -8,9 +8,15 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const title =
     searchParams.get('title')?.trim() ||
-    'AQURIVO — أفضل صفقات Amazon وNoon وTemu وClickBank';
+    'AQURIVO | مراجعات المنتجات ومقارنة الأسعار قبل الشراء';
   const price = searchParams.get('price')?.trim() || '';
   const source = searchParams.get('source')?.trim() || 'AQURIVO';
+  const rating = searchParams.get('rating')?.trim() || '';
+  const category = searchParams.get('category')?.trim() || '';
+  const subtitle = searchParams.get('subtitle')?.trim() || '';
+  const rawImage = searchParams.get('image')?.trim() || '';
+  const hasExternalImage =
+    rawImage.startsWith('https://') || rawImage.startsWith('http://');
 
   return new ImageResponse(
     (
@@ -21,10 +27,10 @@ export async function GET(req: NextRequest) {
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'space-between',
-          padding: '64px',
+          padding: '56px 64px',
           backgroundColor: '#101816',
           backgroundImage:
-            'radial-gradient(circle at 85% 20%, rgba(17, 94, 73, 0.45), transparent 55%)',
+            'radial-gradient(circle at 85% 20%, rgba(17, 94, 73, 0.48), transparent 55%)',
           color: '#F7F6F2',
           fontFamily: 'sans-serif',
         }}
@@ -90,69 +96,162 @@ export async function GET(req: NextRequest) {
 
           <div
             style={{
-              padding: '8px 20px',
-              borderRadius: '999px',
-              backgroundColor: '#115E49',
-              color: '#FFFFFF',
-              fontSize: '20px',
-              fontWeight: 700,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
             }}
           >
-            {source}
+            {category ? (
+              <div
+                style={{
+                  padding: '8px 18px',
+                  borderRadius: '999px',
+                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                  color: '#D1FAE5',
+                  fontSize: '18px',
+                  fontWeight: 600,
+                }}
+              >
+                {category}
+              </div>
+            ) : null}
+            <div
+              style={{
+                padding: '8px 20px',
+                borderRadius: '999px',
+                backgroundColor: '#115E49',
+                color: '#FFFFFF',
+                fontSize: '20px',
+                fontWeight: 700,
+              }}
+            >
+              {source}
+            </div>
           </div>
         </div>
 
-        {/* Center Title */}
+        {/* Center Body with Optional Product Image */}
         <div
           style={{
             display: 'flex',
-            flexDirection: 'column',
-            gap: '20px',
-            maxWidth: '1000px',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '40px',
+            width: '100%',
           }}
         >
           <div
             style={{
-              fontSize: '52px',
-              fontWeight: 700,
-              lineHeight: 1.2,
-              color: '#FFFFFF',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '20px',
+              maxWidth: hasExternalImage ? '720px' : '1020px',
+              flex: 1,
             }}
           >
-            {title.length > 90 ? `${title.slice(0, 87)}...` : title}
-          </div>
-
-          {price ? (
             <div
               style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '16px',
+                fontSize: hasExternalImage ? '44px' : '50px',
+                fontWeight: 700,
+                lineHeight: 1.22,
+                color: '#FFFFFF',
               }}
             >
-              <span
+              {title.length > 88 ? `${title.slice(0, 85)}...` : title}
+            </div>
+
+            {subtitle ? (
+              <div
                 style={{
-                  padding: '10px 26px',
-                  borderRadius: '12px',
-                  backgroundColor: '#C87D28',
-                  color: '#FFFFFF',
-                  fontSize: '32px',
-                  fontWeight: 700,
+                  fontSize: '22px',
+                  lineHeight: 1.4,
+                  color: '#C7D1CE',
                 }}
               >
-                {price}
-              </span>
-            </div>
-          ) : (
+                {subtitle.length > 110 ? `${subtitle.slice(0, 107)}...` : subtitle}
+              </div>
+            ) : null}
+
+            {price || rating ? (
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '16px',
+                }}
+              >
+                {price ? (
+                  <span
+                    style={{
+                      padding: '10px 26px',
+                      borderRadius: '12px',
+                      backgroundColor: '#C87D28',
+                      color: '#FFFFFF',
+                      fontSize: '30px',
+                      fontWeight: 700,
+                    }}
+                  >
+                    {price}
+                  </span>
+                ) : null}
+                {rating ? (
+                  <span
+                    style={{
+                      padding: '10px 20px',
+                      borderRadius: '12px',
+                      backgroundColor: 'rgba(45, 212, 191, 0.16)',
+                      border: '1px solid rgba(45, 212, 191, 0.4)',
+                      color: '#5EEAD4',
+                      fontSize: '26px',
+                      fontWeight: 700,
+                    }}
+                  >
+                    ★ {rating} / 5
+                  </span>
+                ) : null}
+              </div>
+            ) : !subtitle ? (
+              <div
+                style={{
+                  fontSize: '24px',
+                  color: '#C7D1CE',
+                }}
+              >
+                Amazon · Noon · Temu · ClickBank
+              </div>
+            ) : null}
+          </div>
+
+          {hasExternalImage ? (
             <div
               style={{
-                fontSize: '24px',
-                color: '#C7D1CE',
+                width: '280px',
+                height: '280px',
+                borderRadius: '24px',
+                backgroundColor: '#FFFFFF',
+                padding: '16px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 20px 45px rgba(0, 0, 0, 0.45)',
+                flexShrink: 0,
               }}
             >
-              Amazon · Noon · Temu · ClickBank
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={rawImage}
+                alt={title}
+                width={248}
+                height={248}
+                style={{
+                  width: '248px',
+                  height: '248px',
+                  objectFit: 'contain',
+                  borderRadius: '14px',
+                }}
+              />
             </div>
-          )}
+          ) : null}
         </div>
 
         {/* Bottom Footer Bar */}
@@ -162,13 +261,13 @@ export async function GET(req: NextRequest) {
             alignItems: 'center',
             justifyContent: 'space-between',
             borderTop: '1px solid rgba(255,255,255,0.16)',
-            paddingTop: '24px',
+            paddingTop: '22px',
             fontSize: '20px',
             color: '#9BA8A4',
           }}
         >
-          <span>aqurivo.store — Curated Global Deals</span>
-          <span>مراجعات مستقلة وروابط شراء مباشرة</span>
+          <span>aqurivo.store — Choose Smarter. Buy with Confidence.</span>
+          <span>اختر بذكاء. واشترِ بثقة.</span>
         </div>
       </div>
     ),

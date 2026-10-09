@@ -7,19 +7,57 @@
 
 .hero {
   position: relative;
-  background-image: url('/images/hero-bg.jpg');
+  background-color: #092c27;
+  background-image: url('/images/hero-mobile.jpg');
   background-size: cover;
-  background-position: center top;
+  background-position: center bottom;
   background-repeat: no-repeat;
-  min-height: 500px;
+  min-height: 580px;
 }
 
-.hero::before {
-  content: '';
+@media (min-width: 768px) {
+  .hero {
+    background-image: url('/images/hero-desktop.jpg');
+    background-position: center center;
+    min-height: 560px;
+  }
+}
+
+.heroPicture {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to bottom, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.35) 100%);
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.heroBgImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center bottom;
+  display: block;
+}
+
+@media (min-width: 768px) {
+  .heroBgImage {
+    object-position: center center;
+  }
+}
+
+.heroBackdropOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(6, 26, 23, 0.38) 0%,
+    rgba(6, 26, 23, 0.28) 55%,
+    rgba(6, 26, 23, 0.52) 100%
+  );
   z-index: 1;
+  pointer-events: none;
 }
 
 .heroContent {
@@ -30,13 +68,22 @@
 .heroBanner {
   position: relative;
   width: 100%;
-  min-block-size: 500px;
+  min-block-size: 580px;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  padding-block: var(--space-12);
+  padding-block-start: var(--space-10);
+  padding-block-end: var(--space-12);
   overflow: visible;
   z-index: 20;
+}
+
+@media (min-width: 768px) {
+  .heroBanner {
+    min-block-size: 560px;
+    align-items: center;
+    padding-block: var(--space-12);
+  }
 }
 
 /* Subtle pattern layer with CSS dots in #2DD4BF with 0.03 opacity */
@@ -56,7 +103,7 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: var(--space-5);
+  gap: var(--space-4);
   max-inline-size: 860px;
   margin-inline: auto;
 }
@@ -64,44 +111,57 @@
 /* 2. Massive Centered White Headline — Cairo Bold, clamp(2rem, 5.5vw, 3.75rem) */
 .heroHeadline {
   font-family: var(--font-cairo), 'Cairo', var(--font-body-latin), sans-serif;
-  font-size: clamp(1.95rem, 5.2vw, 3.65rem);
-  font-weight: 700;
-  line-height: 1.38;
+  font-size: clamp(2rem, 5.2vw, 3.65rem);
+  font-weight: 800;
+  line-height: 1.32;
   color: #ffffff;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   margin: 0;
   letter-spacing: 0em;
+  text-shadow: 0 4px 22px rgba(0, 0, 0, 0.35);
+}
+
+@media (min-width: 640px) {
+  .heroHeadline {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+  }
 }
 
 .headlineLine {
-  display: block;
+  display: inline-block;
   color: #ffffff;
 }
 
 /* Line 2 in Turquoise Accent (Strictly zero purple) */
 .headlineAccent {
-  display: block;
+  display: inline-block;
   color: #2DD4BF;
 }
 
-/* 3. Subtitle below headline (16px, white 80% opacity) */
+/* 3. Subtitle below headline (16px, white 90% opacity) */
 .heroDescription {
   font-family: var(--font-cairo), 'Cairo', var(--font-body-latin), sans-serif;
-  font-size: 16px;
-  font-weight: 400;
-  line-height: 1.65;
-  color: rgba(255, 255, 255, 0.85);
-  max-inline-size: 620px;
+  font-size: clamp(15px, 2vw, 17px);
+  font-weight: 500;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.92);
+  max-inline-size: 650px;
   margin: 0;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
 }
 
 .heroCtaWrap {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
+  gap: 12px;
   margin-block-start: var(--space-1);
 }
 
@@ -119,7 +179,7 @@
   font-size: 15px;
   font-weight: 700;
   text-decoration: none;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
   transition:
     background-color var(--duration-fast) var(--ease-out-quart),
     transform var(--duration-fast) var(--ease-out-quart);
@@ -127,6 +187,36 @@
 
 .heroPrimaryCta:hover {
   background-color: var(--color-accent-hover);
+  transform: translateY(-1px);
+}
+
+.heroSecondaryCta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-block-size: 46px;
+  padding-block: 10px;
+  padding-inline: 26px;
+  background-color: rgba(12, 46, 40, 0.62);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: #ffffff;
+  border: 1.5px solid rgba(45, 212, 191, 0.55);
+  border-radius: 50px;
+  font-family: var(--font-cairo), 'Cairo', var(--font-body-latin), sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  text-decoration: none;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.22);
+  transition:
+    background-color var(--duration-fast) var(--ease-out-quart),
+    border-color var(--duration-fast) var(--ease-out-quart),
+    transform var(--duration-fast) var(--ease-out-quart);
+}
+
+.heroSecondaryCta:hover {
+  background-color: rgba(17, 94, 73, 0.82);
+  border-color: #2DD4BF;
   transform: translateY(-1px);
 }
 
@@ -175,13 +265,14 @@
   flex: 1;
   min-inline-size: 0;
   height: 44px;
-  padding-inline: 14px;
+  padding-inline: 16px;
   border: none;
   outline: none;
   background: transparent;
   color: #141817;
   font-family: var(--font-cairo), 'Cairo', var(--font-body-latin), sans-serif;
   font-size: 14.5px;
+  text-align: start;
 }
 
 .searchInput::placeholder {
@@ -407,44 +498,109 @@
   color: var(--color-text-muted);
 }
 
-/* 5. Quick Category Chips below search (Small, transparent background, white border) */
+/* 5. Sleek Glass Category Chips below search */
 .chipsRow {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 8px;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-block: 4px;
+  padding-inline: 4px;
   margin-block-start: var(--space-1);
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (min-width: 720px) {
+  .chipsRow {
+    flex-wrap: wrap;
+    justify-content: center;
+    overflow-x: visible;
+  }
+}
+
+.chipsRow::-webkit-scrollbar {
+  display: none;
 }
 
 .quickChip {
+  flex-shrink: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-block-size: 32px;
-  padding-block: 4px;
-  padding-inline: 14px;
-  background-color: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.65);
-  border-radius: 50px;
-  color: #ffffff;
+  gap: 6px;
+  height: 34px;
+  padding-inline-start: 11px;
+  padding-inline-end: 10px;
+  background-color: rgba(15, 23, 21, 0.55);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.94);
   font-family: var(--font-cairo), 'Cairo', var(--font-body-latin), sans-serif;
-  font-size: 12.5px;
+  font-size: 12px;
   font-weight: 600;
+  white-space: nowrap;
   text-decoration: none;
   cursor: pointer;
   transition:
-    background-color var(--duration-fast) var(--ease-out-quart),
-    border-color var(--duration-fast) var(--ease-out-quart),
-    transform var(--duration-fast) var(--ease-out-quart);
+    background-color 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.15s ease,
+    box-shadow 0.18s ease;
 }
 
-.quickChip:hover,
+.quickChip:hover {
+  background-color: rgba(17, 94, 73, 0.78);
+  border-color: rgba(255, 255, 255, 0.65);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
 .quickChipActive {
   background-color: var(--color-accent-primary);
   border-color: var(--color-accent-primary);
   color: #ffffff;
-  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(17, 94, 73, 0.42);
+}
+
+.quickChipIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #6ee7b7;
+  transition: color 0.18s ease;
+}
+
+.quickChipActive .quickChipIcon,
+.quickChip:hover .quickChipIcon {
+  color: #ffffff;
+}
+
+.quickChipCount {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-inline-size: 18px;
+  height: 17px;
+  padding-inline: 5px;
+  border-radius: 999px;
+  background-color: rgba(255, 255, 255, 0.14);
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 10.5px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.quickChipActive .quickChipCount {
+  background-color: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
 }
 
 /* 6. Stats Bar at the bottom of the Hero (4 horizontal items on dark background) */

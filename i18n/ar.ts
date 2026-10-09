@@ -3,8 +3,9 @@ import type { MessagesDictionary } from './en';
 export const arMessages: MessagesDictionary = {
   meta: {
     siteName: 'AQURIVO',
-    tagline: 'منتجات منتقاة بعناية من أرقى المتاجر العالمية الموثوقة.',
-    defaultDescription: 'أفضل المنتجات من أكبر المتاجر العالمية في مكان واحد',
+    tagline: 'مراجعات المنتجات ومقارنة الأسعار قبل الشراء.',
+    defaultDescription:
+      'اكتشف مراجعات المنتجات وأدلة الشراء، وقارن الأسعار والمميزات والعيوب قبل اتخاذ قرارك. يساعدك AQURIVO على اختيار ما يناسب احتياجاتك وميزانيتك.',
   },
   nav: {
     home: 'الرئيسية',
@@ -27,13 +28,13 @@ export const arMessages: MessagesDictionary = {
   },
   hero: {
     kicker: 'انتقاء مستقل للمنتجات',
-    titleLine1: 'اعثر على أفضل منتج',
-    titleLine2: 'يناسب احتياجاتك',
-    title: 'اعثر على أفضل منتج يناسب احتياجاتك',
+    titleLine1: 'اختر بذكاء.',
+    titleLine2: 'واشترِ بثقة.',
+    title: 'اختر بذكاء. واشترِ بثقة.',
     subtitle:
-      'نختار لك أفضل المنتجات من الإنترنت بعناية، كل ما عليك هو النقر والشراء بأمان.',
+      'اكتشف مراجعات المنتجات ومقارنات الأسعار وأدلة الشراء والأدوات المجانية لتعرف ما يستحق أموالك قبل اتخاذ قرارك.',
     primaryCta: 'اكتشف المنتجات',
-    secondaryCta: 'كيف يعمل AQURIVO؟',
+    secondaryCta: 'جرّب الأدوات',
     stats: {
       products: '+500 منتج مختار',
       stores: 'توصيل عالمي',

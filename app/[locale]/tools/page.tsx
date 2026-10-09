@@ -52,6 +52,13 @@ export async function generateMetadata({
     title,
     description,
     keywords,
+    other: {
+      thumbnail: ogImageUrl,
+      'og:image:secure_url': ogImageUrl,
+      'og:image:type': 'image/png',
+      'twitter:label1': isAr ? 'عدد الأدوات' : 'Calculators Included',
+      'twitter:data1': isAr ? '11 أداة ذكية مجانية' : '11 Free Smart Tools',
+    },
     alternates: {
       canonical,
       languages: {
@@ -66,21 +73,31 @@ export async function generateMetadata({
       url: canonical,
       siteName: 'AQURIVO',
       locale: isAr ? 'ar_SA' : 'en_US',
+      alternateLocale: isAr ? ['en_US'] : ['ar_SA'],
       type: 'website',
       images: [
         {
           url: ogImageUrl,
+          secureUrl: ogImageUrl,
           width: 1200,
           height: 630,
+          type: 'image/png',
           alt: title,
         },
       ],
     },
     twitter: {
       card: 'summary_large_image',
+      site: '@aqurivo',
+      creator: '@aqurivo',
       title,
       description,
-      images: [ogImageUrl],
+      images: [
+        {
+          url: ogImageUrl,
+          alt: title,
+        },
+      ],
     },
   };
 }

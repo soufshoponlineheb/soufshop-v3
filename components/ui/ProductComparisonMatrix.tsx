@@ -173,7 +173,7 @@ export function ProductComparisonMatrix({
     return list;
   }, [products, sortBy]);
 
-  const getProductBestForLabel = (p: Product): string => {
+  const getBestForText = (p: Product): string => {
     const dnaBestFor = p.comparisonDna?.bestFor
       ? isAr
         ? p.comparisonDna.bestFor.ar || p.comparisonDna.bestFor.en
@@ -193,7 +193,7 @@ export function ProductComparisonMatrix({
     return isAr ? 'توازن الأداء والقيمة' : 'Balanced Performance & Value';
   };
 
-  const getProductKeySpecs = (p: Product): string[] => {
+  const getKeySpecsList = (p: Product): string[] => {
     const dnaSpecs = p.comparisonDna?.keySpecs
       ? isAr
         ? p.comparisonDna.keySpecs.ar || p.comparisonDna.keySpecs.en
@@ -203,6 +203,17 @@ export function ProductComparisonMatrix({
       return dnaSpecs.filter(Boolean).slice(0, 3);
     }
     return [];
+  };
+
+  const getAlgorithmicDnaScore = (p: Product): number => {
+    const perf =
+      p.comparisonDna?.performanceScore ?? Math.round((p.stars ?? 4.5) * 20);
+    const valScore =
+      p.comparisonDna?.valueScore ??
+      Math.min(98, 82 + Math.round(getProductDiscount(p) * 0.4));
+    const relScore =
+      p.comparisonDna?.reliabilityScore ?? Math.round((p.stars ?? 4.5) * 19.5);
+    return Math.round((perf + valScore + relScore) / 3);
   };
 
   const getAwardLabel = (

@@ -49,10 +49,21 @@ export async function generateMetadata({
         'AQURIVO',
       ];
 
+  const ogImageUrl = `${BASE_URL}/api/og?title=${encodeURIComponent(
+    title
+  )}&subtitle=${encodeURIComponent(description.slice(0, 120))}&category=${encodeURIComponent(
+    isAr ? 'أدلة الشراء' : 'Buying Guides'
+  )}&source=AQURIVO`;
+
   return {
     title,
     description: description.slice(0, 155),
     keywords,
+    other: {
+      thumbnail: ogImageUrl,
+      'og:image:secure_url': ogImageUrl,
+      'og:image:type': 'image/png',
+    },
     alternates: {
       canonical: canonicalUrl,
       languages: {
@@ -67,21 +78,31 @@ export async function generateMetadata({
       url: canonicalUrl,
       siteName: 'AQURIVO',
       locale: isAr ? 'ar_SA' : 'en_US',
+      alternateLocale: isAr ? ['en_US'] : ['ar_SA'],
       type: 'website',
       images: [
         {
-          url: `${BASE_URL}/images/hero-bg.jpg`,
+          url: ogImageUrl,
+          secureUrl: ogImageUrl,
           width: 1200,
           height: 630,
-          alt: 'AQURIVO Buying Guides',
+          type: 'image/png',
+          alt: title,
         },
       ],
     },
     twitter: {
       card: 'summary_large_image',
+      site: '@aqurivo',
+      creator: '@aqurivo',
       title,
       description: description.slice(0, 155),
-      images: [`${BASE_URL}/images/hero-bg.jpg`],
+      images: [
+        {
+          url: ogImageUrl,
+          alt: title,
+        },
+      ],
     },
   };
 }

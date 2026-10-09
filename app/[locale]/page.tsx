@@ -22,11 +22,11 @@ export async function generateMetadata({
   const isAr = locale === 'ar';
 
   const title = isAr
-    ? 'AQURIVO — أفضل المنتجات المختارة، أدلة الشراء و11 أداة تسوق ذكية'
-    : 'AQURIVO — Handpicked Products, Buying Guides & 11 Free Smart Tools';
+    ? 'AQURIVO | مراجعات المنتجات ومقارنة الأسعار قبل الشراء'
+    : 'AQURIVO | Product Reviews & Price Comparisons Before You Buy';
   const description = isAr
-    ? 'نختار لك أفضل المنتجات من المتاجر العالمية بعناية فائقة مع مراجعات المواصفات وأدلة الشراء و11 حاسبة تسوق ومال ذكية مجانية.'
-    : 'Discover top handpicked products across global stores with verified reviews, side-by-side buying guides, and 11 free smart shopping & finance calculators.';
+    ? 'اكتشف مراجعات المنتجات وأدلة الشراء، وقارن الأسعار والمميزات والعيوب قبل اتخاذ قرارك. يساعدك AQURIVO على اختيار ما يناسب احتياجاتك وميزانيتك.'
+    : 'Explore product reviews and buying guides, and compare prices, pros, and cons before making your decision. AQURIVO helps you choose what fits your needs and budget.';
   const keywords = isAr
     ? [
         'AQURIVO',
@@ -49,10 +49,17 @@ export async function generateMetadata({
         'verified store deals',
       ];
 
+  const ogImageUrl = `${SITE_URL}/images/hero-desktop.jpg`;
+
   return {
     title,
     description,
     keywords,
+    other: {
+      thumbnail: ogImageUrl,
+      'og:image:secure_url': ogImageUrl,
+      'og:image:type': 'image/jpeg',
+    },
     alternates: {
       canonical: `${SITE_URL}/${locale}`,
       languages: {
@@ -78,22 +85,32 @@ export async function generateMetadata({
       description,
       images: [
         {
-          url: `${SITE_URL}/images/hero-bg.jpg`,
+          url: ogImageUrl,
+          secureUrl: ogImageUrl,
           width: 1200,
-          height: 630,
-          alt: 'AQURIVO',
+          height: 675,
+          type: 'image/jpeg',
+          alt: title,
         },
       ],
       url: `${SITE_URL}/${locale}`,
       siteName: 'AQURIVO',
       locale: isAr ? 'ar_SA' : 'en_US',
+      alternateLocale: isAr ? ['en_US'] : ['ar_SA'],
       type: 'website',
     },
     twitter: {
       card: 'summary_large_image',
+      site: '@aqurivo',
+      creator: '@aqurivo',
       title,
       description,
-      images: [`${SITE_URL}/images/hero-bg.jpg`],
+      images: [
+        {
+          url: ogImageUrl,
+          alt: title,
+        },
+      ],
     },
   };
 }
@@ -117,6 +134,7 @@ export default async function LocalizedHomePage({
   ]);
 
   const isAr = locale === 'ar';
+  const heroImageUrl = `${SITE_URL}/images/hero-desktop.jpg`;
 
   const structuredDataJsonLd = {
     '@context': 'https://schema.org',
@@ -127,9 +145,22 @@ export default async function LocalizedHomePage({
         name: 'AQURIVO',
         url: `${SITE_URL}/${locale}`,
         inLanguage: isAr ? 'ar' : 'en',
+        image: heroImageUrl,
+        thumbnailUrl: heroImageUrl,
+        primaryImageOfPage: {
+          '@type': 'ImageObject',
+          '@id': `${SITE_URL}/${locale}#primaryimage`,
+          url: heroImageUrl,
+          contentUrl: heroImageUrl,
+          width: 1200,
+          height: 675,
+          caption: isAr
+            ? 'AQURIVO | اختر بذكاء. واشترِ بثقة.'
+            : 'AQURIVO | Choose Smarter. Buy with Confidence.',
+        },
         description: isAr
-          ? 'نختار لك أفضل المنتجات من المتاجر العالمية بعناية فائقة مع مراجعات المواصفات وأدلة الشراء و11 حاسبة تسوق ومال ذكية مجانية.'
-          : 'Discover top handpicked products across global stores with verified reviews, side-by-side buying guides, and 11 free smart shopping & finance calculators.',
+          ? 'اكتشف مراجعات المنتجات وأدلة الشراء، وقارن الأسعار والمميزات والعيوب قبل اتخاذ قرارك. يساعدك AQURIVO على اختيار ما يناسب احتياجاتك وميزانيتك.'
+          : 'Explore product reviews and buying guides, and compare prices, pros, and cons before making your decision. AQURIVO helps you choose what fits your needs and budget.',
         potentialAction: {
           '@type': 'SearchAction',
           target: `${SITE_URL}/${locale}/products?q={search_term}`,
@@ -203,17 +234,52 @@ export default async function LocalizedHomePage({
             {
               '@type': 'ItemList',
               name: isAr ? 'أبرز المنتجات المختارة' : 'Featured Curated Products',
-              numberOfItems: Math.min(products.length, 12),
-              itemListElement: products.slice(0, 12).map((prod, idx) => ({
-                '@type': 'ListItem',
-                position: idx + 1,
-                url: `${SITE_URL}/${locale}/products/${encodeURIComponent(
-                  prod.slug
-                )}`,
-                name: isAr
-                  ? prod.title?.ar || prod.title?.en || prod.slug
-                  : prod.title?.en || prod.title?.ar || prod.slug,
-              })),
+              numberOfItems: Math.min(products.length, 16),
+              itemListElement: products.slice(0, 16).map((prod, idx) => {
+                const prodSlug = encodeURIComponent(prod.slug || prod.id);
+                const prodUrl = `${SITE_URL}/${locale}/products/${prodSlug}`;
+                const prodName = isAr
+                  ? prod.title?.ar || prod.title?.en || prod.name?.ar || prod.slug
+                  : prod.title?.en || prod.title?.ar || prod.name?.en || prod.slug;
+                const prodSummary = isAr
+                  ? prod.shortSummary?.ar || prod.description?.ar || prodName
+                  : prod.shortSummary?.en || prod.description?.en || prodName;
+                const rawImg = prod.images?.[0]?.url?.trim() || '';
+                const prodImg = rawImg
+                  ? rawImg.startsWith('http')
+                    ? rawImg
+                    : `${SITE_URL}${rawImg.startsWith('/') ? rawImg : `/${rawImg}`}`
+                  : `${SITE_URL}/api/og?title=${encodeURIComponent(prodName)}`;
+
+                return {
+                  '@type': 'ListItem',
+                  position: idx + 1,
+                  url: prodUrl,
+                  name: prodName,
+                  image: prodImg,
+                  item: {
+                    '@type': 'Product',
+                    '@id': `${prodUrl}#product`,
+                    mainEntityOfPage: prodUrl,
+                    url: prodUrl,
+                    name: prodName,
+                    description: prodSummary.slice(0, 155),
+                    image: [prodImg],
+                    thumbnailUrl: prodImg,
+                    ...(typeof prod.priceAmount === 'number' && prod.priceAmount > 0
+                      ? {
+                          offers: {
+                            '@type': 'Offer',
+                            url: prodUrl,
+                            price: prod.priceAmount,
+                            priceCurrency: prod.priceCurrency || 'USD',
+                            availability: 'https://schema.org/InStock',
+                          },
+                        }
+                      : {}),
+                  },
+                };
+              }),
             },
           ]
         : []),

@@ -124,36 +124,67 @@ export async function listPublishedProducts(): Promise<Product[]> {
 
 export async function getPublishedProductBySlug(slug: string): Promise<Product | null> {
   const db = getAdminDb();
-  if (!db) return null;
+  if (!db || !slug) return null;
+
+  let cleanSlug = slug.trim();
+  try {
+    cleanSlug = decodeURIComponent(cleanSlug).trim();
+  } catch {
+    // keep trimmed slug
+  }
 
   for (const client of [db, getCloudFallbackDb()]) {
     try {
       // 1. Check direct doc lookup
-      const directDoc = await client.collection(COLLECTION).doc(slug).get();
-      if (directDoc.exists) {
-        const data = directDoc.data() as Omit<Product, 'id'>;
-        if (data.status === 'published') {
-          return normalizeProductDoc(directDoc.id, data);
+      for (const candidate of Array.from(new Set([cleanSlug, slug.trim()]))) {
+        if (!candidate) continue;
+        const directDoc = await client.collection(COLLECTION).doc(candidate).get();
+        if (directDoc.exists) {
+          const data = directDoc.data() as Omit<Product, 'id'>;
+          if (data.status === 'published') {
+            return normalizeProductDoc(directDoc.id, data);
+          }
+        }
+
+        // 2. Query where slug == candidate
+        const snap = await client
+          .collection(COLLECTION)
+          .where('slug', '==', candidate)
+          .limit(1)
+          .get();
+
+        if (!snap.empty) {
+          const doc = snap.docs[0];
+          const data = doc.data() as Omit<Product, 'id'>;
+          if (data.status === 'published') {
+            return normalizeProductDoc(doc.id, data);
+          }
         }
       }
-
-      // 2. Query where slug == slug
-      const snap = await client
-        .collection(COLLECTION)
-        .where('slug', '==', slug)
-        .limit(1)
-        .get();
-
-      if (snap.empty) continue;
-      const doc = snap.docs[0];
-      const data = doc.data() as Omit<Product, 'id'>;
-      if (data.status !== 'published') return null;
-      return normalizeProductDoc(doc.id, data);
     } catch {
       // Try cloud REST fallback
     }
   }
-  return null;
+
+  // 3. Resilient fallback: case-insensitive / decoded match against published catalog
+  const allPublished = await listPublishedProducts();
+  const targetLower = cleanSlug.toLowerCase();
+  const matched = allPublished.find((item) => {
+    const itemSlug = (item.slug || '').trim();
+    let decodedItemSlug = itemSlug;
+    try {
+      decodedItemSlug = decodeURIComponent(itemSlug).trim();
+    } catch {
+      // ignore
+    }
+    return (
+      item.id === cleanSlug ||
+      itemSlug.toLowerCase() === targetLower ||
+      decodedItemSlug.toLowerCase() === targetLower
+    );
+  });
+
+  return matched || null;
 }
 
 export const getProductBySlug = getPublishedProductBySlug;

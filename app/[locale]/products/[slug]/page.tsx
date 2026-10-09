@@ -46,25 +46,45 @@ function resolveLocalizedField(
   return '';
 }
 
+function resolveAbsoluteImageUrl(rawUrl: string | undefined, fallbackName: string): string {
+  const trimmed = (rawUrl || '').trim();
+  if (!trimmed) {
+    return `${BASE_URL}/api/og?title=${encodeURIComponent(fallbackName || 'AQURIVO')}`;
+  }
+  if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+    return trimmed;
+  }
+  return `${BASE_URL}${trimmed.startsWith('/') ? trimmed : `/${trimmed}`}`;
+}
+
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{ locale: string; slug: string }>;
 }): Promise<Metadata> {
   const { slug, locale } = await params;
+  const safeLocale = locale === 'ar' ? 'ar' : 'en';
   const decodedSlug = decodeURIComponent(slug);
   const product =
     (await getProductBySlug(decodedSlug)) ?? (await getProductBySlug(slug));
 
-  if (!product) return {};
+  if (!product) {
+    return {
+      title: 'Product Not Found | AQURIVO',
+      robots: {
+        index: false,
+        follow: false,
+      },
+    };
+  }
 
-  const isAr = locale === 'ar';
+  const isAr = safeLocale === 'ar';
   const name =
-    product.name?.[locale as Locale] ||
+    product.name?.[safeLocale as Locale] ||
     product.name?.en ||
-    product.title?.[locale as Locale] ||
+    product.title?.[safeLocale as Locale] ||
     product.title?.en ||
-    '';
+    decodedSlug;
 
   const seoTitle =
     name.length > 0 && name.length <= 36
@@ -74,12 +94,12 @@ export async function generateMetadata({
       : `${name} | AQURIVO`;
 
   const description =
-    product.shortSummary?.[locale as Locale] ||
-    product.description?.[locale as Locale] ||
+    product.shortSummary?.[safeLocale as Locale] ||
+    product.description?.[safeLocale as Locale] ||
     product.shortSummary?.en ||
     product.description?.en ||
-    product.name?.[locale as Locale] ||
-    '';
+    product.name?.[safeLocale as Locale] ||
+    name;
 
   const dnaSpecs =
     (isAr
@@ -98,17 +118,152 @@ export async function generateMetadata({
     )
   ).slice(0, 12);
 
-  const image = product.images?.[0]?.url || '';
-  const imageAlt =
-    pickLocalizedText(product.images?.[0]?.alt, locale as Locale) || name;
+  const rawFirstImage =
+    typeof product.images?.[0]?.url === 'string'
+      ? product.images[0].url.trim()
+      : '';
+
+  const numericPrice =
+    typeof product.priceAmount === 'number' &&
+    !Number.isNaN(product.priceAmount) &&
+    product.priceAmount > 0
+      ? product.priceAmount
+      : typeof (product as Record<string, unknown>).price === 'number' &&
+          Number((product as Record<string, unknown>).price) > 0
+        ? Number((product as Record<string, unknown>).price)
+        : null;
+
+  const currencyCode =
+    typeof product.priceCurrency === 'string' && product.priceCurrency.trim()
+      ? product.priceCurrency.trim()
+      : 'USD';
+
+  const localizedPriceLabel = resolveLocalizedField(
+    product.priceLabel,
+    undefined,
+    safeLocale as Locale
+  );
+
+  const formattedPriceLabel =
+    numericPrice !== null
+      ? formatProductPrice(numericPrice, currencyCode, safeLocale as Locale)
+      : localizedPriceLabel;
+
+  const localizedSourceName = resolveLocalizedField(
+    product.sourceName,
+    undefined,
+    safeLocale as Locale
+  );
+  const rawSourceSlug =
+    typeof product.sourceSlug === 'string' && product.sourceSlug.trim()
+      ? product.sourceSlug.trim()
+      : typeof product.sourceId === 'string' && product.sourceId.trim()
+        ? product.sourceId.trim()
+        : '';
+  const storeSourceName =
+    localizedSourceName ||
+    (rawSourceSlug
+      ? rawSourceSlug.charAt(0).toUpperCase() + rawSourceSlug.slice(1)
+      : 'AQURIVO');
+
+  const rawRating =
+    typeof product.rating === 'number' && !Number.isNaN(product.rating) && product.rating > 0
+      ? product.rating
+      : typeof product.stars === 'number' && !Number.isNaN(product.stars) && product.stars > 0
+        ? product.stars
+        : null;
+  const ratingScore = rawRating !== null ? rawRating.toFixed(1) : '';
+
+  const ogDynamicCardUrl = `${BASE_URL}/api/og?title=${encodeURIComponent(
+    name
+  )}&price=${encodeURIComponent(formattedPriceLabel)}&source=${encodeURIComponent(
+    storeSourceName
+  )}${ratingScore ? `&rating=${encodeURIComponent(ratingScore)}` : ''}${
+    rawFirstImage ? `&image=${encodeURIComponent(rawFirstImage)}` : ''
+  }`;
+
+  const primaryImageUrl = rawFirstImage
+    ? resolveAbsoluteImageUrl(rawFirstImage, name)
+    : ogDynamicCardUrl;
+
+  const allProductImages =
+    Array.isArray(product.images) && product.images.length > 0
+      ? [
+          ...product.images
+            .map((img) => ({
+              url: resolveAbsoluteImageUrl(
+                typeof img?.url === 'string' ? img.url : undefined,
+                name
+              ),
+              width: img?.width || 1200,
+              height: img?.height || 630,
+              alt: pickLocalizedText(img?.alt, safeLocale as Locale) || name,
+            }))
+            .filter((img) => Boolean(img.url)),
+          {
+            url: ogDynamicCardUrl,
+            width: 1200,
+            height: 630,
+            alt: `${name} — ${storeSourceName}`,
+          },
+        ]
+      : [
+          {
+            url: ogDynamicCardUrl,
+            width: 1200,
+            height: 630,
+            alt: name,
+          },
+        ];
+
   const canonicalSlug = encodeURIComponent(product.slug || decodedSlug);
+  const canonicalUrl = `${BASE_URL}/${safeLocale}/products/${canonicalSlug}`;
+  const cleanMetaDescription = description.slice(0, 155);
+
+  const productMetaOther: Record<string, string> = {
+    thumbnail: primaryImageUrl,
+    'og:image:secure_url': primaryImageUrl,
+    'og:image:alt': name,
+    'product:availability': 'in stock',
+    'product:condition': 'new',
+    'product:brand': storeSourceName,
+    'product:retailer_item_id': product.slug || decodedSlug,
+    'twitter:label1': isAr ? 'المتجر' : 'Store',
+    'twitter:data1': storeSourceName,
+  };
+
+  if (numericPrice !== null) {
+    productMetaOther['product:price:amount'] = String(numericPrice);
+    productMetaOther['product:price:currency'] = currencyCode;
+    productMetaOther['twitter:label1'] = isAr ? 'السعر' : 'Price';
+    productMetaOther['twitter:data1'] = formattedPriceLabel;
+    productMetaOther['twitter:label2'] = isAr ? 'المتجر والتقييم' : 'Store & Rating';
+    productMetaOther['twitter:data2'] = ratingScore
+      ? `${storeSourceName} (★ ${ratingScore}/5)`
+      : storeSourceName;
+  } else if (ratingScore) {
+    productMetaOther['twitter:label2'] = isAr ? 'التقييم' : 'Rating';
+    productMetaOther['twitter:data2'] = `★ ${ratingScore} / 5`;
+  }
 
   return {
     title: seoTitle,
-    description: description.slice(0, 155),
+    description: cleanMetaDescription,
     keywords,
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+        'max-video-preview': -1,
+      },
+    },
+    other: productMetaOther,
     alternates: {
-      canonical: `${BASE_URL}/${locale}/products/${canonicalSlug}`,
+      canonical: canonicalUrl,
       languages: {
         en: `${BASE_URL}/en/products/${canonicalSlug}`,
         ar: `${BASE_URL}/ar/products/${canonicalSlug}`,
@@ -117,27 +272,24 @@ export async function generateMetadata({
     },
     openGraph: {
       title: seoTitle,
-      description: description.slice(0, 155),
-      url: `${BASE_URL}/${locale}/products/${canonicalSlug}`,
+      description: cleanMetaDescription,
+      url: canonicalUrl,
       siteName: 'AQURIVO',
       locale: isAr ? 'ar_SA' : 'en_US',
+      alternateLocale: isAr ? ['en_US'] : ['ar_SA'],
       type: 'website',
-      images: image
-        ? [
-            {
-              url: image,
-              width: 800,
-              height: 800,
-              alt: imageAlt,
-            },
-          ]
-        : [],
+      images: allProductImages,
     },
     twitter: {
       card: 'summary_large_image',
+      site: '@aqurivo',
+      creator: '@aqurivo',
       title: seoTitle,
-      description: description.slice(0, 155),
-      images: image ? [image] : [],
+      description: cleanMetaDescription,
+      images: allProductImages.map((img) => ({
+        url: img.url,
+        alt: img.alt,
+      })),
     },
   };
 }
@@ -304,7 +456,11 @@ export default async function ProductPage({
   const productUrl = `${BASE_URL}/${locale}/products/${encodeURIComponent(
     productSlug
   )}`;
-  const allImageUrls = images.map((img) => img.url).filter(Boolean);
+  const allImageUrls = images
+    .map((img) => resolveAbsoluteImageUrl(img.url, name))
+    .filter(Boolean);
+  const primaryImageUrl =
+    allImageUrls[0] || resolveAbsoluteImageUrl(undefined, name);
 
   const sourceRaw = (product.sourceSlug || product.sourceId || 'Amazon').trim();
   const sourceBrandName =
@@ -380,9 +536,35 @@ export default async function ProductPage({
       : {}),
   };
 
+  const webPageSchemaNode: Record<string, unknown> = {
+    '@type': 'WebPage',
+    '@id': productUrl,
+    url: productUrl,
+    name: `${name} | AQURIVO`,
+    inLanguage: isAr ? 'ar' : 'en',
+    description: (shortSummary || detailedDescription || name).slice(0, 155),
+    thumbnailUrl: primaryImageUrl,
+    primaryImageOfPage: {
+      '@type': 'ImageObject',
+      '@id': `${productUrl}#primaryimage`,
+      url: primaryImageUrl,
+      contentUrl: primaryImageUrl,
+      width: 800,
+      height: 800,
+      caption: name,
+    },
+    mainEntity: {
+      '@id': `${productUrl}#product`,
+    },
+  };
+
   // JSON-LD structured data with all real product image URLs, brand, SKU, and Pros/Cons review
   const productSchemaNode: Record<string, unknown> = {
     '@type': 'Product',
+    '@id': `${productUrl}#product`,
+    mainEntityOfPage: {
+      '@id': productUrl,
+    },
     name,
     sku: product.id || productSlug,
     mpn: productSlug,
@@ -392,7 +574,8 @@ export default async function ProductPage({
       name: sourceBrandName,
     },
     description: (shortSummary || detailedDescription || name).slice(0, 155),
-    ...(allImageUrls.length > 0 ? { image: allImageUrls } : {}),
+    image: allImageUrls.length > 0 ? allImageUrls : [primaryImageUrl],
+    thumbnailUrl: primaryImageUrl,
     url: productUrl,
     review: editorialReviewNode,
     ...(priceAmount !== null && priceAmount > 0
@@ -449,9 +632,7 @@ export default async function ProductPage({
         : `${name} — Product Video`,
     description: (shortSummary || detailedDescription || name).slice(0, 155),
     thumbnailUrl:
-      allImageUrls.length > 0
-        ? allImageUrls
-        : [`${BASE_URL}/images/hero-bg.jpg`],
+      allImageUrls.length > 0 ? allImageUrls : [primaryImageUrl],
     uploadDate: product.updatedAt || product.createdAt || new Date().toISOString(),
     contentUrl: vUrl,
     embedUrl: vUrl,
@@ -496,7 +677,12 @@ export default async function ProductPage({
 
   const structuredDataJsonLd = {
     '@context': 'https://schema.org',
-    '@graph': [productSchemaNode, breadcrumbSchemaNode, ...videoSchemaNodes],
+    '@graph': [
+      webPageSchemaNode,
+      productSchemaNode,
+      breadcrumbSchemaNode,
+      ...videoSchemaNodes,
+    ],
   };
 
   return (

@@ -34,39 +34,54 @@ const siteUrlCom = process.env.NEXT_PUBLIC_SITE_URL_COM || 'https://aqurivo.com'
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: 'AQURIVO — اكتشف أفضل المنتجات المختارة بعناية',
+  title: 'AQURIVO | مراجعات المنتجات ومقارنة الأسعار قبل الشراء',
   authors: [{ name: 'AQURIVO Editorial Team' }],
   publisher: 'AQURIVO',
   other: {
     author: 'AQURIVO Editorial Team',
+    thumbnail: `${siteUrl}/images/hero-desktop.jpg`,
+    'og:image:secure_url': `${siteUrl}/images/hero-desktop.jpg`,
+    'og:image:type': 'image/jpeg',
   },
   description:
-    'نبحث عنك ونختار لك أفضل المنتجات العالمية مع مراجعات المواصفات وأدلة الشراء و11 أداة تسوق ذكية مجانية.',
+    'اكتشف مراجعات المنتجات وأدلة الشراء، وقارن الأسعار والمميزات والعيوب قبل اتخاذ قرارك. يساعدك AQURIVO على اختيار ما يناسب احتياجاتك وميزانيتك.',
   keywords:
-    'AQURIVO، تسوق ذكي، منتجات مختارة، مراجعات المنتجات، أدلة الشراء، حاسبة هل يستحق الشراء، أفضل أسعار',
+    'AQURIVO، مراجعات المنتجات، مقارنة الأسعار، أدلة الشراء، تسوق ذكي، المميزات والعيوب، أفضل أسعار',
   openGraph: {
-    title: 'AQURIVO — اكتشف أفضل المنتجات المختارة بعناية',
+    title: 'AQURIVO | مراجعات المنتجات ومقارنة الأسعار قبل الشراء',
     description:
-      'نبحث عنك ونختار لك أفضل المنتجات العالمية مع مراجعات المواصفات وأدلة الشراء و11 أداة تسوق ذكية مجانية.',
+      'اكتشف مراجعات المنتجات وأدلة الشراء، وقارن الأسعار والمميزات والعيوب قبل اتخاذ قرارك. يساعدك AQURIVO على اختيار ما يناسب احتياجاتك وميزانيتك.',
     url: siteUrl,
     siteName: 'AQURIVO',
-    images: [{ url: `${siteUrl}/api/og`, width: 1200, height: 630 }],
+    images: [
+      {
+        url: `${siteUrl}/images/hero-desktop.jpg`,
+        secureUrl: `${siteUrl}/images/hero-desktop.jpg`,
+        width: 1200,
+        height: 675,
+        type: 'image/jpeg',
+        alt: 'AQURIVO | مراجعات المنتجات ومقارنة الأسعار قبل الشراء',
+      },
+    ],
     locale: 'ar_SA',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'AQURIVO — اكتشف أفضل المنتجات المختارة بعناية',
+    title: 'AQURIVO | مراجعات المنتجات ومقارنة الأسعار قبل الشراء',
     description:
-      'نبحث عنك ونختار لك أفضل المنتجات العالمية مع مراجعات المواصفات وأدلة الشراء و11 أداة تسوق ذكية مجانية.',
-    images: [`${siteUrl}/api/og`],
+      'اكتشف مراجعات المنتجات وأدلة الشراء، وقارن الأسعار والمميزات والعيوب قبل اتخاذ قرارك. يساعدك AQURIVO على اختيار ما يناسب احتياجاتك وميزانيتك.',
+    images: [`${siteUrl}/images/hero-desktop.jpg`],
   },
-  alternates: {
-    canonical: siteUrl,
-    languages: {
-      en: `${siteUrl}/en`,
-      ar: `${siteUrl}/ar`,
-      'x-default': `${siteUrl}/en`,
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+      'max-video-preview': -1,
     },
   },
   icons: {
@@ -110,7 +125,7 @@ const organizationAndWebsiteJsonLd = {
         width: 192,
         height: 192,
       },
-      image: `${siteUrl}/icon`,
+      image: `${siteUrl}/images/hero-desktop.jpg`,
     },
     {
       '@type': 'WebSite',
@@ -118,6 +133,15 @@ const organizationAndWebsiteJsonLd = {
       url: siteUrl,
       name: 'AQURIVO',
       alternateName: ['أكوريفو', 'AQURIVO'],
+      image: `${siteUrl}/images/hero-desktop.jpg`,
+      thumbnailUrl: `${siteUrl}/images/hero-desktop.jpg`,
+      primaryImageOfPage: {
+        '@type': 'ImageObject',
+        url: `${siteUrl}/images/hero-desktop.jpg`,
+        contentUrl: `${siteUrl}/images/hero-desktop.jpg`,
+        width: 1200,
+        height: 675,
+      },
       publisher: {
         '@id': `${siteUrl}/#organization`,
       },

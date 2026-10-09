@@ -1,9 +1,9 @@
 export const enMessages = {
   meta: {
     siteName: 'AQURIVO',
-    tagline: 'Thoughtfully vetted products from trusted global stores.',
+    tagline: 'Product Reviews & Price Comparisons Before You Buy.',
     defaultDescription:
-      "Top products from the world's biggest stores, all in one place",
+      'Explore product reviews and buying guides, and compare prices, pros, and cons before making your decision. AQURIVO helps you choose what fits your needs and budget.',
   },
   nav: {
     home: 'Home',
@@ -26,13 +26,13 @@ export const enMessages = {
   },
   hero: {
     kicker: 'Independent Product Curation',
-    titleLine1: 'Find the best product',
-    titleLine2: 'for your needs',
-    title: 'Find the best product for your needs',
+    titleLine1: 'Choose Smarter.',
+    titleLine2: 'Buy with Confidence.',
+    title: 'Choose Smarter. Buy with Confidence.',
     subtitle:
-      'We handpick the best products from around the web so you can shop smarter, not harder.',
+      'Explore product reviews, price comparisons, buying guides, and free smart tools to know what truly deserves your money before making your decision.',
     primaryCta: 'Explore Products',
-    secondaryCta: 'How we vet products',
+    secondaryCta: 'Try Smart Tools',
     stats: {
       products: '+500 Selected Products',
       stores: 'Worldwide Delivery',

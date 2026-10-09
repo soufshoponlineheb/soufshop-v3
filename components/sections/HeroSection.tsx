@@ -3,7 +3,19 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ArrowUpLeft, BookOpen, Search, X } from 'lucide-react';
+import {
+  ArrowUpLeft,
+  BookOpen,
+  Cpu,
+  Dumbbell,
+  HeartPulse,
+  Home,
+  LayoutGrid,
+  Search,
+  Shirt,
+  Sparkles,
+  X,
+} from 'lucide-react';
 import type { Article, Category, Locale, Product } from '@/types';
 import { useI18n } from '@/i18n/I18nProvider';
 import { getDictionary } from '@/i18n';
@@ -21,6 +33,54 @@ export interface HeroQuickChip {
   query: string;
   slug?: string;
   icon?: string;
+  count?: number;
+}
+
+function renderHeroChipIcon(slug = '', labelAr = '', labelEn = '') {
+  const key = `${slug} ${labelAr} ${labelEn}`.toLowerCase();
+  if (
+    key.includes('electron') ||
+    key.includes('tech') ||
+    key.includes('إلكترونيات') ||
+    key.includes('تقنية')
+  ) {
+    return <Cpu size={13} aria-hidden="true" />;
+  }
+  if (
+    key.includes('home') ||
+    key.includes('kitchen') ||
+    key.includes('منزل') ||
+    key.includes('مطبخ')
+  ) {
+    return <Home size={13} aria-hidden="true" />;
+  }
+  if (
+    key.includes('health') ||
+    key.includes('beauty') ||
+    key.includes('care') ||
+    key.includes('صحة') ||
+    key.includes('عناية')
+  ) {
+    return <HeartPulse size={13} aria-hidden="true" />;
+  }
+  if (
+    key.includes('sport') ||
+    key.includes('fitness') ||
+    key.includes('رياضة') ||
+    key.includes('لياقة')
+  ) {
+    return <Dumbbell size={13} aria-hidden="true" />;
+  }
+  if (
+    key.includes('fashion') ||
+    key.includes('apparel') ||
+    key.includes('style') ||
+    key.includes('موضة') ||
+    key.includes('أزياء')
+  ) {
+    return <Shirt size={13} aria-hidden="true" />;
+  }
+  return <Sparkles size={13} aria-hidden="true" />;
 }
 
 export interface HeroSectionProps {
@@ -74,19 +134,27 @@ export function HeroSection({
 
   // Compute chips to render from Firestore categories if available
   const chipsToRender = useMemo<HeroQuickChip[]>(() => {
-    if (categories && categories.length > 0) {
-      return categories
-        .filter((c) => c.isActive !== false)
-        .map((c) => ({
-          labelAr: c.name?.ar || c.name?.en || c.slug,
-          labelEn: c.name?.en || c.name?.ar || c.slug,
-          query: c.slug,
-          slug: c.slug,
-          icon: c.icon || '',
-        }));
-    }
-    return DEFAULT_QUICK_CHIPS;
-  }, [categories]);
+    const baseChips =
+      categories && categories.length > 0
+        ? categories
+            .filter((c) => c.isActive !== false)
+            .map((c) => ({
+              labelAr: c.name?.ar || c.name?.en || c.slug,
+              labelEn: c.name?.en || c.name?.ar || c.slug,
+              query: c.slug,
+              slug: c.slug,
+              icon: c.icon || '',
+            }))
+        : DEFAULT_QUICK_CHIPS;
+
+    return baseChips.map((chip) => {
+      const targetSlug = chip.slug || chip.query;
+      const count = products.filter(
+        (p) => p.categorySlug === targetSlug || p.categoryId === targetSlug
+      ).length;
+      return { ...chip, count };
+    });
+  }, [categories, products]);
 
   // Live instant results for both Products and Articles/Buying Guides
   const liveProductMatches = useMemo(() => {
@@ -158,22 +226,41 @@ export function HeroSection({
       dir={isAr ? 'rtl' : 'ltr'}
       aria-label={isAr ? 'القسم الرئيسي' : 'Hero Section'}
     >
-      {/* 1. Full-width Hero with Background Image & Dark Overlay */}
+      {/* 1. Full-width Hero with Responsive Mobile & Desktop Studio Image + Overlay */}
       <div className={`${styles.hero} ${styles.heroBanner}`}>
+        <picture className={styles.heroPicture} aria-hidden="true">
+          <source
+            media="(min-width: 768px)"
+            srcSet={backgroundImageUrl || '/images/hero-desktop.jpg'}
+          />
+          <img
+            src={backgroundImageUrl || '/images/hero-mobile.jpg'}
+            alt=""
+            className={styles.heroBgImage}
+            fetchPriority="high"
+            decoding="async"
+            referrerPolicy="no-referrer"
+          />
+        </picture>
+        <div className={styles.heroBackdropOverlay} aria-hidden="true" />
+
         <div className={`siteContainer ${styles.heroContent} ${styles.heroInner}`}>
-          {/* 2. Massive Centered White Title (2-line structure) */}
+          {/* 2. Massive Centered Headline (2-tone structure) */}
           <h1 className={styles.heroHeadline}>
             <span className={styles.headlineLine}>{messages.hero.titleLine1}</span>{' '}
             <span className={styles.headlineAccent}>{messages.hero.titleLine2}</span>
           </h1>
 
-          {/* 3. Subtitle (16px, white 85% opacity) */}
+          {/* 3. Subtitle */}
           <p className={styles.heroDescription}>{messages.hero.subtitle}</p>
 
-          {/* Primary CTA Button */}
+          {/* Primary & Secondary CTA Buttons */}
           <div className={styles.heroCtaWrap}>
             <Link href={`/${locale}/products`} className={styles.heroPrimaryCta}>
               {messages.hero.primaryCta}
+            </Link>
+            <Link href={`/${locale}/tools`} className={styles.heroSecondaryCta}>
+              {messages.hero.secondaryCta}
             </Link>
           </div>
 
@@ -191,6 +278,7 @@ export function HeroSection({
 
               <input
                 type="search"
+                dir={isAr ? 'rtl' : 'ltr'}
                 value={currentQuery}
                 onFocus={() => {
                   if (trimmedQuery.length > 0) setIsDropdownOpen(true);
@@ -438,23 +526,49 @@ export function HeroSection({
             )}
           </div>
 
-          {/* 5. Quick Category Chips below search */}
+          {/* 5. Sleek Glass Category Ribbon below search */}
           <div
             className={styles.chipsRow}
+            role="tablist"
             aria-label={isAr ? 'تصنيفات سريعة' : 'Quick Categories'}
           >
+            {onChipSelect && (
+              <button
+                type="button"
+                role="tab"
+                aria-selected={!activeChip}
+                onClick={() => {
+                  onChipSelect('', '');
+                  setIsDropdownOpen(false);
+                }}
+                className={`${styles.quickChip} ${!activeChip ? styles.quickChipActive : ''}`}
+              >
+                <span className={styles.quickChipIcon}>
+                  <LayoutGrid size={13} aria-hidden="true" />
+                </span>
+                <span>{isAr ? 'الكل' : 'All'}</span>
+                {products.length > 0 && (
+                  <span className={`${styles.quickChipCount} tabularNums`}>
+                    {formatNumber(products.length, locale)}
+                  </span>
+                )}
+              </button>
+            )}
             {chipsToRender.map((chip) => {
               const label = isAr ? chip.labelAr : chip.labelEn;
               const isSelected =
-                activeChip === chip.slug ||
-                activeChip === chip.query ||
-                activeChip === label;
+                Boolean(activeChip) &&
+                (activeChip === chip.slug ||
+                  activeChip === chip.query ||
+                  activeChip === label);
 
               if (onChipSelect) {
                 return (
                   <button
                     key={chip.slug || chip.labelAr}
                     type="button"
+                    role="tab"
+                    aria-selected={isSelected}
                     onClick={() => {
                       onChipSelect(isSelected ? '' : chip.query, chip.slug);
                       setIsDropdownOpen(false);
@@ -467,8 +581,15 @@ export function HeroSection({
                       isSelected ? styles.quickChipActive : ''
                     }`}
                   >
-                    {chip.icon && <span style={{ marginInlineEnd: '4px' }}>{chip.icon}</span>}
-                    {label}
+                    <span className={styles.quickChipIcon}>
+                      {renderHeroChipIcon(chip.slug, chip.labelAr, chip.labelEn)}
+                    </span>
+                    <span>{label}</span>
+                    {chip.count !== undefined && chip.count > 0 && (
+                      <span className={`${styles.quickChipCount} tabularNums`}>
+                        {formatNumber(chip.count, locale)}
+                      </span>
+                    )}
                   </button>
                 );
               }
@@ -479,8 +600,15 @@ export function HeroSection({
                   href={`/${locale}/categories/${encodeURIComponent(chip.slug || chip.query)}`}
                   className={styles.quickChip}
                 >
-                  {chip.icon && <span style={{ marginInlineEnd: '4px' }}>{chip.icon}</span>}
-                  {label}
+                  <span className={styles.quickChipIcon}>
+                    {renderHeroChipIcon(chip.slug, chip.labelAr, chip.labelEn)}
+                  </span>
+                  <span>{label}</span>
+                  {chip.count !== undefined && chip.count > 0 && (
+                    <span className={`${styles.quickChipCount} tabularNums`}>
+                      {formatNumber(chip.count, locale)}
+                    </span>
+                  )}
                 </Link>
               );
             })}

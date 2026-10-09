@@ -69,6 +69,10 @@ export interface AgentHandoffBrief {
     altEn: string;
   }>;
   videoUrls: string[];
+  summaryAr?: string;
+  summaryEn?: string;
+  descriptionAr?: string;
+  descriptionEn?: string;
   bestForAr?: string;
   bestForEn?: string;
   keySpecsAr?: string[];
@@ -192,22 +196,52 @@ export function clearSavedAgentHandoffBrief(): void {
 }
 
 /**
+ * Extracts a clean YouTube video ID from standard watch URLs, Shorts URLs, youtu.be, or embed URLs.
+ */
+export function extractYouTubeVideoId(rawUrl: string): string | null {
+  if (!rawUrl || typeof rawUrl !== 'string') return null;
+  const trimmed = rawUrl.trim();
+  const shortsMatch = trimmed.match(/youtube\.com\/shorts\/([a-zA-Z0-9_-]{6,20})/i);
+  if (shortsMatch?.[1]) return shortsMatch[1];
+  const watchMatch = trimmed.match(/[?&]v=([a-zA-Z0-9_-]{6,20})/i);
+  if (watchMatch?.[1] && /youtube\.com/i.test(trimmed)) return watchMatch[1];
+  const shortDomainMatch = trimmed.match(/youtu\.be\/([a-zA-Z0-9_-]{6,20})/i);
+  if (shortDomainMatch?.[1]) return shortDomainMatch[1];
+  const embedMatch = trimmed.match(/youtube(?:-nocookie)?\.com\/embed\/([a-zA-Z0-9_-]{6,20})/i);
+  if (embedMatch?.[1]) return embedMatch[1];
+  return null;
+}
+
+/**
  * Formats an AgentHandoffBrief into a human- and AI-readable block for the Article Agent.
  */
 export function formatAgentHandoffBriefText(brief: AgentHandoffBrief): string {
   const imageLines =
     brief.images.length > 0
       ? brief.images
-          .map(
-            (img, i) =>
-              `  - صورة #${i + 1}: ${img.url}\n    وصف محتوها (AR): ${img.altAr}\n    Alt (EN): ${img.altEn}`
-          )
+          .map((img, i) => {
+            const roleNote =
+              i === 0 && brief.images.length > 1
+                ? ' [مخصصة لحقل (صورة الغلاف) — تجنب تكرارها داخل فقرات المقال واستخدم الصور #2 وما بعدها داخل الفقرات]'
+                : i > 0
+                  ? ' [صورة إضافية مخصصة للتضمين الذكي داخل فقرات المقال بوسم <figure>]'
+                  : '';
+            return `  - صورة #${i + 1}${roleNote}: ${img.url}\n    وصف محتواها (AR): ${img.altAr}\n    Alt (EN): ${img.altEn}`;
+          })
           .join('\n')
       : '  - لم يتم إرفاق روابط صور بعد';
 
   const videoLines =
     brief.videoUrls.length > 0
-      ? brief.videoUrls.map((v, i) => `  - فيديو #${i + 1}: ${v}`).join('\n')
+      ? brief.videoUrls
+          .map((v, i) => {
+            const ytId = extractYouTubeVideoId(v);
+            const embedHint = ytId
+              ? `\n    كود التضمين المباشر في المقال: <figure><iframe src="https://www.youtube.com/embed/${ytId}" title="${brief.titleAr}" loading="lazy" allowfullscreen></iframe><figcaption>فيديو استعراضي يوضح تصميم وأداء المنتج على أرض الواقع</figcaption></figure>`
+              : '';
+            return `  - فيديو #${i + 1} (اعرضه كمشغل فيديو مدمج داخل المقال ولا تعامله كرابط عمولة): ${v}${embedHint}`;
+          })
+          .join('\n')
       : '  - لا يوجد فيديو مرفق';
 
   const specsAr =
@@ -220,27 +254,38 @@ export function formatAgentHandoffBriefText(brief: AgentHandoffBrief): string {
       : '';
 
   return [
-    `📦 [بطاقة تسليم المنتج من وكيل المنتج إلى وكيل المقالات — AQURIVO Handoff Brief]`,
-    `- اسم المنتج (AR): ${brief.titleAr}`,
-    `- اسم المنتج (EN): ${brief.titleEn}`,
-    `- معرف الرابط في متجرنا (Slug): ${brief.productSlug}`,
-    `- رابط المنتج الداخلي بالعربية: ${brief.storePathAr}`,
-    `- رابط المنتج الداخلي بالإنجليزية: ${brief.storePathEn}`,
+    `📦 [مرجع الحقائق الفنية للمنتج — خاص بالوكيل فقط: يُمنع منعاً باتاً ذكر عبارة "بطاقة التسليم" أو "البيانات المقدمة" أو "رابط العمولة المختصر" أمام القارئ]`,
+    `- اسم المنتج المعتمد (AR): ${brief.titleAr}`,
+    `- اسم المنتج المعتمد (EN): ${brief.titleEn}`,
+    `- معرف المنتج في المتجر (Slug): ${brief.productSlug}`,
+    `- صفحة المنتج الداخلية بالعربية: ${brief.storePathAr}`,
+    `- صفحة المنتج الداخلية بالإنجليزية: ${brief.storePathEn}`,
     ...(brief.sourceProductUrl
-      ? [`- رابط المنتج الحقيقي للمراجعة والبحث في الويب: ${brief.sourceProductUrl}`]
+      ? [`- رابط الشراء الرسمي (Affiliate URL): ${brief.sourceProductUrl}`]
       : []),
     `- الفئة: ${brief.categorySlug}${brief.categoryNameAr ? ` (${brief.categoryNameAr} | ${brief.categoryNameEn || ''})` : ''}`,
-    ...(brief.priceUsd ? [`- السعر الحالي: $${brief.priceUsd} USD`] : []),
+    ...(brief.priceUsd
+      ? [
+          `- السعر المرجعي: $${brief.priceUsd} USD${brief.oldPriceUsd ? ` (السعر السابق: $${brief.oldPriceUsd})` : ''}${brief.discount ? ` — خصم ${brief.discount}%` : ''}`,
+        ]
+      : []),
+    ...(brief.stars ? [`- تقييم المشترين: ★ ${brief.stars} / 5`] : []),
+    ...(brief.summaryAr ? [`- الملخص المختصر (AR): ${brief.summaryAr}`] : []),
+    ...(brief.summaryEn ? [`- Short Summary (EN): ${brief.summaryEn}`] : []),
+    ...(brief.descriptionAr ? [`- الوصف التفصيلي الموثق (AR): ${brief.descriptionAr}`] : []),
+    ...(brief.descriptionEn ? [`- Detailed Description (EN): ${brief.descriptionEn}`] : []),
     ...(brief.bestForAr ? [`- الاستخدام الأنسب (AR): ${brief.bestForAr}`] : []),
     ...(brief.bestForEn ? [`- Best For (EN): ${brief.bestForEn}`] : []),
     ...(specsAr ? [`- المواصفات الثلاث للمقارنة (AR): ${specsAr}`] : []),
     ...(specsEn ? [`- Key Specs (EN): ${specsEn}`] : []),
-    ...(brief.whyAr ? [`- أبرز نقاط القوة الفعلية: ${brief.whyAr}`] : []),
-    ...(brief.considerAr ? [`- نقطة الانتباه الصادقة للمشتري: ${brief.considerAr}`] : []),
-    ...(brief.handoffNotes ? [`- ملاحظات وكيل المنتج: ${brief.handoffNotes}`] : []),
-    `- الصور المعتمدة للمنتج (${brief.images.length} صور):`,
+    ...(brief.whyAr ? [`- نقاط التفوق الفعلية (AR): ${brief.whyAr}`] : []),
+    ...(brief.whyEn ? [`- Why We Picked It (EN): ${brief.whyEn}`] : []),
+    ...(brief.considerAr ? [`- ما يجب الانتباه له قبل الشراء (AR): ${brief.considerAr}`] : []),
+    ...(brief.considerEn ? [`- What to Consider (EN): ${brief.considerEn}`] : []),
+    ...(brief.handoffNotes ? [`- ملاحظات إضافية: ${brief.handoffNotes}`] : []),
+    `- معرض صور المنتج (${brief.images.length} صور):`,
     imageLines,
-    `- الفيديوهات المعتمدة للمنتج (${brief.videoUrls.length}):`,
+    `- الفيديوهات التوضيحية للمنتج (${brief.videoUrls.length}):`,
     videoLines,
   ].join('\n');
 }
@@ -960,44 +1005,179 @@ export interface ParsedArticleDraft {
   coverImage?: string;
   relatedProductsQuery?: string[];
   agentReport?: string;
+  affiliateCtaUrl?: string;
+  affiliateCtaColor?: string;
   faqItems?: Array<{
     question: { ar: string; en: string };
     answer: { ar: string; en: string };
   }>;
 }
 
+export interface AffiliateCtaColorPreset {
+  hex: string;
+  nameAr: string;
+  nameEn: string;
+}
+
+export const AFFILIATE_CTA_COLOR_PRESETS: AffiliateCtaColorPreset[] = [
+  {
+    hex: '#EA580C',
+    nameAr: 'برتقالي نحاسي دافئ (الافتراضي المحفز)',
+    nameEn: 'Warm Copper Orange (Default)',
+  },
+  {
+    hex: '#059669',
+    nameAr: 'أخضر زمردي موثوق',
+    nameEn: 'Emerald Trust Green',
+  },
+  {
+    hex: '#2563EB',
+    nameAr: 'أزرق ياقوتي واضح',
+    nameEn: 'Royal Sapphire Blue',
+  },
+  {
+    hex: '#D97706',
+    nameAr: 'ذهبي كهرماني مميز',
+    nameEn: 'Amber Gold',
+  },
+  {
+    hex: '#E11D48',
+    nameAr: 'عنابي ياقوتي جذاب',
+    nameEn: 'Crimson Ruby',
+  },
+  {
+    hex: '#7C3AED',
+    nameAr: 'بنفسجي ملكي أنيق',
+    nameEn: 'Royal Violet',
+  },
+];
+
+export function normalizeHexColor(input?: string | null, fallback = '#EA580C'): string {
+  if (!input || typeof input !== 'string') return fallback;
+  const trimmed = input.trim();
+  if (/^#[0-9a-fA-F]{6}$/.test(trimmed)) return trimmed.toUpperCase();
+  if (/^#[0-9a-fA-F]{3}$/.test(trimmed)) {
+    const r = trimmed[1];
+    const g = trimmed[2];
+    const b = trimmed[3];
+    return `#${r}${r}${g}${g}${b}${b}`.toUpperCase();
+  }
+  return fallback;
+}
+
+/**
+ * Applies or updates the affiliate link URL and chosen highlight color on contextual
+ * buying-trigger anchor tags inside article HTML without disturbing internal category/product links.
+ */
+export function applyAffiliateCtaStylingToHtml(
+  rawHtml: string,
+  affiliateUrl?: string,
+  highlightColor = '#EA580C'
+): string {
+  if (!rawHtml || typeof rawHtml !== 'string') return '';
+  const safeColor = normalizeHexColor(highlightColor, '#EA580C');
+  const trimmedAffiliateUrl = affiliateUrl?.trim() || '';
+
+  let html = rawHtml;
+  if (trimmedAffiliateUrl) {
+    html = html
+      .replace(/\[AFFILIATE_LINK\]/gi, trimmedAffiliateUrl)
+      .replace(/\{\{\s*AFFILIATE_LINK\s*\}\}/gi, trimmedAffiliateUrl);
+  }
+
+  // Upgrade any <a ...> that is an affiliate CTA link while protecting video/internal links
+  return html.replace(
+    /<a\b([^>]*)>([\s\S]*?)<\/a>/gi,
+    (fullMatch, rawAttrs: string, innerHtml: string) => {
+      const hrefMatch = rawAttrs.match(/\bhref\s*=\s*(['"])(.*?)\1/i);
+      const currentHref = hrefMatch ? hrefMatch[2].trim() : '';
+      const cleanInner = innerHtml.replace(/\s*↗\s*$/g, '').trim();
+
+      // Never style video links (YouTube, Shorts, Vimeo, direct video) as affiliate CTA links
+      if (currentHref && isVideoMediaUrl(currentHref)) {
+        return `<a href="${currentHref}" target="_blank" rel="noopener noreferrer">${cleanInner}</a>`;
+      }
+
+      const isExplicitCta =
+        /data-affiliate-cta\s*=\s*(['"]?)true\1/i.test(rawAttrs) ||
+        /\baffiliate-cta-link\b/i.test(rawAttrs) ||
+        /data-cta-color\s*=/i.test(rawAttrs) ||
+        /\brel\s*=\s*(['"])[^'"]*sponsored[^'"]*\1/i.test(rawAttrs);
+
+      const isMatchingAffiliateHref =
+        Boolean(trimmedAffiliateUrl) &&
+        (currentHref === trimmedAffiliateUrl ||
+          currentHref === '[AFFILIATE_LINK]' ||
+          currentHref.startsWith('/go/'));
+
+      const isExternalMerchantLink =
+        /^https?:\/\//i.test(currentHref) &&
+        !/aqurivo\.(?:store|com)/i.test(currentHref) &&
+        !/(?:youtube\.com|youtu\.be|vimeo\.com|tiktok\.com|dailymotion\.com|wikipedia\.org)/i.test(
+          currentHref
+        );
+
+      if (!isExplicitCta && !isMatchingAffiliateHref && !isExternalMerchantLink) {
+        return fullMatch;
+      }
+
+      const finalHref =
+        trimmedAffiliateUrl && (isExplicitCta || currentHref === '[AFFILIATE_LINK]')
+          ? trimmedAffiliateUrl
+          : currentHref || trimmedAffiliateUrl || '#';
+
+      return `<a href="${finalHref}" class="affiliate-cta-link" data-affiliate-cta="true" data-cta-color="${safeColor}" style="--cta-color: ${safeColor};" target="_blank" rel="sponsored noopener noreferrer">${cleanInner}</a>`;
+    }
+  );
+}
+
 export const MAGIC_ARTICLE_AI_PROMPT_TEMPLATE = `أنت «وكيل المقالات التحريرية والمراجعات المتعمقة» (Editorial Guide & Deep Review Agent) لمنصة AQURIVO (https://aqurivo.store | https://aqurivo.com).
 
-فلسفة وقواعد عملك الصارمة (System Prompt):
-1. مقال ومراجعة مخصصة للمنتج (Product-Specific Deep Review & Guide):
-   - مهمتك هي كتابة مقال تحريري ومراجعة عملية متعمقة تركّز على المنتج المحدد في «بطاقة تسليم المنتج» أدناه (أو الموضوع المطلوب)، وليس مقالاً عاماً يهمّش المنتج الجديد لصالح المنتجات القديمة.
-   - ابحث في الويب عن هذا المنتج لتدعيم المقال بتجارب الاستخدام الواقعية، الأداء الفعلي تحت الضغط، وأدق التفاصيل التي يبحث عنها المشتري قبل اتخاذ قرار الشراء.
-2. إلغاء نظام "المنتج الفائز الوهمي":
-   - منصتنا تعتمد على خوارزمية مقارنة ذكية حية تقارن المنتجات حسب احتياج كل مشتري؛ لذلك لا تتوج أي منتج بلقب "فائز مطلق"، بل وضّح بكل أمانة متى يكون هذا المنتج هو الخيار الأمثل ومتى قد يفضّل القارئ بديلاً آخر من نفس الفئة.
-3. الاستخدام الذكي وغير المبالغ فيه للصور والفيديوهات:
-   - استخدم روابط الصور والفيديوهات الموجودة في «بطاقة تسليم المنتج» بذكاء واعتدال داخل فقرات المقال (مثلاً: تضمين صورتين توضيحيتين في السياق المناسب باستخدام <figure><img src="URL" alt="وصف الصورة" /><figcaption>تعليق مفيد</figcaption></figure>، أو الإشارة للفيديو التوضيحي دون حشو أو مبالغة).
-4. دمج منتجات المتجر الأخرى من نفس الفئة بذكاء:
-   - راجع فهرس منتجات متجر AQURIVO المرفق أدناه، واختر المنتجات التي تنتمي لنفس الفئة لتدرجها في خانة [المنتجات المقترحة] (مما يفعّل جدول المقارنة الخوارزمي التفاعلي تلقائياً في صفحة المقال)، وأشر إليها بطبيعية داخل قسم مخصص للبدائل أو المكملات عبر روابطها الداخلية (مثال للعربية: <a href="/ar/products/SLUG">اسم المنتج</a>، وللإنجليزية: <a href="/en/products/SLUG">Product Name</a>).
-5. حظر أسلوب الذكاء الاصطناعي (Zero AI Slop Policy):
-   - يُمنع منعاً باتاً استخدام مقدمات إنشائية أو عبارات مستهلكة مثل: ("في عالمنا المتسارع"، "لا شك أن"، "يُعد خياراً مثالياً لكل من يبحث عن..."، "في الختام").
-   - ادخل مباشرة من الجملة الأولى في صلب التجربة العملية والبيانات الرقمية التي تفيد القارئ وتجيب عن تساؤلاته الحقيقية.
+فلسفة وقواعد عملك الصارمة والعامة لأي منتج (Universal Editorial System Prompt):
+1. الهوية التحريرية الموثوقة ومنع كسر الجدار الرابع (Strict Editorial Voice & Zero Fourth-Wall Leaks):
+   - اكتب دائماً بصفتك فريق التحرير والاختبار في منصة AQURIVO الذي يخاطب القارئ مباشرةً بلغة خبيرة، واضحة، ومقنعة تناسب طبيعة المنتج قيد المراجعة أياً كانت فئته.
+   - يُمنع منعاً باتاً ذكر أي مصطلحات داخلية أو كواليس تقنية أمام القارئ، مثل: ("بطاقة التسليم"، "البيانات المسلمة لنا"، "القائمة المطابقة للعنوان"، "رابط العمولة المختصر"، "السعر المسجل في بطاقة AQURIVO"، "لم يتح لنا الرابط التحقق"). القارئ يقرأ مراجعة تحريرية احترافية منشورة للجمهور العام وليس تقريراً داخلياً.
+2. التوازن الاحترافي بين الإقناع الذكي والأمانة المهنية (High-Conversion Objectivity):
+   - تجنب نبرة "التشكيك القانوني المفرط" أو تكرار عبارات إخلاء المسؤولية في كل فقرة (مثل تكرار "لا تتوفر اختبارات معملية مستقلة" أو التشكيك في تطابق صفحة المتجر)، لأن ذلك يربك القارئ ويضعف ثقته دون مبرر.
+   - بدلاً من ذلك، اعرض نقاط القوة والمواصفات الفنية وتجربة الاستخدام الواقعية بثقة ووضوح، وناقش القيود العملية أو نقاط الانتباه بأسلوب الخبير الناصح الذي يوضّح للمشتري متى يكون هذا المنتج خياراً ممتازاً له ومتى قد يفضّل مواصفات أخرى.
+3. التوزيع الاستراتيجي لروابط العمولة الملونة (3 عبارات شرائية في مواضع القرار، للأحرف فقط):
+   - ادمج رابط العمولة المعتمد في **3 مواضع طبيعية موزعة بذكاء** عبر المقال:
+     (أ) الموضع الأول: بعد تحليل التجربة العملية والمواصفات الأساسية في الثلث الأول من المقال.
+     (ب) الموضع الثاني: داخل قسم تقييم القيمة مقابل السعر.
+     (ج) الموضع الثالث: في القسم الختامي (قرار الشراء) حيث يحسم القارئ قراره النهائي.
+   - لوّن نص العبارة التحفيزية (تلوين الحروف فقط بدون أي رموز أسهم وبدون إطارات) باستخدام هذا الوسم الدقيق:
+     <a href="AFFILIATE_URL" class="affiliate-cta-link" data-affiliate-cta="true" data-cta-color="HIGHLIGHT_HEX" style="--cta-color: HIGHLIGHT_HEX;" target="_blank" rel="sponsored noopener noreferrer">العبارة التحفيزية الطبيعية للشراء</a>
+   - تنبيه صارم: يُمنع وضع كلاس affiliate-cta-link أو تلوين الشراء على روابط الفيديوهات (مثل YouTube) أو الروابط الداخلية للموقع؛ التلوين مخصص حصرياً لروابط شراء المنتج.
+4. التوظيف البصري الذكي لمعرض الصور والفيديو بدون تكرار صورة الغلاف:
+   - الصورة رقم [1] تُعتمد لحقل [صورة الغلاف]؛ لذلك تجنب تكرار الصورة رقم [1] داخل فقرات المقال طالما تتوفر صور إضافية للمنتج ([2]، [3]، [4]...).
+   - وزّع 2 إلى 3 صور مختلفة من الصور الإضافية داخل أقسام المقال لشرح زوايا المنتج وميزاته وتفاصيله باستخدام:
+     <figure><img src="IMAGE_URL" alt="وصف دقيق لمحتوى الصورة" loading="lazy" /><figcaption>تعليق توضيحي مفيد للقارئ</figcaption></figure>
+   - إذا توفر للمنتج فيديو توضيحي (YouTube أو Shorts)، قم بتضمينه في السياق المناسب باستخدام كود التضمين <figure><iframe src="https://www.youtube.com/embed/VIDEO_ID" title="عنوان الفيديو" loading="lazy" allowfullscreen></iframe><figcaption>تعليق توضيحي</figcaption></figure> دون تلوينه كرابط عمولة.
+5. الدقة الصارمة في ربط المنتجات المقترحة وجدول المقارنة (Strict Comparable-Only Product Linking):
+   - في خانة [المنتجات المقترحة]، أدرج دائماً معرف (slug) المنتج الأساسي أولاً.
+   - لا تضف معه منتجات أخرى من فهرس متجر AQURIVO إلا إذا كانت بدائل حقيقية قابلة للمقارنة المباشرة أو مكملات وثيقة الصلة بنفس نوع الاستخدام.
+   - إذا لم يتوفر في فهرس المتجر منتج آخر يصلح للمقارنة المنطقية المباشرة مع المنتج الأساسي، اكتفِ بوضع slug المنتج الأساسي وحده فقط في [المنتجات المقترحة]، ولا تحشر منتجات عشوائية لا علاقة لها بطبيعة المنتج، ولا تكتب داخل نص المقال أي تبرير أو إشارة لعدم توفر بدائل في فهرس المتجر.
+6. حظر أسلوب الذكاء الاصطناعي المبتذل (Zero AI Slop Policy):
+   - يُمنع استخدام مقدمات إنشائية عامة أو قوالب مكررة مثل: ("في عالمنا المتسارع"، "لا شك أن"، "يُعد خياراً مثالياً لكل من يبحث عن..."، "في الختام"). ادخل مباشرة من الجملة الأولى في صلب التجربة العملية والأرقام التي تفيد المشتري.
 
 طريقة الإخراج المطلوبة:
-أولاً — خارج مربع الكود، قدم "تقرير الفحص والترابط" في 3 نقاط مختصرة:
-- المنتج الأساسي الذي بُني عليه المقال وأهم الحقائق المستخرجة عنه من الويب.
-- الصور والفيديوهات التي تم توظيفها بذكاء داخل المقال.
-- المنتجات المشابهة من نفس الفئة في متجر AQURIVO التي تم ربطها لتفعيل جدول المقارنة الخوارزمي.
+أولاً — خارج مربع الكود، قدم "تقرير الفحص والترابط" في 3 نقاط مختصرة (موجهة للمشرف):
+- المنتج الأساسي الذي بُني عليه المقال وأهم الحقائق المستخرجة عنه.
+- الصور الإضافية والفيديو والعبارات التحفيزية الثلاث الملونة التي تم توزيعها داخل المقال.
+- قرار ربط المنتجات المقترحة (ذكر البدائل المتوافقة منطقياً إن وجدت، أو الاكتفاء بالمنتج الأساسي وحده لضمان دقة العرض).
 
 ثانياً — داخل مربع كود واحد فقط (\`\`\`text ... \`\`\`)، اكتب المراجعة والدليل التحريري باللغتين العربية والإنجليزية باستخدام هذه العناوين بدقة تامة:
 
 \`\`\`text
-[تقرير الفحص]: ملخص سريع يوضح المنتج الأساسي والمنتجات المدمجة من نفس الفئة لتفعيل المقارنة الخوارزمية
+[تقرير الفحص]: ملخص سريع للمشرف يوضح المنتج الأساسي وتوزيع الصور والروابط التحفيزية الثلاثة
 [العنوان بالعربية]: عنوان احترافي للمراجعة ودليل الشراء يستهدف نية الباحث الحقيقية
 [العنوان بالإنجليزية]: Authoritative review and buying guide title in English
 [الرابط slug]: in-depth-review-and-guide-slug-2026
-[الفئة]: electronics
-[المنتجات المقترحة]: slug-المنتج-الأساسي, slug-منتج-مقارن-2, slug-منتج-مقارن-3
-[صورة الغلاف]: ضع رابط الصورة الرئيسية للمنتج من بطاقة التسليم (أو اكتب الـ slug الخاص به)
+[الفئة]: معرف الفئة المناسب للمنتج
+[المنتجات المقترحة]: slug-المنتج-الأساسي (أضف معه فقط المنتجات القابلة للمقارنة المباشرة منطقياً إن وجدت في المتجر)
+[رابط العمولة المدمج]: ضع رابط العمولة المعتمد للمنتج هنا
+[لون الكلمات التحفيزية]: #EA580C
+[صورة الغلاف]: ضع رابط الصورة رقم 1 للمنتج هنا
 [المقتطف بالعربية]: خلاصة مركزة من سطرين تخبر القارئ فوراً بما سيكتشفه في هذه المراجعة العملية
 [المقتطف بالإنجليزية]: Direct 2-line summary telling the reader what this hands-on review covers
 [عنوان SEO بالعربية]: عنوان مخصص لمحركات البحث بحد أقصى 60 حرفاً
@@ -1007,17 +1187,17 @@ export const MAGIC_ARTICLE_AI_PROMPT_TEMPLATE = `أنت «وكيل المقال�
 [الكلمات المفتاحية]: مراجعة، تحليل الأداء، دليل شراء، مقارنة، الكلمات المفتاحية للمنتج
 [الكاتب]: AQURIVO Editorial Team
 [وقت القراءة]: 6
-[المحتوى بالعربية]: <h2>التجربة الفعلية: ماذا يقدم هذا المنتج على أرض الواقع؟</h2><p>تحليل مباشر بالأرقام والحقائق...</p><h2>جودة التصنيع والأداء اليومي</h2><p>تفصيل عميق مع تضمين معتدل وذكي لصور المنتج والروابط الداخلية...</p><h2>لمن يناسب هذا المنتج وما هي البدائل في نفس الفئة؟</h2><p>مقارنة موضوعية توجه المشتري وتدمج منتجات الفئة من متجرنا...</p>
-[المحتوى بالإنجليزية]: <h2>Real-World Performance: What Does It Actually Deliver?</h2><p>Direct, data-backed analysis...</p><h2>Build Quality & Daily Workflow</h2><p>In-depth breakdown with smart media placement and internal product links...</p><h2>Who Should Buy It & Category Alternatives</h2><p>Objective guidance linking matching AQURIVO category options...</p>
+[المحتوى بالعربية]: <h2>التجربة الفعلية: ماذا يقدم هذا المنتج على أرض الواقع؟</h2><p>تحليل مباشر بالأرقام والحقائق العملية مع دمج متناسق لـ <a href="AFFILIATE_URL" class="affiliate-cta-link" data-affiliate-cta="true" data-cta-color="#EA580C" style="--cta-color: #EA580C;" target="_blank" rel="sponsored noopener noreferrer">التحقق من السعر الحالي وتوفر النسخة الأصلية</a> في السياق المناسب...</p><h2>جودة التصنيع والأداء اليومي</h2><p>تفصيل عميق مع تضمين الصور الإضافية (صورة #2 و #3) والفيديو التوضيحي إن وجد...</p><h2>القيمة مقابل السعر: هل يستحق الاقتناء؟</h2><p>تحليل اقتصادي واضح مع دمج الرابط الثاني مثل <a href="AFFILIATE_URL" class="affiliate-cta-link" data-affiliate-cta="true" data-cta-color="#EA580C" style="--cta-color: #EA580C;" target="_blank" rel="sponsored noopener noreferrer">مراجعة العرض الرسمي وخيارات الشحن المتاحة</a>...</p><h2>لمن يناسب هذا المنتج وقرار الشراء النهائي</h2><p>توجيه عملي واضح يساعد القارئ على حسم قراره مع دمج الرابط الختامي <a href="AFFILIATE_URL" class="affiliate-cta-link" data-affiliate-cta="true" data-cta-color="#EA580C" style="--cta-color: #EA580C;" target="_blank" rel="sponsored noopener noreferrer">طلب المنتج مباشرة من المتجر المعتمد</a>...</p>
+[المحتوى بالإنجليزية]: <h2>Real-World Performance: What Does It Actually Deliver?</h2><p>Direct, data-backed analysis with natural integration to <a href="AFFILIATE_URL" class="affiliate-cta-link" data-affiliate-cta="true" data-cta-color="#EA580C" style="--cta-color: #EA580C;" target="_blank" rel="sponsored noopener noreferrer">check live official pricing and availability</a> in context...</p><h2>Build Quality & Daily Experience</h2><p>In-depth breakdown with smart placement of additional product images (#2, #3) and video...</p><h2>Value for Money</h2><p>Practical evaluation of cost vs features with natural link to <a href="AFFILIATE_URL" class="affiliate-cta-link" data-affiliate-cta="true" data-cta-color="#EA580C" style="--cta-color: #EA580C;" target="_blank" rel="sponsored noopener noreferrer">view the current deal and shipping options</a>...</p><h2>Who Should Buy It & Final Buying Decision</h2><p>Actionable guidance concluding with <a href="AFFILIATE_URL" class="affiliate-cta-link" data-affiliate-cta="true" data-cta-color="#EA580C" style="--cta-color: #EA580C;" target="_blank" rel="sponsored noopener noreferrer">order the authentic edition from the official store</a>...</p>
 [خلاصة المحرر بالعربية]: نصيحة قرار واضحة ومحددة تساعد القارئ على حسم قراره حسب طبيعة استخدامه وميزانيته
 [خلاصة المحرر بالإنجليزية]: Actionable final verdict helping the reader decide based on use case and budget
 [سؤال 1 بالعربية]: سؤال عملي محدد يسأله المشترون فعلياً قبل شراء هذا المنتج؟
 [إجابة 1 بالعربية]: إجابة دقيقة ومباشرة مبنية على المواصفات الحقيقية.
 [سؤال 1 بالإنجليزية]: Specific practical question buyers ask before ordering this product?
 [إجابة 1 بالإنجليزية]: Direct, factual answer backed by real specifications.
-[سؤال 2 بالعربية]: سؤال ثانٍ حول التوافق أو الصيانة أو مقارنة القيمة مقابل السعر؟
+[سؤال 2 بالعربية]: سؤال ثانٍ حول الاستخدام اليومي أو العناية أو القيمة مقابل السعر؟
 [إجابة 2 بالعربية]: إجابة عملية واضحة تساعد المشتري.
-[سؤال 2 بالإنجليزية]: Second question regarding compatibility, longevity, or value?
+[سؤال 2 بالإنجليزية]: Second question regarding daily use, care, or value?
 [إجابة 2 بالإنجليزية]: Clear, helpful answer for the shopper.
 \`\`\``;
 
@@ -1032,6 +1212,7 @@ export function buildDynamicArticleAiPrompt(
     priceAmount?: number | null;
     priceCurrency?: string;
     stars?: number | null;
+    affiliateUrl?: string;
     images?: Array<{ url: string; alt?: { ar?: string; en?: string } }>;
     videoUrl?: string;
     videoUrls?: string[];
@@ -1045,7 +1226,11 @@ export function buildDynamicArticleAiPrompt(
     slug: string;
     name: { ar?: string; en?: string };
   }> = [],
-  handoffBrief?: AgentHandoffBrief | null
+  handoffBrief?: AgentHandoffBrief | null,
+  affiliateOptions?: {
+    affiliateUrl?: string;
+    highlightColor?: string;
+  }
 ): string {
   const categoryLines = categories
     .map((c) => `- ${c.slug || c.id}: ${c.name?.ar || ''} | ${c.name?.en || ''}`)
@@ -1076,14 +1261,36 @@ export function buildDynamicArticleAiPrompt(
     })
     .join('\n');
 
+  const resolvedAffiliateUrl =
+    affiliateOptions?.affiliateUrl?.trim() ||
+    handoffBrief?.sourceProductUrl?.trim() ||
+    (handoffBrief?.productSlug ? `/go/${handoffBrief.productSlug}?ref=article_cta` : '[AFFILIATE_LINK]');
+
+  const resolvedColor = normalizeHexColor(affiliateOptions?.highlightColor, '#EA580C');
+  const presetInfo = AFFILIATE_CTA_COLOR_PRESETS.find(
+    (p) => p.hex.toUpperCase() === resolvedColor
+  );
+  const colorLabel = presetInfo ? `${resolvedColor} (${presetInfo.nameAr})` : resolvedColor;
+
+  const affiliateCtaDirectiveSection = [
+    `\n---`,
+    `🎨 🔗 إعدادات دمج رابط العمولة وتلوين الكلمات التحفيزية (Contextual Affiliate CTA Settings):`,
+    `- رابط العمولة المطلوب دمجه في الكلمات المحفزة للشراء: ${resolvedAffiliateUrl}`,
+    `- اللون المميز المطلوب للكلمات التحفيزية (تلوين الحروف فقط بدون حواف أو أسهم): ${colorLabel}`,
+    `- طريقة الدمج الإلزامية (3 مواضع استراتيجية: بعد الأداء الفعلي، وفي القيمة مقابل السعر، وفي قرار الشراء الختامي):`,
+    `  استخدم هذا الكود نصياً عند كتابة العبارات التي تحفز القارئ على الشراء أو فحص العرض في [المحتوى بالعربية] و [المحتوى بالإنجليزية]:`,
+    `  <a href="${resolvedAffiliateUrl}" class="affiliate-cta-link" data-affiliate-cta="true" data-cta-color="${resolvedColor}" style="--cta-color: ${resolvedColor};" target="_blank" rel="sponsored noopener noreferrer">العبارة التحفيزية هنا</a>`,
+    `- تنبيه: لا تستخدم هذا الكود أو اللون على روابط يوتيوب أو الفيديوهات؛ هذا التلوين خاص بروابط شراء المنتج فقط.`,
+  ].join('\n');
+
   const handoffSection = handoffBrief
     ? `\n---\n${formatAgentHandoffBriefText(handoffBrief)}\n`
-    : `\n---\n🎯 المنتج أو الموضوع المطلوب البحث عنه في الويب وكتابة مراجعة ومقال خاص به:\n[الصق هنا بطاقة تسليم المنتج من وكيل المنتج، أو اكتب اسم/رابط المنتج]\n`;
+    : `\n---\n🎯 المنتج أو الموضوع المطلوب البحث عنه في الويب وكتابة مراجعة ومقال خاص به:\n[اختر المنتج من منتقي المنتجات في لوحة التحكم أو اكتب اسم/رابط المنتج هنا]\n`;
 
   return `${MAGIC_ARTICLE_AI_PROMPT_TEMPLATE}
-
+${affiliateCtaDirectiveSection}
 ---
-📌 بيانات حية من متجر AQURIVO (لربط المنتجات من نفس الفئة وتفعيل خوارزمية المقارنة الحية):
+📌 فهرس منتجات متجر AQURIVO (اربط منه فقط البدائل القابلة للمقارنة المباشرة منطقياً مع المنتج الأساسي؛ وإن لم يوجد بديل مباشر من نفس نوع الاستخدام، اكتفِ بوضع slug المنتج الأساسي وحده فقط في [المنتجات المقترحة]):
 
 الفئات المتاحة في المتجر:
 ${categoryLines || '- electronics, home, health, sports, fashion'}
@@ -1093,7 +1300,13 @@ ${productLines || '- تصفح https://aqurivo.store/ar/products لاستخراج
 ${handoffSection}`;
 }
 
-export function parseMagicArticleContent(rawInput: string): {
+export function parseMagicArticleContent(
+  rawInput: string,
+  affiliateOptions?: {
+    affiliateUrl?: string;
+    highlightColor?: string;
+  }
+): {
   draft: ParsedArticleDraft;
   fieldsFoundCount: number;
 } {
@@ -1233,12 +1446,40 @@ export function parseMagicArticleContent(rawInput: string): {
   draft.coverImage = extractFirstMatch(text, [
     /\[(?:صورة\s*الغلاف|رابط\s*صورة\s*الغلاف|الغلاف|Cover\s*Image)\]\s*:\s*([^\n\[]+)/i,
   ]);
+  draft.affiliateCtaUrl = extractFirstMatch(text, [
+    /\[(?:رابط\s*العمولة\s*المدمج|رابط\s*العمولة|رابط\s*الافلييت|Affiliate\s*URL|Affiliate\s*Link)\]\s*:\s*(https?:\/\/[^\s\n\[]+|\/go\/[^\s\n\[]+)/i,
+  ]);
+  draft.affiliateCtaColor = extractFirstMatch(text, [
+    /\[(?:لون\s*الكلمات\s*التحفيزية|لون\s*الرابط\s*التحفيزي|Highlight\s*Color|CTA\s*Color)\]\s*:\s*(#[0-9a-fA-F]{3,6})/i,
+  ]);
   draft.contentAr = extractFirstMatch(text, [
     /\[(?:المحتوى\s*بالعربية|محتوى\s*الدليل\s*بالعربية|Content\s*AR)\]\s*:\s*([\s\S]*?)(?=\n\s*\[(?:المحتوى\s*بالإنجليزية|خلاصة|سؤال|إجابة|Content\s*EN|Editor|FAQ)|$)/i,
   ]);
   draft.contentEn = extractFirstMatch(text, [
     /\[(?:المحتوى\s*بالإنجليزية|محتوى\s*الدليل\s*بالإنجليزية|Content\s*EN)\]\s*:\s*([\s\S]*?)(?=\n\s*\[(?:المحتوى\s*بالعربية|خلاصة|سؤال|إجابة|Editor|FAQ)|$)/i,
   ]);
+
+  const effectiveAffiliateUrl =
+    affiliateOptions?.affiliateUrl?.trim() || draft.affiliateCtaUrl?.trim() || '';
+  const effectiveHighlightColor = normalizeHexColor(
+    affiliateOptions?.highlightColor || draft.affiliateCtaColor,
+    '#EA580C'
+  );
+
+  if (draft.contentAr) {
+    draft.contentAr = applyAffiliateCtaStylingToHtml(
+      draft.contentAr,
+      effectiveAffiliateUrl,
+      effectiveHighlightColor
+    );
+  }
+  if (draft.contentEn) {
+    draft.contentEn = applyAffiliateCtaStylingToHtml(
+      draft.contentEn,
+      effectiveAffiliateUrl,
+      effectiveHighlightColor
+    );
+  }
   draft.editorVerdictAr = extractFirstMatch(text, [
     /\[(?:خلاصة\s*المحرر\s*بالعربية|توصية\s*المحرر\s*بالعربية|Editor\s*Verdict\s*AR)\]\s*:\s*([\s\S]*?)(?=\n\s*\[|$)/i,
   ]);

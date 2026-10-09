@@ -29,6 +29,13 @@ interface TocItem {
   text: string;
 }
 
+function extractYouTubeEmbedId(url: string): string | null {
+  const m = url.match(
+    /(?:youtube\.com\/(?:watch\?v=|shorts\/|embed\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/i
+  );
+  return m ? m[1] : null;
+}
+
 function buildContentChunksWithToc(
   rawHtml: string,
   locale: string
@@ -40,10 +47,41 @@ function buildContentChunksWithToc(
   let index = 0;
 
   // Normalize full aqurivo.store / aqurivo.com product links to current locale relative paths
-  const normalizedLinksHtml = rawHtml.replace(
-    /https?:\/\/(?:www\.)?aqurivo\.(?:store|com)\/(?:(?:ar|en)\/)?products\/([^/?#\s"'<>]+)/gi,
-    `/${locale}/products/$1`
-  );
+  // and ensure video links are never styled as affiliate CTA links
+  const normalizedLinksHtml = rawHtml
+    .replace(
+      /https?:\/\/(?:www\.)?aqurivo\.(?:store|com)\/(?:(?:ar|en)\/)?products\/([^/?#\s"'<>]+)/gi,
+      `/${locale}/products/$1`
+    )
+    .replace(
+      /<p[^>]*>\s*<a\b[^>]*href\s*=\s*(['"])(https?:\/\/(?:www\.)?(?:youtube\.com|youtu\.be)\/[^'"]+)\1[^>]*>([\s\S]*?)<\/a>\s*<\/p>/gi,
+      (fullMatch, _q: string, href: string, innerText: string) => {
+        const ytId = extractYouTubeEmbedId(href);
+        if (!ytId) return fullMatch;
+        const cleanCaption = innerText.replace(/<[^>]*>/g, '').replace(/↗/g, '').trim();
+        return `<figure><iframe src="https://www.youtube.com/embed/${ytId}" title="${cleanCaption || 'Product Video'}" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>${cleanCaption ? `<figcaption>${cleanCaption}</figcaption>` : ''}</figure>`;
+      }
+    )
+    .replace(
+      /<a\b([^>]*href\s*=\s*(['"])https?:\/\/(?:www\.)?(?:youtube\.com|youtu\.be)\/[^'"]+\2[^>]*)>/gi,
+      (_fullTag, attrs: string) => {
+        const cleanedAttrs = attrs
+          .replace(/\bclass\s*=\s*(['"])[^'"]*affiliate-cta-link[^'"]*\1/gi, '')
+          .replace(/\bdata-affiliate-cta\s*=\s*(['"])[^'"]*\1/gi, '')
+          .replace(/\bdata-cta-color\s*=\s*(['"])[^'"]*\1/gi, '');
+        return `<a${cleanedAttrs}>`;
+      }
+    )
+    .replace(
+      /<a\b([^>]*data-cta-color\s*=\s*(['"])(#[0-9a-fA-F]{3,6})\2[^>]*)>/gi,
+      (fullTag, attrs: string, _quote: string, hexColor: string) => {
+        if (/style\s*=\s*(['"])[^'"]*--cta-color/i.test(attrs)) {
+          return fullTag;
+        }
+        return `<a${attrs} style="--cta-color: ${hexColor};">`;
+      }
+    )
+    .replace(/(<a\b[^>]*>[\s\S]*?)\s*↗(\s*<\/a>)/gi, '$1$2');
 
   const htmlWithIds = normalizedLinksHtml.replace(
     /<(h[23])([^>]*)>([\s\S]*?)<\/\1>/gi,

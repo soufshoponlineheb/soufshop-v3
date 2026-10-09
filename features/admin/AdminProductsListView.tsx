@@ -192,16 +192,18 @@ export function AdminProductsListView({
       </div>
 
       <section className={styles.card}>
-        <div className={styles.actionRow}>
-          <input
-            type="search"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder={isAr ? 'بحث بالاسم أو المعرّف...' : 'Search by title or slug...'}
-            className={styles.selectInput}
-          />
+        <div className={styles.filterToolbar}>
+          <div className={styles.filterSearchInput}>
+            <input
+              type="search"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder={isAr ? 'بحث بالاسم أو المعرّف...' : 'Search by title or slug...'}
+              className={styles.selectInput}
+            />
+          </div>
 
-          <div className={styles.actionRow}>
+          <div className={styles.filterSelectGroup}>
             <select
               value={sourceFilter}
               onChange={(e) => setSourceFilter(e.target.value)}
@@ -233,68 +235,196 @@ export function AdminProductsListView({
             {isAr ? 'لا توجد منتجات مطابقة حالياً.' : 'No matching products found.'}
           </p>
         ) : (
-          <div className={styles.tableWrap}>
-            <table className={styles.table}>
-              <thead>
-                <tr>
-                  <th>{isAr ? 'المنتج' : 'Product'}</th>
-                  <th>{isAr ? 'المتجر' : 'Store'}</th>
-                  <th>{isAr ? 'السعر' : 'Price'}</th>
-                  <th>{isAr ? 'تحديث السعر' : 'Price Checked'}</th>
-                  <th>{isAr ? 'الحالة' : 'Status'}</th>
-                  <th>{isAr ? 'النقرات' : 'Clicks'}</th>
-                  <th>{isAr ? 'الإجراءات' : 'Actions'}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map((item) => {
-                  const warnStats =
-                    productWarnings[item.slug.trim().toLowerCase()] ||
-                    productWarnings[item.title.ar.trim().toLowerCase()] ||
-                    productWarnings[item.title.en.trim().toLowerCase()];
-                  return (
-                  <tr key={item.id}>
-                    <td>
-                      <strong>{t(item.title)}</strong>
-                      <div className={styles.kpiLabel}>/{item.slug}</div>
-                      {warnStats?.hasWarning && (
-                        <div className={styles.productWarningBadge}>
-                          <AlertTriangle size={12} aria-hidden="true" />
-                          <span>
-                            {isAr
-                              ? `تحذير: ${warnStats.totalCriticalCount} بلاغات (رابط/توفر)`
-                              : `Warning: ${warnStats.totalCriticalCount} reports (link/stock)`}
-                          </span>
-                        </div>
-                      )}
-                    </td>
-                    <td>{t(item.sourceName)}</td>
-                    <td className="tabularNums">
-                      {item.priceDisplayPolicy === 'show_with_timestamp' && item.priceAmount
-                        ? formatProductPrice(item.priceAmount, item.priceCurrency, locale)
-                        : isAr
-                          ? 'يُفحص في المتجر'
-                          : 'Live at store'}
-                    </td>
-                    <td className="tabularNums">
-                      {formatCalendarDate(item.priceUpdatedAt, locale)}
-                    </td>
-                    <td>
+          <>
+            {/* Desktop Table View (>= 768px) */}
+            <div className={`${styles.tableWrap} ${styles.desktopTableOnly}`}>
+              <table className={styles.table}>
+                <thead>
+                  <tr>
+                    <th>{isAr ? 'المنتج' : 'Product'}</th>
+                    <th>{isAr ? 'المتجر' : 'Store'}</th>
+                    <th>{isAr ? 'السعر' : 'Price'}</th>
+                    <th>{isAr ? 'تحديث السعر' : 'Price Checked'}</th>
+                    <th>{isAr ? 'الحالة' : 'Status'}</th>
+                    <th>{isAr ? 'النقرات' : 'Clicks'}</th>
+                    <th>{isAr ? 'الإجراءات' : 'Actions'}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filtered.map((item) => {
+                    const warnStats =
+                      productWarnings[item.slug.trim().toLowerCase()] ||
+                      productWarnings[item.title.ar.trim().toLowerCase()] ||
+                      productWarnings[item.title.en.trim().toLowerCase()];
+                    return (
+                      <tr key={item.id}>
+                        <td className={styles.tableTitleCell}>
+                          <strong>{t(item.title)}</strong>
+                          <div className={styles.kpiLabel}>/{item.slug}</div>
+                          {warnStats?.hasWarning && (
+                            <div className={styles.productWarningBadge}>
+                              <AlertTriangle size={12} aria-hidden="true" />
+                              <span>
+                                {isAr
+                                  ? `تحذير: ${warnStats.totalCriticalCount} بلاغات (رابط/توفر)`
+                                  : `Warning: ${warnStats.totalCriticalCount} reports (link/stock)`}
+                              </span>
+                            </div>
+                          )}
+                        </td>
+                        <td>{t(item.sourceName)}</td>
+                        <td className="tabularNums">
+                          {item.priceDisplayPolicy === 'show_with_timestamp' && item.priceAmount
+                            ? formatProductPrice(item.priceAmount, item.priceCurrency, locale)
+                            : isAr
+                              ? 'يُفحص في المتجر'
+                              : 'Live at store'}
+                        </td>
+                        <td className="tabularNums">
+                          {formatCalendarDate(item.priceUpdatedAt, locale)}
+                        </td>
+                        <td>
+                          <select
+                            value={item.status}
+                            onChange={(e) =>
+                              handleStatusChange(item.id, e.target.value as ProductStatus)
+                            }
+                            className={styles.topBarBtn}
+                          >
+                            <option value="published">{isAr ? 'منشور' : 'Published'}</option>
+                            <option value="draft">{isAr ? 'مسودة' : 'Draft'}</option>
+                            <option value="archived">{isAr ? 'مؤرشف' : 'Archived'}</option>
+                          </select>
+                        </td>
+                        <td className="tabularNums">{item.clicksCount || 0}</td>
+                        <td>
+                          <div className={styles.actionRow}>
+                            <Link
+                              href={`/admin/products/${encodeURIComponent(item.id)}`}
+                              className={styles.topBarBtn}
+                            >
+                              <Edit3 size={14} aria-hidden="true" />
+                              <span>{isAr ? 'تعديل' : 'Edit'}</span>
+                            </Link>
+                            <button
+                              type="button"
+                              onClick={() => handleConfirmPriceToday(item.id)}
+                              className={styles.topBarBtn}
+                              title={isAr ? 'تأكيد صحة السعر اليوم' : 'Confirm price today'}
+                            >
+                              <RefreshCw size={14} aria-hidden="true" />
+                              <span>{isAr ? 'تحديث الختم' : 'Stamp Today'}</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setDeleteTarget(item)}
+                              className={styles.topBarBtn}
+                            >
+                              <Trash2 size={14} aria-hidden="true" />
+                              <span>{isAr ? 'حذف' : 'Delete'}</span>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile Cards View (< 768px) */}
+            <div className={styles.mobileAdminCards}>
+              {filtered.map((item) => {
+                const warnStats =
+                  productWarnings[item.slug.trim().toLowerCase()] ||
+                  productWarnings[item.title.ar.trim().toLowerCase()] ||
+                  productWarnings[item.title.en.trim().toLowerCase()];
+                const priceText =
+                  item.priceDisplayPolicy === 'show_with_timestamp' && item.priceAmount
+                    ? formatProductPrice(item.priceAmount, item.priceCurrency, locale)
+                    : isAr
+                      ? 'يُفحص في المتجر'
+                      : 'Live at store';
+
+                return (
+                  <article key={item.id} className={styles.mobileItemCard}>
+                    <div className={styles.mobileItemTop}>
+                      {item.primaryImage ? (
+                        /* eslint-disable-next-line @next/next/no-img-element */
+                        <img
+                          src={item.primaryImage}
+                          alt={t(item.title)}
+                          className={styles.mobileItemThumb}
+                          loading="lazy"
+                        />
+                      ) : null}
+                      <div className={styles.mobileItemInfo}>
+                        <div className={styles.mobileItemTitle}>{t(item.title)}</div>
+                        <div className={styles.mobileItemSlug}>/{item.slug}</div>
+                        {warnStats?.hasWarning && (
+                          <div className={styles.productWarningBadge}>
+                            <AlertTriangle size={12} aria-hidden="true" />
+                            <span>
+                              {isAr
+                                ? `تحذير: ${warnStats.totalCriticalCount} بلاغات (رابط/توفر)`
+                                : `Warning: ${warnStats.totalCriticalCount} reports (link/stock)`}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className={styles.mobileItemMetaRow}>
+                      <span className={styles.mobileMetaPill}>
+                        <span className={styles.mobileMetaLabel}>
+                          {isAr ? 'المتجر:' : 'Store:'}
+                        </span>
+                        <span className={styles.mobileMetaValue}>{t(item.sourceName)}</span>
+                      </span>
+
+                      <span className={styles.mobileMetaPill}>
+                        <span className={styles.mobileMetaLabel}>
+                          {isAr ? 'السعر:' : 'Price:'}
+                        </span>
+                        <span className={`${styles.mobileMetaValue} tabularNums`}>
+                          {priceText}
+                        </span>
+                      </span>
+
+                      <span className={styles.mobileMetaPill}>
+                        <span className={styles.mobileMetaLabel}>
+                          {isAr ? 'التحديث:' : 'Checked:'}
+                        </span>
+                        <span className={`${styles.mobileMetaValue} tabularNums`}>
+                          {formatCalendarDate(item.priceUpdatedAt, locale)}
+                        </span>
+                      </span>
+
+                      <span className={styles.mobileMetaPill}>
+                        <span className={styles.mobileMetaLabel}>
+                          {isAr ? 'النقرات:' : 'Clicks:'}
+                        </span>
+                        <span className={`${styles.mobileMetaValue} tabularNums`}>
+                          {item.clicksCount || 0}
+                        </span>
+                      </span>
+                    </div>
+
+                    <div className={styles.mobileItemActions}>
                       <select
                         value={item.status}
                         onChange={(e) =>
                           handleStatusChange(item.id, e.target.value as ProductStatus)
                         }
                         className={styles.topBarBtn}
+                        aria-label={isAr ? 'حالة نشر المنتج' : 'Product publication status'}
                       >
                         <option value="published">{isAr ? 'منشور' : 'Published'}</option>
                         <option value="draft">{isAr ? 'مسودة' : 'Draft'}</option>
                         <option value="archived">{isAr ? 'مؤرشف' : 'Archived'}</option>
                       </select>
-                    </td>
-                    <td className="tabularNums">{item.clicksCount || 0}</td>
-                    <td>
-                      <div className={styles.actionRow}>
+
+                      <div className={styles.mobileActionButtonsGroup}>
                         <Link
                           href={`/admin/products/${encodeURIComponent(item.id)}`}
                           className={styles.topBarBtn}
@@ -320,13 +450,12 @@ export function AdminProductsListView({
                           <span>{isAr ? 'حذف' : 'Delete'}</span>
                         </button>
                       </div>
-                    </td>
-                  </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          </>
         )}
       </section>
 

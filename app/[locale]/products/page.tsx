@@ -51,12 +51,21 @@ export async function generateMetadata({
         'منتجات AQURIVO',
       ];
 
+  const ogImageUrl = `${SITE_URL}/api/og?title=${encodeURIComponent(
+    title
+  )}&subtitle=${encodeURIComponent(description.slice(0, 120))}&source=AQURIVO`;
+
   return {
     metadataBase: new URL(SITE_URL),
     title,
     description: description.slice(0, 155),
     keywords,
     robots: 'index, follow',
+    other: {
+      thumbnail: ogImageUrl,
+      'og:image:secure_url': ogImageUrl,
+      'og:image:type': 'image/png',
+    },
     alternates: {
       canonical: canonicalUrl,
       languages: {
@@ -71,21 +80,31 @@ export async function generateMetadata({
       url: canonicalUrl,
       siteName: 'AQURIVO',
       locale: isEn ? 'en_US' : 'ar_SA',
+      alternateLocale: isEn ? ['ar_SA'] : ['en_US'],
       type: 'website',
       images: [
         {
-          url: `${SITE_URL}/images/hero-bg.jpg`,
+          url: ogImageUrl,
+          secureUrl: ogImageUrl,
           width: 1200,
           height: 630,
+          type: 'image/png',
           alt: title,
         },
       ],
     },
     twitter: {
       card: 'summary_large_image',
+      site: '@aqurivo',
+      creator: '@aqurivo',
       title,
       description: description.slice(0, 155),
-      images: [`${SITE_URL}/images/hero-bg.jpg`],
+      images: [
+        {
+          url: ogImageUrl,
+          alt: title,
+        },
+      ],
     },
   };
 }
@@ -129,17 +148,51 @@ export default async function LocalizedProductsPage({
         '@type': 'ItemList',
         name: isEn ? 'AQURIVO Curated Products' : 'منتجات AQURIVO المنتقاة',
         numberOfItems: products.length,
-        itemListElement: products.slice(0, 50).map((product, index) => ({
-          '@type': 'ListItem',
-          position: index + 1,
-          url: `${SITE_URL}/${isEn ? 'en' : 'ar'}/products/${encodeURIComponent(
-            product.slug
-          )}`,
-          name: isEn
-            ? product.title?.en || product.title?.ar
-            : product.title?.ar || product.title?.en,
-          ...(product.images?.[0]?.url ? { image: product.images[0].url } : {}),
-        })),
+        itemListElement: products.slice(0, 50).map((product, index) => {
+          const prodSlug = encodeURIComponent(product.slug || product.id);
+          const prodUrl = `${SITE_URL}/${isEn ? 'en' : 'ar'}/products/${prodSlug}`;
+          const prodName = isEn
+            ? product.title?.en || product.title?.ar || product.slug
+            : product.title?.ar || product.title?.en || product.slug;
+          const prodDesc = isEn
+            ? product.shortSummary?.en || product.description?.en || prodName
+            : product.shortSummary?.ar || product.description?.ar || prodName;
+          const rawImg = product.images?.[0]?.url?.trim() || '';
+          const prodImg = rawImg
+            ? rawImg.startsWith('http')
+              ? rawImg
+              : `${SITE_URL}${rawImg.startsWith('/') ? rawImg : `/${rawImg}`}`
+            : `${SITE_URL}/api/og?title=${encodeURIComponent(prodName)}`;
+
+          return {
+            '@type': 'ListItem',
+            position: index + 1,
+            url: prodUrl,
+            name: prodName,
+            image: prodImg,
+            item: {
+              '@type': 'Product',
+              '@id': `${prodUrl}#product`,
+              mainEntityOfPage: prodUrl,
+              url: prodUrl,
+              name: prodName,
+              description: prodDesc.slice(0, 155),
+              image: [prodImg],
+              thumbnailUrl: prodImg,
+              ...(typeof product.priceAmount === 'number' && product.priceAmount > 0
+                ? {
+                    offers: {
+                      '@type': 'Offer',
+                      url: prodUrl,
+                      price: product.priceAmount,
+                      priceCurrency: product.priceCurrency || 'USD',
+                      availability: 'https://schema.org/InStock',
+                    },
+                  }
+                : {}),
+            },
+          };
+        }),
       },
       {
         '@type': 'BreadcrumbList',

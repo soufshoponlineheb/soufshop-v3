@@ -225,6 +225,7 @@ export function AdminProductFormView({
     nextOldPrice?: string;
     nextDiscount?: string;
     nextStars?: string;
+    nextAffiliateUrl?: string;
     nextImages: ProductImage[];
     nextVideoUrls: string[];
     nextBestForAr?: string;
@@ -235,6 +236,10 @@ export function AdminProductFormView({
     nextWhyEn?: string;
     nextConsiderAr?: string;
     nextConsiderEn?: string;
+    nextSummaryAr?: string;
+    nextSummaryEn?: string;
+    nextDescAr?: string;
+    nextDescEn?: string;
     nextNotes?: string;
   }) => {
     const resolvedSlug =
@@ -251,7 +256,15 @@ export function AdminProductFormView({
       oldPriceUsd: params.nextOldPrice,
       discount: params.nextDiscount,
       stars: params.nextStars,
-      sourceProductUrl: agentSourceProductUrl.trim() || affiliateUrl.trim() || undefined,
+      summaryAr: params.nextSummaryAr || summaryAr || undefined,
+      summaryEn: params.nextSummaryEn || summaryEn || undefined,
+      descriptionAr: params.nextDescAr || descAr || undefined,
+      descriptionEn: params.nextDescEn || descEn || undefined,
+      sourceProductUrl:
+        params.nextAffiliateUrl?.trim() ||
+        affiliateUrl.trim() ||
+        agentSourceProductUrl.trim() ||
+        undefined,
       storePathAr: `/ar/products/${resolvedSlug}`,
       storePathEn: `/en/products/${resolvedSlug}`,
       images: params.nextImages.map((img) => ({
@@ -602,6 +615,7 @@ export function AdminProductFormView({
       nextOldPrice,
       nextDiscount,
       nextStars,
+      nextAffiliateUrl: draft.affiliateUrl || affiliateUrl,
       nextImages: updatedImagesWithAlt,
       nextVideoUrls: mergedVideoList,
       nextBestForAr,
@@ -612,6 +626,10 @@ export function AdminProductFormView({
       nextWhyEn: draft.whyEn !== undefined ? draft.whyEn : whyEn,
       nextConsiderAr: draft.considerAr !== undefined ? draft.considerAr : considerAr,
       nextConsiderEn: draft.considerEn !== undefined ? draft.considerEn : considerEn,
+      nextSummaryAr: draft.summaryAr !== undefined ? draft.summaryAr : summaryAr,
+      nextSummaryEn: draft.summaryEn !== undefined ? draft.summaryEn : summaryEn,
+      nextDescAr: draft.descAr !== undefined ? draft.descAr : descAr,
+      nextDescEn: draft.descEn !== undefined ? draft.descEn : descEn,
       nextNotes: draft.handoffSummary || handoffNotes,
     });
 

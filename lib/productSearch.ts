@@ -1512,7 +1512,7 @@ export function buildInterleavedProductFeed(
     return products.map((product) => ({ type: 'product', product }));
   }
 
-  const intervalPool = [6, 8, 10, 12, 15];
+  const intervalPool = [6, 8, 10, 12];
   const rngState = { seed: randomSeed || 1 };
   const checkpoints = new Set<number>();
 
@@ -1538,7 +1538,11 @@ export function buildInterleavedProductFeed(
     currentBatch.push(product);
 
     const countSoFar = i + 1;
-    if (checkpoints.has(countSoFar)) {
+    const remainingProducts = products.length - countSoFar;
+
+    // Ensure at least 4 trailing products exist after an inline article so CSS `grid-auto-flow: row dense`
+    // can always backfill every column (2, 3, 4, or 5 columns) in the row above the article without any empty slot.
+    if (checkpoints.has(countSoFar) && remainingProducts >= 4) {
       const picked = pickReviewArticleForBatch(
         currentBatch,
         articles,
@@ -1554,23 +1558,6 @@ export function buildInterleavedProductFeed(
         });
       }
       currentBatch = [];
-    }
-  }
-
-  // If total products are fewer than the first random checkpoint, place a matched review article for the displayed products
-  if (products.length > 0 && usedArticleIds.size === 0) {
-    const picked = pickReviewArticleForBatch(
-      currentBatch,
-      articles,
-      usedArticleIds,
-      rngState
-    );
-    if (picked) {
-      entries.push({
-        type: 'article',
-        article: picked.article,
-        matchedProduct: picked.matchedProduct,
-      });
     }
   }
 

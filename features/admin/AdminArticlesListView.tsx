@@ -106,78 +106,164 @@ export function AdminArticlesListView({
             {isAr ? 'لا توجد مقالات مسجلة بعد.' : 'No articles created yet.'}
           </p>
         ) : (
-          <div className={styles.tableWrap}>
-            <table className={styles.table}>
-              <thead>
-                <tr>
-                  <th>{isAr ? 'العنوان' : 'Title'}</th>
-                  <th>{isAr ? 'الفئة' : 'Category'}</th>
-                  <th>{isAr ? 'الحالة' : 'Status'}</th>
-                  <th>{isAr ? 'تاريخ التحديث' : 'Updated'}</th>
-                  <th>{isAr ? 'إجراءات' : 'Actions'}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {articles.map((article) => (
-                  <tr key={article.id}>
-                    <td>
-                      <strong>{t(article.title)}</strong>
-                      <div className={styles.kpiLabel}>/{article.slug}</div>
-                    </td>
-                    <td>{t(article.categoryName)}</td>
-                    <td>
-                      <button
-                        type="button"
-                        onClick={() => handleToggleStatus(article)}
-                        disabled={togglingId === article.id}
-                        className={
-                          article.status === 'published'
-                            ? styles.badgeSuccess
-                            : styles.badgeNeutral
-                        }
-                        style={{ cursor: 'pointer', border: 'none' }}
-                        title={
-                          isAr
-                            ? 'اضغط للتبديل بين منشور ومسودة'
-                            : 'Click to toggle between Published and Draft'
-                        }
-                      >
-                        {article.status === 'published'
-                          ? isAr
-                            ? 'منشور (اضغط للإخفاء)'
-                            : 'Published'
-                          : isAr
-                            ? 'مسودة (اضغط للنشر)'
-                            : 'Draft'}
-                      </button>
-                    </td>
-                    <td className="tabularNums">
-                      {formatCalendarDate(article.updatedAt, locale)}
-                    </td>
-                    <td>
-                      <div className={styles.actionRow}>
-                        <Link
-                          href={`/admin/articles/${encodeURIComponent(article.id)}`}
-                          className={styles.topBarBtn}
-                        >
-                          <Edit3 size={14} />
-                          <span>{isAr ? 'تعديل' : 'Edit'}</span>
-                        </Link>
+          <>
+            {/* Desktop Table View (>= 768px) */}
+            <div className={`${styles.tableWrap} ${styles.desktopTableOnly}`}>
+              <table className={styles.table}>
+                <thead>
+                  <tr>
+                    <th>{isAr ? 'العنوان' : 'Title'}</th>
+                    <th>{isAr ? 'الفئة' : 'Category'}</th>
+                    <th>{isAr ? 'الحالة' : 'Status'}</th>
+                    <th>{isAr ? 'تاريخ التحديث' : 'Updated'}</th>
+                    <th>{isAr ? 'إجراءات' : 'Actions'}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {articles.map((article) => (
+                    <tr key={article.id}>
+                      <td className={styles.tableTitleCell}>
+                        <strong>{t(article.title)}</strong>
+                        <div className={styles.kpiLabel}>/{article.slug}</div>
+                      </td>
+                      <td>{t(article.categoryName)}</td>
+                      <td>
                         <button
                           type="button"
-                          onClick={() => setDeleteTarget(article)}
-                          className={styles.topBarBtn}
+                          onClick={() => handleToggleStatus(article)}
+                          disabled={togglingId === article.id}
+                          className={
+                            article.status === 'published'
+                              ? styles.badgeSuccess
+                              : styles.badgeNeutral
+                          }
+                          style={{ cursor: 'pointer', border: 'none' }}
+                          title={
+                            isAr
+                              ? 'اضغط للتبديل بين منشور ومسودة'
+                              : 'Click to toggle between Published and Draft'
+                          }
                         >
-                          <Trash2 size={14} />
-                          <span>{isAr ? 'حذف' : 'Delete'}</span>
+                          {article.status === 'published'
+                            ? isAr
+                              ? 'منشور (اضغط للإخفاء)'
+                              : 'Published'
+                            : isAr
+                              ? 'مسودة (اضغط للنشر)'
+                              : 'Draft'}
                         </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                      </td>
+                      <td className="tabularNums">
+                        {formatCalendarDate(article.updatedAt, locale)}
+                      </td>
+                      <td>
+                        <div className={styles.actionRow}>
+                          <Link
+                            href={`/admin/articles/${encodeURIComponent(article.id)}`}
+                            className={styles.topBarBtn}
+                          >
+                            <Edit3 size={14} />
+                            <span>{isAr ? 'تعديل' : 'Edit'}</span>
+                          </Link>
+                          <button
+                            type="button"
+                            onClick={() => setDeleteTarget(article)}
+                            className={styles.topBarBtn}
+                          >
+                            <Trash2 size={14} />
+                            <span>{isAr ? 'حذف' : 'Delete'}</span>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile Cards View (< 768px) */}
+            <div className={styles.mobileAdminCards}>
+              {articles.map((article) => (
+                <article key={article.id} className={styles.mobileItemCard}>
+                  <div className={styles.mobileItemTop}>
+                    {article.coverImage ? (
+                      /* eslint-disable-next-line @next/next/no-img-element */
+                      <img
+                        src={article.coverImage}
+                        alt={t(article.title)}
+                        className={styles.mobileItemThumb}
+                        loading="lazy"
+                      />
+                    ) : null}
+                    <div className={styles.mobileItemInfo}>
+                      <div className={styles.mobileItemTitle}>{t(article.title)}</div>
+                      <div className={styles.mobileItemSlug}>/{article.slug}</div>
+                    </div>
+                  </div>
+
+                  <div className={styles.mobileItemMetaRow}>
+                    <span className={styles.mobileMetaPill}>
+                      <span className={styles.mobileMetaLabel}>
+                        {isAr ? 'الفئة:' : 'Category:'}
+                      </span>
+                      <span className={styles.mobileMetaValue}>
+                        {t(article.categoryName)}
+                      </span>
+                    </span>
+
+                    <span className={styles.mobileMetaPill}>
+                      <span className={styles.mobileMetaLabel}>
+                        {isAr ? 'التحديث:' : 'Updated:'}
+                      </span>
+                      <span className={`${styles.mobileMetaValue} tabularNums`}>
+                        {formatCalendarDate(article.updatedAt, locale)}
+                      </span>
+                    </span>
+                  </div>
+
+                  <div className={styles.mobileItemActions}>
+                    <button
+                      type="button"
+                      onClick={() => handleToggleStatus(article)}
+                      disabled={togglingId === article.id}
+                      className={
+                        article.status === 'published'
+                          ? styles.badgeSuccess
+                          : styles.badgeNeutral
+                      }
+                      style={{ cursor: 'pointer', border: 'none', paddingBlock: '6px' }}
+                    >
+                      {article.status === 'published'
+                        ? isAr
+                          ? 'منشور (اضغط للإخفاء)'
+                          : 'Published'
+                        : isAr
+                          ? 'مسودة (اضغط للنشر)'
+                          : 'Draft'}
+                    </button>
+
+                    <div className={styles.mobileActionButtonsGroup}>
+                      <Link
+                        href={`/admin/articles/${encodeURIComponent(article.id)}`}
+                        className={styles.topBarBtn}
+                      >
+                        <Edit3 size={14} />
+                        <span>{isAr ? 'تعديل' : 'Edit'}</span>
+                      </Link>
+                      <button
+                        type="button"
+                        onClick={() => setDeleteTarget(article)}
+                        className={styles.topBarBtn}
+                      >
+                        <Trash2 size={14} />
+                        <span>{isAr ? 'حذف' : 'Delete'}</span>
+                      </button>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </>
         )}
       </section>
 

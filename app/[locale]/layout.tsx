@@ -9,17 +9,19 @@ export async function generateMetadata({
 }: {
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
-  const { locale } = await params;
-  const safeLocale = locale === 'ar' ? 'ar' : 'en';
+  await params;
 
   return {
     metadataBase: new URL(SITE_URL),
-    alternates: {
-      canonical: `${SITE_URL}/${safeLocale}`,
-      languages: {
-        en: `${SITE_URL}/en`,
-        ar: `${SITE_URL}/ar`,
-        'x-default': `${SITE_URL}/en`,
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+        'max-video-preview': -1,
       },
     },
     verification: {

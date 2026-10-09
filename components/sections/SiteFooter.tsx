@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { Mail, MessageCircle, Phone } from 'lucide-react';
 import { useI18n } from '@/i18n/I18nProvider';
 import { BrandLogo } from '@/components/ui/BrandLogo';
-import { TOOLS_DATA } from '@/lib/tools-data';
 import styles from './SiteFooter.module.css';
 
 const OFFICIAL_EMAIL = 'soufshop.online@gmail.com';
@@ -138,40 +137,12 @@ export function SiteFooter({ productsCount }: SiteFooterProps = {}) {
           </div>
         </div>
 
-        {/* Crawlable SEO Mesh for All 11 Free Smart Tools */}
-        <nav
-          className={styles.toolsSeoStrip}
-          aria-label={isAr ? 'الأدوات والحاسبات الذكية المجانية' : 'Free Smart Calculators & Tools'}
-        >
-          <span className={styles.toolsSeoLabel}>
-            {isAr ? 'أدوات وحاسبات مجانية:' : 'Free Smart Tools:'}
-          </span>
-          <ul className={styles.toolsSeoList}>
-            {TOOLS_DATA.map((tool) => (
-              <li key={tool.slug}>
-                <Link
-                  href={`/${locale}/tools/${tool.slug}`}
-                  className={styles.toolsSeoLink}
-                >
-                  {isAr ? tool.nameAr : tool.nameEn}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
-
         <div className={styles.bottomBar}>
           <p className={`${styles.copyright} tabularNums`}>
             {isAr
               ? '© 2026 AQURIVO — جميع الحقوق محفوظة'
               : '© 2026 AQURIVO — All rights reserved'}
           </p>
-
-          <address className={styles.bottomAddress}>
-            <a href={`mailto:${OFFICIAL_EMAIL}`}>{OFFICIAL_EMAIL}</a>
-            <span aria-hidden="true">·</span>
-            <a href={OFFICIAL_WHATSAPP_URL}>WhatsApp: +212 684 063908</a>
-          </address>
         </div>
       </div>
     </footer>
