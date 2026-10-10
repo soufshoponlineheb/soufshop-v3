@@ -163,10 +163,16 @@ export async function addTestimonial(input: {
   return data.testimonial;
 }
 
+function readClientCsrfCookie(): string {
+  if (typeof document === 'undefined') return '';
+  const match = document.cookie.match(/(?:^|;\s*)souf_csrf=([^;]+)/);
+  return match ? decodeURIComponent(match[1]) : '';
+}
+
 /**
  * Approves a pending testimonial (`approved: true`) — Admin only.
  */
-export async function approveTestimonial(id: string): Promise<void> {
+export async function approveTestimonial(id: string, csrfToken?: string): Promise<void> {
   const db = getFirebaseClientFirestore();
   if (db) {
     try {
@@ -177,9 +183,13 @@ export async function approveTestimonial(id: string): Promise<void> {
     }
   }
 
+  const token = csrfToken || readClientCsrfCookie();
   const res = await fetch('/api/admin/testimonials', {
     method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { 'x-csrf-token': token } : {}),
+    },
     body: JSON.stringify({ id }),
   });
 
@@ -191,7 +201,7 @@ export async function approveTestimonial(id: string): Promise<void> {
 /**
  * Deletes a testimonial document from Firestore — Admin only.
  */
-export async function deleteTestimonial(id: string): Promise<void> {
+export async function deleteTestimonial(id: string, csrfToken?: string): Promise<void> {
   const db = getFirebaseClientFirestore();
   if (db) {
     try {
@@ -202,9 +212,13 @@ export async function deleteTestimonial(id: string): Promise<void> {
     }
   }
 
+  const token = csrfToken || readClientCsrfCookie();
   const res = await fetch(
     `/api/admin/testimonials?id=${encodeURIComponent(id)}`,
-    { method: 'DELETE' }
+    {
+      method: 'DELETE',
+      headers: token ? { 'x-csrf-token': token } : undefined,
+    }
   );
 
   if (!res.ok) {

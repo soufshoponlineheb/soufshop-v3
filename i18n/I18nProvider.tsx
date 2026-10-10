@@ -70,9 +70,26 @@ export function I18nProvider({
   const router = useRouter();
   const pathLocale = resolvePathLocale(pathname);
   const [userLocale, setUserLocale] = useState<Locale>(initialLocale);
+  const [optimisticLocale, setOptimisticLocale] = useState<Locale | null>(null);
   const [currency, setCurrency] = useState<string>('USD');
   const pendingScrollYRef = useRef<number | null>(null);
-  const locale: Locale = pathLocale || userLocale;
+  const locale: Locale = optimisticLocale || pathLocale || userLocale;
+
+  useEffect(() => {
+    if (pathLocale && optimisticLocale === pathLocale) {
+      setOptimisticLocale(null);
+    }
+  }, [pathLocale, optimisticLocale]);
+
+  useEffect(() => {
+    const oppositeLocale: Locale = locale === 'ar' ? 'en' : 'ar';
+    const nextPath = buildLocalizedPathname(pathname, oppositeLocale);
+    if (nextPath) {
+      try {
+        router.prefetch(nextPath);
+      } catch {}
+    }
+  }, [locale, pathname, router]);
 
   useEffect(() => {
     const detected = detectVisitorCurrencyClient();
@@ -142,7 +159,14 @@ export function I18nProvider({
         } catch {}
       }
 
+      // 1. Update UI language & RTL/LTR direction immediately (0ms)
+      setOptimisticLocale(nextLocale);
       setUserLocale(nextLocale);
+      if (typeof document !== 'undefined') {
+        document.documentElement.lang = nextLocale;
+        document.documentElement.dir = getDirection(nextLocale);
+      }
+
       try {
         window.localStorage.setItem(LOCALE_STORAGE_KEY, nextLocale);
         document.cookie = `${LOCALE_STORAGE_KEY}=${nextLocale}; path=/; max-age=31536000; SameSite=Lax`;
@@ -154,7 +178,15 @@ export function I18nProvider({
       if (nextPath && nextPath !== pathname) {
         const search = typeof window !== 'undefined' ? window.location.search : '';
         const hash = typeof window !== 'undefined' ? window.location.hash : '';
-        router.push(`${nextPath}${search}${hash}`, { scroll: false });
+        const targetUrl = `${nextPath}${search}${hash}`;
+        if (typeof window !== 'undefined') {
+          try {
+            window.history.replaceState(window.history.state, '', targetUrl);
+          } catch {}
+        }
+        React.startTransition(() => {
+          router.replace(targetUrl, { scroll: false });
+        });
       }
     },
     [pathname, router]

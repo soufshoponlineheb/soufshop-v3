@@ -213,6 +213,11 @@ export function ProductGallery({
               <img
                 src={currentUrl}
                 alt={getAltText(currentImage, activeIndex)}
+                width={800}
+                height={800}
+                itemProp="image"
+                fetchPriority="high"
+                decoding="sync"
                 className={styles.mainImage}
                 referrerPolicy="no-referrer"
                 loading="eager"
@@ -276,6 +281,10 @@ export function ProductGallery({
                   <img
                     src={img.url}
                     alt={getAltText(img, idx)}
+                    width={80}
+                    height={80}
+                    loading="lazy"
+                    decoding="async"
                     className={styles.thumbnailImg}
                     referrerPolicy="no-referrer"
                   />

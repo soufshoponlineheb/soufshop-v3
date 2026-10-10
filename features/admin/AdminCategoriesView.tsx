@@ -217,80 +217,156 @@ export function AdminCategoriesView({ initialCategories }: AdminCategoriesViewPr
             </Button>
           </div>
         ) : (
-          <div className={styles.tableWrap}>
-            <table className={styles.table}>
-              <thead>
-                <tr>
-                  <th style={{ width: '60px' }}>{isAr ? 'الأيقونة' : 'Icon'}</th>
-                  <th>{isAr ? 'اسم الفئة (عربي)' : 'Name (Arabic)'}</th>
-                  <th>{isAr ? 'اسم الفئة (إنجليزي)' : 'Name (English)'}</th>
-                  <th>Slug</th>
-                  <th style={{ width: '80px', textAlign: 'center' }}>{isAr ? 'الترتيب' : 'Order'}</th>
-                  <th style={{ width: '90px' }}>{isAr ? 'الحالة' : 'Status'}</th>
-                  <th style={{ width: '130px' }}>{isAr ? 'إجراءات' : 'Actions'}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {categories.map((cat) => (
-                  <tr key={cat.id || cat.slug}>
-                    <td style={{ fontSize: '22px', textAlign: 'center' }}>
+          <>
+            <div className={`${styles.tableWrap} ${styles.desktopTableOnly}`}>
+              <table className={styles.table}>
+                <thead>
+                  <tr>
+                    <th style={{ width: '60px' }}>{isAr ? 'الأيقونة' : 'Icon'}</th>
+                    <th>{isAr ? 'اسم الفئة (عربي)' : 'Name (Arabic)'}</th>
+                    <th>{isAr ? 'اسم الفئة (إنجليزي)' : 'Name (English)'}</th>
+                    <th>Slug</th>
+                    <th style={{ width: '80px', textAlign: 'center' }}>{isAr ? 'الترتيب' : 'Order'}</th>
+                    <th style={{ width: '90px' }}>{isAr ? 'الحالة' : 'Status'}</th>
+                    <th style={{ width: '130px' }}>{isAr ? 'إجراءات' : 'Actions'}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {categories.map((cat) => (
+                    <tr key={cat.id || cat.slug}>
+                      <td style={{ fontSize: '22px', textAlign: 'center' }}>
+                        {cat.icon || '📁'}
+                      </td>
+                      <td>
+                        <strong>{cat.name?.ar || '—'}</strong>
+                      </td>
+                      <td>
+                        <span>{cat.name?.en || '—'}</span>
+                      </td>
+                      <td>
+                        <code style={{ fontSize: '13px', opacity: 0.85 }}>{cat.slug}</code>
+                      </td>
+                      <td style={{ textAlign: 'center' }}>
+                        <span className={styles.sectionHeadingCount}>
+                          {cat.order ?? cat.sortOrder ?? 0}
+                        </span>
+                      </td>
+                      <td>
+                        <span
+                          className={cat.isActive !== false ? styles.badgeSuccess : styles.badgeNeutral}
+                        >
+                          {cat.isActive !== false
+                            ? isAr
+                              ? 'نشطة'
+                              : 'Active'
+                            : isAr
+                              ? 'مخفية'
+                              : 'Hidden'}
+                        </span>
+                      </td>
+                      <td>
+                        <div className={styles.actionRow} style={{ gap: '6px' }}>
+                          <button
+                            type="button"
+                            onClick={() => handleEditSelect(cat)}
+                            className={styles.topBarBtn}
+                            title={isAr ? 'تعديل الفئة' : 'Edit Category'}
+                          >
+                            <Edit3 size={14} />
+                            <span>{isAr ? 'تعديل' : 'Edit'}</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setDeleteTarget(cat)}
+                            className={styles.topBarBtn}
+                            style={{ color: '#ef4444' }}
+                            title={isAr ? 'حذف الفئة' : 'Delete Category'}
+                          >
+                            <Trash2 size={14} />
+                            <span>{isAr ? 'حذف' : 'Delete'}</span>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className={styles.mobileAdminCards}>
+              {categories.map((cat) => (
+                <div key={cat.id || cat.slug} className={styles.mobileItemCard}>
+                  <div className={styles.mobileItemTop}>
+                    <div className={styles.mobileCategoryIcon} aria-hidden="true">
                       {cat.icon || '📁'}
-                    </td>
-                    <td>
-                      <strong>{cat.name?.ar || '—'}</strong>
-                    </td>
-                    <td>
-                      <span>{cat.name?.en || '—'}</span>
-                    </td>
-                    <td>
-                      <code style={{ fontSize: '13px', opacity: 0.85 }}>{cat.slug}</code>
-                    </td>
-                    <td style={{ textAlign: 'center' }}>
-                      <span className={styles.sectionHeadingCount}>
+                    </div>
+                    <div className={styles.mobileItemInfo}>
+                      <div className={styles.mobileCardHeaderRow}>
+                        <span className={styles.mobileItemTitle}>
+                          {cat.name?.ar || cat.name?.en || '—'}
+                        </span>
+                        <span
+                          className={
+                            cat.isActive !== false
+                              ? styles.badgeSuccess
+                              : styles.badgeNeutral
+                          }
+                        >
+                          {cat.isActive !== false
+                            ? isAr
+                              ? 'نشطة'
+                              : 'Active'
+                            : isAr
+                              ? 'مخفية'
+                              : 'Hidden'}
+                        </span>
+                      </div>
+                      <span className={styles.mobileCardBodyText}>
+                        {cat.name?.en || '—'}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className={styles.mobileItemMetaRow}>
+                    <span className={styles.mobileMetaPill}>
+                      <span className={styles.mobileMetaLabel}>Slug:</span>
+                      <code className={styles.mobileMetaValue}>{cat.slug}</code>
+                    </span>
+                    <span className={styles.mobileMetaPill}>
+                      <span className={styles.mobileMetaLabel}>
+                        {isAr ? 'الترتيب:' : 'Order:'}
+                      </span>
+                      <span className={`${styles.mobileMetaValue} tabularNums`}>
                         {cat.order ?? cat.sortOrder ?? 0}
                       </span>
-                    </td>
-                    <td>
-                      <span
-                        className={cat.isActive !== false ? styles.badgeSuccess : styles.badgeNeutral}
+                    </span>
+                  </div>
+
+                  <div className={styles.mobileItemActions}>
+                    <div className={styles.mobileActionButtonsGroup}>
+                      <button
+                        type="button"
+                        onClick={() => handleEditSelect(cat)}
+                        className={styles.topBarBtn}
                       >
-                        {cat.isActive !== false
-                          ? isAr
-                            ? 'نشطة'
-                            : 'Active'
-                          : isAr
-                            ? 'مخفية'
-                            : 'Hidden'}
-                      </span>
-                    </td>
-                    <td>
-                      <div className={styles.actionRow} style={{ gap: '6px' }}>
-                        <button
-                          type="button"
-                          onClick={() => handleEditSelect(cat)}
-                          className={styles.topBarBtn}
-                          title={isAr ? 'تعديل الفئة' : 'Edit Category'}
-                        >
-                          <Edit3 size={14} />
-                          <span>{isAr ? 'تعديل' : 'Edit'}</span>
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setDeleteTarget(cat)}
-                          className={styles.topBarBtn}
-                          style={{ color: '#ef4444' }}
-                          title={isAr ? 'حذف الفئة' : 'Delete Category'}
-                        >
-                          <Trash2 size={14} />
-                          <span>{isAr ? 'حذف' : 'Delete'}</span>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                        <Edit3 size={14} />
+                        <span>{isAr ? 'تعديل' : 'Edit'}</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setDeleteTarget(cat)}
+                        className={styles.topBarBtn}
+                        style={{ color: '#ef4444' }}
+                      >
+                        <Trash2 size={14} />
+                        <span>{isAr ? 'حذف' : 'Delete'}</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         )}
       </section>
 

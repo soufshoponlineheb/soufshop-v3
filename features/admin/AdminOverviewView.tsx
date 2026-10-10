@@ -176,7 +176,7 @@ export function AdminOverviewView({
               ? `منتجات مضى على مراجعة سعرها أكثر من 14 يوماً (${stalePriceProducts.length})`
               : `Products With Price Unchecked for >14 Days (${stalePriceProducts.length})`}
           </h2>
-          <div className={styles.tableWrap}>
+          <div className={`${styles.tableWrap} ${styles.desktopTableOnly}`}>
             <table className={styles.table}>
               <thead>
                 <tr>
@@ -212,6 +212,43 @@ export function AdminOverviewView({
               </tbody>
             </table>
           </div>
+
+          <div className={styles.mobileAdminCards}>
+            {stalePriceProducts.map((item) => (
+              <div key={item.id} className={styles.mobileItemCard}>
+                <div className={styles.mobileItemTitle}>{t(item.title)}</div>
+                <div className={styles.mobileItemMetaRow}>
+                  <span className={styles.mobileMetaPill}>
+                    <span className={styles.mobileMetaLabel}>
+                      {isAr ? 'المتجر:' : 'Store:'}
+                    </span>
+                    <span className={styles.mobileMetaValue}>{t(item.sourceName)}</span>
+                  </span>
+                  <span className={styles.mobileMetaPill}>
+                    <span className={styles.mobileMetaLabel}>
+                      {isAr ? 'آخر تحديث:' : 'Last Checked:'}
+                    </span>
+                    <span className={`${styles.mobileMetaValue} tabularNums`}>
+                      {formatCalendarDate(item.priceUpdatedAt, locale)}
+                    </span>
+                  </span>
+                </div>
+                <div className={styles.mobileItemActions}>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => handleConfirmPriceToday(item.id)}
+                    isLoading={refreshingId === item.id}
+                  >
+                    <RefreshCw size={14} aria-hidden="true" />
+                    <span>
+                      {isAr ? 'تأكيد صحة السعر اليوم' : 'Confirm Price Today'}
+                    </span>
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
         </section>
       )}
 
@@ -233,42 +270,86 @@ export function AdminOverviewView({
               : 'No products added yet. Start by adding your first curated product.'}
           </p>
         ) : (
-          <div className={styles.tableWrap}>
-            <table className={styles.table}>
-              <thead>
-                <tr>
-                  <th>{isAr ? 'المنتج' : 'Product'}</th>
-                  <th>{isAr ? 'المتجر الشريك' : 'Partner Store'}</th>
-                  <th>{isAr ? 'الحالة' : 'Status'}</th>
-                  <th>{isAr ? 'إجمالي النقرات' : 'Total Clicks'}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {topProducts.map((product) => (
-                  <tr key={product.id}>
-                    <td>
-                      <Link href={`/admin/products/${encodeURIComponent(product.id)}`}>
-                        <strong>{t(product.title)}</strong>
-                      </Link>
-                    </td>
-                    <td>{t(product.sourceName)}</td>
-                    <td>
-                      <span
-                        className={
-                          product.status === 'published'
-                            ? styles.badgeSuccess
-                            : styles.badgeNeutral
-                        }
-                      >
-                        {product.status}
-                      </span>
-                    </td>
-                    <td className="tabularNums">{product.clicksCount || 0}</td>
+          <>
+            <div className={`${styles.tableWrap} ${styles.desktopTableOnly}`}>
+              <table className={styles.table}>
+                <thead>
+                  <tr>
+                    <th>{isAr ? 'المنتج' : 'Product'}</th>
+                    <th>{isAr ? 'المتجر الشريك' : 'Partner Store'}</th>
+                    <th>{isAr ? 'الحالة' : 'Status'}</th>
+                    <th>{isAr ? 'إجمالي النقرات' : 'Total Clicks'}</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {topProducts.map((product) => (
+                    <tr key={product.id}>
+                      <td>
+                        <Link href={`/admin/products/${encodeURIComponent(product.id)}`}>
+                          <strong>{t(product.title)}</strong>
+                        </Link>
+                      </td>
+                      <td>{t(product.sourceName)}</td>
+                      <td>
+                        <span
+                          className={
+                            product.status === 'published'
+                              ? styles.badgeSuccess
+                              : styles.badgeNeutral
+                          }
+                        >
+                          {product.status}
+                        </span>
+                      </td>
+                      <td className="tabularNums">{product.clicksCount || 0}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className={styles.mobileAdminCards}>
+              {topProducts.map((product) => (
+                <div key={product.id} className={styles.mobileItemCard}>
+                  <Link
+                    href={`/admin/products/${encodeURIComponent(product.id)}`}
+                    className={styles.mobileItemTitle}
+                  >
+                    {t(product.title)}
+                  </Link>
+                  <div className={styles.mobileItemMetaRow}>
+                    <span className={styles.mobileMetaPill}>
+                      <span className={styles.mobileMetaLabel}>
+                        {isAr ? 'المتجر:' : 'Store:'}
+                      </span>
+                      <span className={styles.mobileMetaValue}>{t(product.sourceName)}</span>
+                    </span>
+                    <span className={styles.mobileMetaPill}>
+                      <span className={styles.mobileMetaLabel}>
+                        {isAr ? 'النقرات:' : 'Clicks:'}
+                      </span>
+                      <span className={`${styles.badgeSuccess} tabularNums`}>
+                        {product.clicksCount || 0}
+                      </span>
+                    </span>
+                    <span
+                      className={
+                        product.status === 'published'
+                          ? styles.badgeSuccess
+                          : styles.badgeNeutral
+                      }
+                    >
+                      {product.status === 'published'
+                        ? isAr
+                          ? 'منشور'
+                          : 'Published'
+                        : product.status}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         )}
       </section>
 
@@ -291,30 +372,47 @@ export function AdminOverviewView({
             {isAr ? 'لا توجد رسائل غير مقروءة حالياً.' : 'All reader messages have been read.'}
           </p>
         ) : (
-          <div className={styles.tableWrap}>
-            <table className={styles.table}>
-              <thead>
-                <tr>
-                  <th>{isAr ? 'المرسل' : 'Sender'}</th>
-                  <th>{isAr ? 'الموضوع' : 'Subject'}</th>
-                  <th>{isAr ? 'التاريخ' : 'Date'}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {unreadMessages.slice(0, 5).map((msg) => (
-                  <tr key={msg.id}>
-                    <td>
-                      {msg.senderName} ({msg.senderEmail})
-                    </td>
-                    <td>{msg.subject}</td>
-                    <td className="tabularNums">
-                      {formatCalendarDate(msg.createdAt, locale)}
-                    </td>
+          <>
+            <div className={`${styles.tableWrap} ${styles.desktopTableOnly}`}>
+              <table className={styles.table}>
+                <thead>
+                  <tr>
+                    <th>{isAr ? 'المرسل' : 'Sender'}</th>
+                    <th>{isAr ? 'الموضوع' : 'Subject'}</th>
+                    <th>{isAr ? 'التاريخ' : 'Date'}</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {unreadMessages.slice(0, 5).map((msg) => (
+                    <tr key={msg.id}>
+                      <td>
+                        {msg.senderName} ({msg.senderEmail})
+                      </td>
+                      <td>{msg.subject}</td>
+                      <td className="tabularNums">
+                        {formatCalendarDate(msg.createdAt, locale)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className={styles.mobileAdminCards}>
+              {unreadMessages.slice(0, 5).map((msg) => (
+                <div key={msg.id} className={styles.mobileItemCard}>
+                  <div className={styles.mobileCardHeaderRow}>
+                    <span className={styles.mobileItemTitle}>{msg.senderName}</span>
+                    <span className={`${styles.mobileMetaValue} tabularNums`}>
+                      {formatCalendarDate(msg.createdAt, locale)}
+                    </span>
+                  </div>
+                  <span className={styles.mobileItemSlug}>{msg.senderEmail}</span>
+                  <p className={styles.mobileCardBodyText}>{msg.subject}</p>
+                </div>
+              ))}
+            </div>
+          </>
         )}
       </section>
     </>

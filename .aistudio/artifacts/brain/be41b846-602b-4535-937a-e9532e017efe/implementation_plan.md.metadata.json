@@ -1,6 +1,6 @@
 {
-  "summary":  "خطة تحديث صورة الظهور في نتائج بحث جوجل وبطاقات المشاركة (OpenGraph / Twitter / Schema.org) للصفحة الرئيسية في AQURIVO لاستخدام صورة الهيرو الجديدة باللغتين العربية والإنجليزية.",
-  "updatedAt":  "2026-10-09T19:13:18.041079397Z",
+  "summary":  "خطة معالجة ملاحظتي تقرير الفحص الأمني (xlogs / TrustedOrigin) لنطاق aqurivo.store: تثبيت ترويسات X-Frame-Options و frame-ancestors 'self' الصارمة على Vercel و Netlify واستجابة الصفحة الرئيسية، وتجهيز سجلات حماية البريد SPF و DMARC مع أداة فحص DNS المباشرة في لوحة التحكم.",
+  "updatedAt":  "2026-10-10T01:34:02.864482356Z",
   "requestFeedback":  true,
   "userFacing":  true
 }

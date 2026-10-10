@@ -117,7 +117,7 @@ export function AdminAnalyticsView({
             </p>
           ) : (
             <div className={styles.tableWrap}>
-              <table className={styles.table}>
+              <table className={`${styles.table} ${styles.compactTable}`}>
                 <thead>
                   <tr>
                     <th>{isAr ? 'المتجر' : 'Store'}</th>
@@ -130,7 +130,9 @@ export function AdminAnalyticsView({
                       <td>
                         <strong>{slugKey}</strong>
                       </td>
-                      <td className="tabularNums">{count}</td>
+                      <td className="tabularNums">
+                        <span className={styles.badgeSuccess}>{count}</span>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -149,7 +151,7 @@ export function AdminAnalyticsView({
             </p>
           ) : (
             <div className={styles.tableWrap}>
-              <table className={styles.table}>
+              <table className={`${styles.table} ${styles.compactTable}`}>
                 <thead>
                   <tr>
                     <th>{isAr ? 'الجهاز' : 'Device'}</th>
@@ -162,7 +164,9 @@ export function AdminAnalyticsView({
                       <td>
                         <strong>{device}</strong>
                       </td>
-                      <td className="tabularNums">{count}</td>
+                      <td className="tabularNums">
+                        <span className={styles.badgeNeutral}>{count}</span>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -182,29 +186,50 @@ export function AdminAnalyticsView({
             {isAr ? 'لا توجد نقرات مسجلة بعد.' : 'No product clicks recorded yet.'}
           </p>
         ) : (
-          <div className={styles.tableWrap}>
-            <table className={styles.table}>
-              <thead>
-                <tr>
-                  <th>{isAr ? 'المنتج' : 'Product'}</th>
-                  <th>{isAr ? 'النقرات' : 'Clicks'}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {byProduct.map(([prodSlug, count]) => {
-                  const matched = products.find((p) => p.slug === prodSlug);
-                  return (
-                    <tr key={prodSlug}>
-                      <td>{matched ? t(matched.title) : prodSlug}</td>
-                      <td className="tabularNums">
-                        <strong>{count}</strong>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+          <>
+            <div className={`${styles.tableWrap} ${styles.desktopTableOnly}`}>
+              <table className={styles.table}>
+                <thead>
+                  <tr>
+                    <th>{isAr ? 'المنتج' : 'Product'}</th>
+                    <th>{isAr ? 'النقرات' : 'Clicks'}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {byProduct.map(([prodSlug, count]) => {
+                    const matched = products.find((p) => p.slug === prodSlug);
+                    return (
+                      <tr key={prodSlug}>
+                        <td>{matched ? t(matched.title) : prodSlug}</td>
+                        <td className="tabularNums">
+                          <strong>{count}</strong>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            <div className={styles.mobileAdminCards}>
+              {byProduct.map(([prodSlug, count]) => {
+                const matched = products.find((p) => p.slug === prodSlug);
+                return (
+                  <div key={prodSlug} className={styles.mobileItemCard}>
+                    <div className={styles.mobileItemTitle}>
+                      {matched ? t(matched.title) : prodSlug}
+                    </div>
+                    <div className={styles.mobileCardHeaderRow}>
+                      <span className={styles.mobileItemSlug}>/{prodSlug}</span>
+                      <span className={`${styles.badgeSuccess} tabularNums`}>
+                        {isAr ? `${count} نقرة` : `${count} clicks`}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </>
         )}
       </section>
 
@@ -218,34 +243,61 @@ export function AdminAnalyticsView({
             {isAr ? 'لا توجد سجلات لعرضها.' : 'No recent click events.'}
           </p>
         ) : (
-          <div className={styles.tableWrap}>
-            <table className={styles.table}>
-              <thead>
-                <tr>
-                  <th>{isAr ? 'المنتج' : 'Product'}</th>
-                  <th>{isAr ? 'المتجر' : 'Store'}</th>
-                  <th>{isAr ? 'المصدر الداخلي' : 'Context'}</th>
-                  <th>{isAr ? 'الجهاز / الدولة' : 'Device / Country'}</th>
-                  <th>{isAr ? 'الوقت' : 'Timestamp'}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredClicks.slice(0, 50).map((c) => (
-                  <tr key={c.id}>
-                    <td>/{c.productSlug}</td>
-                    <td>{c.sourceSlug}</td>
-                    <td>{c.refContext}</td>
-                    <td>
-                      {c.deviceType} · {c.countryCode}
-                    </td>
-                    <td className="tabularNums">
-                      {formatCalendarDate(c.createdAt, locale)}
-                    </td>
+          <>
+            <div className={`${styles.tableWrap} ${styles.desktopTableOnly}`}>
+              <table className={styles.table}>
+                <thead>
+                  <tr>
+                    <th>{isAr ? 'المنتج' : 'Product'}</th>
+                    <th>{isAr ? 'المتجر' : 'Store'}</th>
+                    <th>{isAr ? 'المصدر الداخلي' : 'Context'}</th>
+                    <th>{isAr ? 'الجهاز / الدولة' : 'Device / Country'}</th>
+                    <th>{isAr ? 'الوقت' : 'Timestamp'}</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {filteredClicks.slice(0, 50).map((c) => (
+                    <tr key={c.id}>
+                      <td>/{c.productSlug}</td>
+                      <td>{c.sourceSlug}</td>
+                      <td>{c.refContext}</td>
+                      <td>
+                        {c.deviceType} · {c.countryCode}
+                      </td>
+                      <td className="tabularNums">
+                        {formatCalendarDate(c.createdAt, locale)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className={styles.mobileAdminCards}>
+              {filteredClicks.slice(0, 50).map((c) => (
+                <div key={c.id} className={styles.mobileItemCard}>
+                  <div className={styles.mobileCardHeaderRow}>
+                    <strong className={styles.mobileItemSlug} style={{ fontSize: '13px', color: 'var(--color-text-primary)' }}>
+                      /{c.productSlug}
+                    </strong>
+                    <span className={styles.badgeSuccess}>{c.sourceSlug}</span>
+                  </div>
+                  <div className={styles.mobileItemMetaRow}>
+                    <span className={styles.mobileMetaPill}>
+                      <span className={styles.mobileMetaLabel}>{isAr ? 'الجهاز:' : 'Device:'}</span>
+                      <span className={styles.mobileMetaValue}>{c.deviceType} · {c.countryCode}</span>
+                    </span>
+                    <span className={styles.mobileMetaPill}>
+                      <span className={styles.mobileMetaLabel}>{isAr ? 'التاريخ:' : 'Date:'}</span>
+                      <span className={`${styles.mobileMetaValue} tabularNums`}>
+                        {formatCalendarDate(c.createdAt, locale)}
+                      </span>
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         )}
       </section>
     </>

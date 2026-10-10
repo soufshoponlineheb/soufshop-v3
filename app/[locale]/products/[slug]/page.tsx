@@ -584,6 +584,7 @@ export default async function ProductPage({
             '@type': 'Offer',
             price: priceAmount,
             priceCurrency,
+            priceValidUntil: '2027-12-31',
             itemCondition: 'https://schema.org/NewCondition',
             availability: inStock
               ? 'https://schema.org/InStock'

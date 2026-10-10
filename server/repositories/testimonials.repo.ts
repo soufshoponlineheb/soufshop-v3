@@ -1,5 +1,6 @@
 import 'server-only';
 import { getAdminDb } from '@/server/config/firebase-admin';
+import { sanitizePlainText } from '@/server/validators';
 
 export interface TestimonialItem {
   id: string;
@@ -60,9 +61,9 @@ export async function listApprovedTestimonialsServer(): Promise<TestimonialItem[
       const data = doc.data();
       return {
         id: doc.id,
-        name: String(data.name || ''),
+        name: sanitizePlainText(data.name, 50),
         rating: Math.min(5, Math.max(1, Number(data.rating) || 5)),
-        text: String(data.text || ''),
+        text: sanitizePlainText(data.text, 300),
         createdAt: String(data.createdAt || new Date().toISOString()),
         approved: Boolean(data.approved),
         locale: data.locale === 'en' ? 'en' : 'ar',
@@ -88,9 +89,9 @@ export async function listAllTestimonialsAdminServer(): Promise<TestimonialItem[
     const data = doc.data();
     return {
       id: doc.id,
-      name: String(data.name || ''),
+      name: sanitizePlainText(data.name, 50),
       rating: Math.min(5, Math.max(1, Number(data.rating) || 5)),
-      text: String(data.text || ''),
+      text: sanitizePlainText(data.text, 300),
       createdAt: String(data.createdAt || new Date().toISOString()),
       approved: Boolean(data.approved),
       locale: data.locale === 'en' ? 'en' : 'ar',
@@ -104,8 +105,8 @@ export async function createTestimonialServer(input: {
   text: string;
   locale: 'ar' | 'en';
 }): Promise<TestimonialItem> {
-  const cleanName = String(input.name || '').trim().slice(0, 50);
-  const cleanText = String(input.text || '').trim().slice(0, 300);
+  const cleanName = sanitizePlainText(input.name, 50);
+  const cleanText = sanitizePlainText(input.text, 300);
   const cleanRating = Math.min(5, Math.max(1, Math.round(Number(input.rating) || 5)));
   const cleanLocale: 'ar' | 'en' = input.locale === 'en' ? 'en' : 'ar';
 

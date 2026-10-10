@@ -72,6 +72,17 @@ export async function generateMetadata({
       ? { keywords: article.seoKeywords.join(', ') }
       : {}),
     authors: [{ name: authorName }],
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+        'max-video-preview': -1,
+      },
+    },
     other: {
       thumbnail: coverImage,
       'og:image:secure_url': coverImage,
@@ -253,7 +264,7 @@ export default async function GuideDetailPage({
     article.slug
   )}`;
   const rawCover =
-    article.coverImage || resolvedProducts[0]?.images?.[0]?.url || '/images/hero-bg.jpg';
+    article.coverImage || resolvedProducts[0]?.images?.[0]?.url || '/images/hero-desktop.jpg';
   const coverImage = rawCover.startsWith('http')
     ? rawCover
     : `${BASE_URL}${rawCover.startsWith('/') ? rawCover : `/${rawCover}`}`;

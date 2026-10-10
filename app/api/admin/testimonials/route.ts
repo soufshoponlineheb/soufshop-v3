@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { requireAdminApi } from '@/server/middleware/security';
+import { requireAdminApi, verifyCsrfRequest } from '@/server/middleware/security';
 import {
   approveTestimonialServer,
   deleteTestimonialServer,
   listAllTestimonialsAdminServer,
 } from '@/server/repositories/testimonials.repo';
+import { sanitizePlainText } from '@/server/validators';
 
 export const dynamic = 'force-dynamic';
 
@@ -24,9 +25,14 @@ export async function PATCH(req: NextRequest) {
   const guard = await requireAdminApi();
   if (!guard.authorized) return guard.response;
 
+  const csrfValid = await verifyCsrfRequest(req);
+  if (!csrfValid) {
+    return NextResponse.json({ error: 'Invalid security token.' }, { status: 403 });
+  }
+
   try {
     const body = await req.json();
-    const id = String(body.id || '').trim();
+    const id = sanitizePlainText(body?.id, 128);
     if (!id) {
       return NextResponse.json({ error: 'Missing testimonial id' }, { status: 400 });
     }
@@ -44,8 +50,13 @@ export async function DELETE(req: NextRequest) {
   const guard = await requireAdminApi();
   if (!guard.authorized) return guard.response;
 
+  const csrfValid = await verifyCsrfRequest(req);
+  if (!csrfValid) {
+    return NextResponse.json({ error: 'Invalid security token.' }, { status: 403 });
+  }
+
   try {
-    const id = req.nextUrl.searchParams.get('id') || '';
+    const id = sanitizePlainText(req.nextUrl.searchParams.get('id'), 128);
     if (!id) {
       return NextResponse.json({ error: 'Missing testimonial id' }, { status: 400 });
     }

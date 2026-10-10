@@ -34,6 +34,85 @@ export function AdminSettingsView({
   const [whatsappUrl, setWhatsappUrl] = useState(initialSettings.whatsappUrl);
   const [saving, setSaving] = useState(false);
 
+  const [dnsChecking, setDnsChecking] = useState(false);
+  const [dnsStatus, setDnsStatus] = useState<{
+    checked: boolean;
+    spfFound: boolean;
+    spfValue: string;
+    dmarcFound: boolean;
+    dmarcValue: string;
+  }>({
+    checked: false,
+    spfFound: false,
+    spfValue: '',
+    dmarcFound: false,
+    dmarcValue: '',
+  });
+
+  const handleCopyRecord = async (label: string, value: string) => {
+    try {
+      await navigator.clipboard.writeText(value);
+      showToast(
+        isAr ? `تم نسخ سجل ${label} بنجاح.` : `Copied ${label} record to clipboard.`,
+        'success'
+      );
+    } catch {
+      showToast(
+        isAr ? 'تعذر النسخ التلقائي، يرجى تحديد النص ونسخه.' : 'Could not copy automatically.',
+        'error'
+      );
+    }
+  };
+
+  const handleVerifyDnsRecords = async () => {
+    setDnsChecking(true);
+    try {
+      const [spfRes, dmarcRes] = await Promise.all([
+        fetch('https://dns.google/resolve?name=aqurivo.store&type=TXT', { cache: 'no-store' }),
+        fetch('https://dns.google/resolve?name=_dmarc.aqurivo.store&type=TXT', { cache: 'no-store' }),
+      ]);
+      const spfJson = (await spfRes.json()) as { Answer?: Array<{ data?: string }> };
+      const dmarcJson = (await dmarcRes.json()) as { Answer?: Array<{ data?: string }> };
+
+      const spfAnswers = (spfJson.Answer || []).map((a) => (a.data || '').replace(/^"|"$/g, ''));
+      const dmarcAnswers = (dmarcJson.Answer || []).map((a) => (a.data || '').replace(/^"|"$/g, ''));
+
+      const spfMatch = spfAnswers.find((txt) => txt.toLowerCase().includes('v=spf1')) || '';
+      const dmarcMatch = dmarcAnswers.find((txt) => txt.toLowerCase().includes('v=dmarc1')) || '';
+
+      setDnsStatus({
+        checked: true,
+        spfFound: Boolean(spfMatch),
+        spfValue: spfMatch,
+        dmarcFound: Boolean(dmarcMatch),
+        dmarcValue: dmarcMatch,
+      });
+
+      if (spfMatch && dmarcMatch) {
+        showToast(
+          isAr
+            ? 'تم التحقق! سجلا SPF و DMARC منشوران وفعالان على نطاق aqurivo.store.'
+            : 'Verified! Both SPF and DMARC records are published on aqurivo.store.',
+          'success'
+        );
+      } else {
+        showToast(
+          isAr
+            ? 'تم فحص DNS: يرجى إضافة السجلات الموضحة أدناه في لوحة تحكم النطاق.'
+            : 'DNS checked: Please add the missing TXT records at your DNS provider.',
+          'info'
+        );
+      }
+    } catch {
+      showToast(
+        isAr ? 'تعذر الاتصال بخادم فحص DNS حالياً.' : 'Unable to reach DNS resolver right now.',
+        'error'
+      );
+    } finally {
+      setDnsChecking(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!csrfToken) return;
@@ -68,6 +147,10 @@ export function AdminSettingsView({
       setSaving(false);
     }
   };
+
+  const spfRecordValue = 'v=spf1 -all';
+  const dmarcObserveValue = 'v=DMARC1; p=none; sp=none; adkim=s; aspf=s; rua=mailto:soufshop.online@gmail.com';
+  const dmarcRejectValue = 'v=DMARC1; p=reject; sp=reject; adkim=s; aspf=s; rua=mailto:soufshop.online@gmail.com';
 
   return (
     <>
@@ -154,6 +237,150 @@ export function AdminSettingsView({
           </Button>
         </div>
       </form>
+
+      {/* Domain Email Anti-Spoofing (SPF & DMARC) + Security Headers Verification */}
+      <section className={styles.card}>
+        <div className={styles.sectionHeader}>
+          <div>
+            <h2 className={styles.sectionTitle}>
+              {isAr
+                ? 'حماية النطاق من انتحال البريد (SPF & DMARC) وترويسات الأمان'
+                : 'Domain Email Anti-Spoofing (SPF & DMARC) & Security Headers'}
+            </h2>
+            <p className={styles.pageSubtitle}>
+              {isAr
+                ? 'أضف سجلات TXT التالية في لوحة تحكم DNS الخاصة بنطاق aqurivo.store لمنع أي جهة من إرسال بريد مزيف باسم موقعك.'
+                : 'Add these TXT records in your DNS provider for aqurivo.store to prevent email spoofing.'}
+            </p>
+          </div>
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            isLoading={dnsChecking}
+            onClick={handleVerifyDnsRecords}
+          >
+            {isAr ? 'فحص سجلات DNS الآن' : 'Verify DNS Records Live'}
+          </Button>
+        </div>
+
+        {dnsStatus.checked && (
+          <div className={styles.alertBanner} role="status">
+            <strong>
+              {isAr ? 'نتيجة الفحص المباشر لنطاق aqurivo.store:' : 'Live DNS Check Result for aqurivo.store:'}
+            </strong>
+            <p>
+              • <strong>SPF (`aqurivo.store`):</strong>{' '}
+              {dnsStatus.spfFound
+                ? `${isAr ? 'مفعّل بنجاح' : 'Published'} (${dnsStatus.spfValue})`
+                : isAr
+                  ? 'غير منشور بعد في DNS — انسخ السجل الأول أدناه وأضفه في لوحة النطاق.'
+                  : 'Not published in DNS yet — copy Record 1 below into your DNS panel.'}
+            </p>
+            <p>
+              • <strong>DMARC (`_dmarc.aqurivo.store`):</strong>{' '}
+              {dnsStatus.dmarcFound
+                ? `${isAr ? 'مفعّل بنجاح' : 'Published'} (${dnsStatus.dmarcValue})`
+                : isAr
+                  ? 'غير منشور بعد في DNS — انسخ السجل الثاني أدناه وأضفه في لوحة النطاق.'
+                  : 'Not published in DNS yet — copy Record 2 below into your DNS panel.'}
+            </p>
+          </div>
+        )}
+
+        <div className={styles.mobileAdminCards} style={{ display: 'flex' }}>
+          <div className={styles.mobileAdminCard}>
+            <div className={styles.mobileAdminCardHeader}>
+              <div>
+                <h3 className={styles.mobileAdminCardTitle}>
+                  {isAr ? '1. سجل SPF (منع إرسال بريد مزيف باسم النطاق)' : '1. SPF Record (Prevent Spoofing)'}
+                </h3>
+                <p className={styles.mobileAdminCardSub}>
+                  Type: <strong>TXT</strong> | Host / Name: <strong>@</strong> (aqurivo.store)
+                </p>
+              </div>
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                onClick={() => handleCopyRecord('SPF', spfRecordValue)}
+              >
+                {isAr ? 'نسخ القيمة' : 'Copy Value'}
+              </Button>
+            </div>
+            <div className={styles.mobileAdminCardMeta}>
+              <div className={styles.mobileAdminMetaItem}>
+                <span className={styles.mobileAdminMetaLabel}>TXT Value</span>
+                <span className={styles.mobileAdminMetaValue} dir="ltr">
+                  {spfRecordValue}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.mobileAdminCard}>
+            <div className={styles.mobileAdminCardHeader}>
+              <div>
+                <h3 className={styles.mobileAdminCardTitle}>
+                  {isAr
+                    ? '2. سجل DMARC — وضع المراقبة الموصى به للبدء (p=none)'
+                    : '2. DMARC Record — Observation Mode (p=none)'}
+                </h3>
+                <p className={styles.mobileAdminCardSub}>
+                  Type: <strong>TXT</strong> | Host / Name: <strong>_dmarc</strong> (_dmarc.aqurivo.store)
+                </p>
+              </div>
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                onClick={() => handleCopyRecord('DMARC (p=none)', dmarcObserveValue)}
+              >
+                {isAr ? 'نسخ القيمة' : 'Copy Value'}
+              </Button>
+            </div>
+            <div className={styles.mobileAdminCardMeta}>
+              <div className={styles.mobileAdminMetaItem}>
+                <span className={styles.mobileAdminMetaLabel}>TXT Value</span>
+                <span className={styles.mobileAdminMetaValue} dir="ltr">
+                  {dmarcObserveValue}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.mobileAdminCard}>
+            <div className={styles.mobileAdminCardHeader}>
+              <div>
+                <h3 className={styles.mobileAdminCardTitle}>
+                  {isAr
+                    ? '3. سجل DMARC — وضع الحظر الصارم (p=reject)'
+                    : '3. DMARC Record — Strict Reject Mode (p=reject)'}
+                </h3>
+                <p className={styles.mobileAdminCardSub}>
+                  Type: <strong>TXT</strong> | Host / Name: <strong>_dmarc</strong> (_dmarc.aqurivo.store)
+                </p>
+              </div>
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                onClick={() => handleCopyRecord('DMARC (p=reject)', dmarcRejectValue)}
+              >
+                {isAr ? 'نسخ القيمة' : 'Copy Value'}
+              </Button>
+            </div>
+            <div className={styles.mobileAdminCardMeta}>
+              <div className={styles.mobileAdminMetaItem}>
+                <span className={styles.mobileAdminMetaLabel}>TXT Value</span>
+                <span className={styles.mobileAdminMetaValue} dir="ltr">
+                  {dmarcRejectValue}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
     </>
   );
 }

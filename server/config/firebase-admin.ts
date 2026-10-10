@@ -12,8 +12,9 @@ const PERSISTENT_DB_PATH = path.join(process.cwd(), '.soufshopstore-data.json');
 const TMP_DB_PATH = path.join('/tmp', 'soufshopstore-db.json');
 const TMP_TOKEN_PATH = path.join('/tmp', 'soufshopstore-idtoken.txt');
 
-const CLOUD_FETCH_TIMEOUT_MS = 3500;
-const COLLECTION_CACHE_TTL_MS = 0;
+const CLOUD_FETCH_TIMEOUT_MS = 2500;
+const COLLECTION_CACHE_TTL_MS = 60_000;
+const inFlightRefreshes: Record<string, Promise<Record<string, Record<string, unknown>> | null> | undefined> = {};
 
 export type CloudDocumentData = Record<string, unknown>;
 
@@ -343,21 +344,9 @@ async function deleteDocFromSoufshopCloud(
   }
 }
 
-async function fetchCollectionFromSoufshopCloud(
+async function performCloudCollectionFetch(
   collectionName: string
 ): Promise<Record<string, Record<string, unknown>> | null> {
-  const now = Date.now();
-  const lastFetched = collectionCacheTimestamps[collectionName] || 0;
-  const store = readLocalMirror();
-
-  if (
-    COLLECTION_CACHE_TTL_MS > 0 &&
-    now - lastFetched < COLLECTION_CACHE_TTL_MS &&
-    store[collectionName]
-  ) {
-    return store[collectionName];
-  }
-
   const token = getServerFirebaseIdToken();
   const env = loadServerEnv();
 
@@ -426,6 +415,58 @@ async function fetchCollectionFromSoufshopCloud(
   return null;
 }
 
+async function fetchCollectionFromSoufshopCloud(
+  collectionName: string
+): Promise<Record<string, Record<string, unknown>> | null> {
+  const now = Date.now();
+  const lastFetched = collectionCacheTimestamps[collectionName] || 0;
+  const store = readLocalMirror();
+  const cachedCollection = store[collectionName];
+  const hasCachedEntries =
+    cachedCollection && Object.keys(cachedCollection).length > 0;
+
+  // Fresh cache hit: return immediately in 0ms
+  if (
+    COLLECTION_CACHE_TTL_MS > 0 &&
+    now - lastFetched < COLLECTION_CACHE_TTL_MS &&
+    cachedCollection
+  ) {
+    return cachedCollection;
+  }
+
+  // Stale-While-Revalidate: if we already have local mirror data, return it immediately
+  // and refresh from cloud in the background so page navigation never blocks!
+  if (hasCachedEntries) {
+    if (!inFlightRefreshes[collectionName]) {
+      inFlightRefreshes[collectionName] = performCloudCollectionFetch(collectionName)
+        .then((cloudCol) => {
+          if (cloudCol !== null && Object.keys(cloudCol).length > 0) {
+            store[collectionName] = {
+              ...(store[collectionName] || {}),
+              ...cloudCol,
+            };
+          }
+          return cloudCol;
+        })
+        .catch(() => null)
+        .finally(() => {
+          delete inFlightRefreshes[collectionName];
+        });
+    }
+    return cachedCollection;
+  }
+
+  // Cold start without local data: deduplicate concurrent requests
+  if (!inFlightRefreshes[collectionName]) {
+    inFlightRefreshes[collectionName] = performCloudCollectionFetch(collectionName).finally(
+      () => {
+        delete inFlightRefreshes[collectionName];
+      }
+    );
+  }
+  return inFlightRefreshes[collectionName]!;
+}
+
 export class CloudSyncedDocRef {
   public readonly id: string;
   private readonly collectionName: string;
@@ -437,13 +478,16 @@ export class CloudSyncedDocRef {
 
   async get(): Promise<CloudDocSnapshot> {
     const store = readLocalMirror();
+    const prevKnownTimestamp = collectionCacheTimestamps[this.collectionName] || 0;
     const cloudCol = await fetchCollectionFromSoufshopCloud(this.collectionName);
     if (cloudCol !== null && Object.keys(cloudCol).length > 0) {
       store[this.collectionName] = {
         ...(store[this.collectionName] || {}),
         ...cloudCol,
       };
-      writeLocalMirror(store);
+      if (prevKnownTimestamp === 0) {
+        writeLocalMirror(store);
+      }
     }
 
     const col = store[this.collectionName] || {};
@@ -560,13 +604,16 @@ export class CloudSyncedCollectionQuery {
 
   async get(): Promise<CloudQuerySnapshot> {
     const store = readLocalMirror();
+    const prevKnownTimestamp = collectionCacheTimestamps[this.collectionName] || 0;
     const cloudCol = await fetchCollectionFromSoufshopCloud(this.collectionName);
     if (cloudCol !== null && Object.keys(cloudCol).length > 0) {
       store[this.collectionName] = {
         ...(store[this.collectionName] || {}),
         ...cloudCol,
       };
-      writeLocalMirror(store);
+      if (prevKnownTimestamp === 0) {
+        writeLocalMirror(store);
+      }
     }
 
     const col = store[this.collectionName] || {};

@@ -28,9 +28,27 @@ export async function generateMetadata({
     ? 'مركز العناية بالزوار وحل المشكلات في AQURIVO. أبلغ عن أي مشكلة في المنتجات أو استفسر عن طلبك لنراجعه باهتمام كامل.'
     : 'AQURIVO Visitor Care & Issue Resolution Center. Report a product issue or request assistance with your order.';
 
+  const ogImageUrl = `${SITE_URL}/images/hero-desktop.jpg`;
+
   return {
     title,
     description,
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+        'max-video-preview': -1,
+      },
+    },
+    other: {
+      thumbnail: ogImageUrl,
+      'og:image:secure_url': ogImageUrl,
+      'og:image:type': 'image/jpeg',
+    },
     alternates: {
       canonical: `${SITE_URL}/${locale}/report`,
       languages: {
@@ -44,7 +62,27 @@ export async function generateMetadata({
       description,
       url: `${SITE_URL}/${locale}/report`,
       siteName: 'AQURIVO',
+      locale: isAr ? 'ar_SA' : 'en_US',
+      alternateLocale: isAr ? ['en_US'] : ['ar_SA'],
       type: 'website',
+      images: [
+        {
+          url: ogImageUrl,
+          secureUrl: ogImageUrl,
+          width: 1200,
+          height: 675,
+          type: 'image/jpeg',
+          alt: title,
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      site: '@aqurivo',
+      creator: '@aqurivo',
+      title,
+      description,
+      images: [{ url: ogImageUrl, alt: title }],
     },
   };
 }

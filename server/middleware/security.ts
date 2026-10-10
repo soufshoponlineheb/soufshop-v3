@@ -24,9 +24,13 @@ interface SignedSessionPayload {
   exp: number;
 }
 
+const EPHEMERAL_RUNTIME_SECRET = randomBytes(32).toString('hex');
+const EPHEMERAL_IP_SALT = randomBytes(16).toString('hex');
+const JWT_FORMAT_REGEX = /^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+$/;
+
 function getSigningSecret(): string {
   const env = loadServerEnv();
-  return env.sessionCookieSecret || 'soufshopstore-hmac-session-secret-key-2026';
+  return env.sessionCookieSecret || EPHEMERAL_RUNTIME_SECRET;
 }
 
 export function createSignedSessionToken(payload: SignedSessionPayload): string {
@@ -125,11 +129,12 @@ function buildSessionFromSignedPayload(
   adminEmails: string[]
 ): AuthenticatedSession {
   const email = verified.email.trim().toLowerCase();
-  const isAdmin = adminEmails.includes(email);
+  const emailVerified = Boolean(verified.emailVerified);
+  const isAdmin = emailVerified && adminEmails.includes(email);
   return {
     uid: verified.uid,
     email,
-    emailVerified: verified.emailVerified,
+    emailVerified,
     role: isAdmin ? 'admin' : 'visitor',
   };
 }
@@ -142,11 +147,6 @@ export async function getServerSession(): Promise<AuthenticatedSession | null> {
   try {
     const env = loadServerEnv();
     const hdrs = await headers();
-    const fbIdToken = hdrs.get('x-firebase-id-token')?.trim();
-    if (fbIdToken) {
-      setServerFirebaseIdToken(fbIdToken);
-    }
-
     const cookieStore = await cookies();
     const sessionCookie = cookieStore.get(SESSION_COOKIE_NAME)?.value;
 
@@ -161,12 +161,13 @@ export async function getServerSession(): Promise<AuthenticatedSession | null> {
         if (adminAuth) {
           const decoded = await adminAuth.verifySessionCookie(sessionCookie, true);
           const email = (decoded.email || '').trim().toLowerCase();
+          const emailVerified = Boolean(decoded.email_verified);
           if (email) {
             return {
               uid: decoded.uid,
               email,
-              emailVerified: Boolean(decoded.email_verified),
-              role: env.adminEmails.includes(email) ? 'admin' : 'visitor',
+              emailVerified,
+              role: emailVerified && env.adminEmails.includes(email) ? 'admin' : 'visitor',
             };
           }
         }
@@ -200,11 +201,24 @@ export async function getServerSession(): Promise<AuthenticatedSession | null> {
   }
 }
 
+async function captureVerifiedAdminFirebaseToken(): Promise<void> {
+  try {
+    const hdrs = await headers();
+    const fbIdToken = hdrs.get('x-firebase-id-token')?.trim();
+    if (fbIdToken && fbIdToken.length <= 4096 && JWT_FORMAT_REGEX.test(fbIdToken)) {
+      setServerFirebaseIdToken(fbIdToken);
+    }
+  } catch {
+    // Ignore header access failure outside request context
+  }
+}
+
 export async function requireAdminPage(): Promise<AuthenticatedSession> {
   const session = await getServerSession();
   if (!session || session.role !== 'admin') {
     notFound();
   }
+  await captureVerifiedAdminFirebaseToken();
   return session;
 }
 
@@ -219,12 +233,13 @@ export async function requireAdminApi(): Promise<
       response: NextResponse.json({ error: 'Not found' }, { status: 404 }),
     };
   }
+  await captureVerifiedAdminFirebaseToken();
   return { authorized: true, session, email: session.email };
 }
 
 export function hashClientIpDaily(rawIp: string): string {
   const env = loadServerEnv();
-  const salt = env.ipHashSalt || 'soufshop-ephemeral-salt';
+  const salt = env.ipHashSalt || EPHEMERAL_IP_SALT;
   const dayKey = new Date().toISOString().slice(0, 10);
   return createHash('sha256')
     .update(`${rawIp.trim()}|${salt}|${dayKey}`)

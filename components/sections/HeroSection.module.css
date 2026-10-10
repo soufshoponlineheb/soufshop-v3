@@ -8,7 +8,7 @@
 .hero {
   position: relative;
   background-color: #092c27;
-  background-image: url('/images/hero-mobile.jpg');
+  background-image: url('data:image/webp;base64,UklGRmAAAABXRUJQVlA4IFQAAACwBACdASogABIAPsFQokwnpKMiMBgIAPAYCWUAx+QPS494PVwZb/bvrwDptKsIAP7w33Ws8E73+/pLoWtR2reT5KjX/lNW1y6sFjIzmn8uSjNMAAA=');
   background-size: cover;
   background-position: center bottom;
   background-repeat: no-repeat;
@@ -17,7 +17,6 @@
 
 @media (min-width: 768px) {
   .hero {
-    background-image: url('/images/hero-desktop.jpg');
     background-position: center center;
     min-height: 560px;
   }

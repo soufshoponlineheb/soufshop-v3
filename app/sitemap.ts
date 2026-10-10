@@ -9,6 +9,17 @@ export const dynamic = 'force-dynamic';
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://aqurivo.store';
 const LOCALES = ['en', 'ar'] as const;
 
+function toAbsoluteImageUrl(rawUrl: string | undefined): string | null {
+  const trimmed = (rawUrl || '').trim();
+  if (!trimmed || trimmed.startsWith('data:')) return null;
+  const full =
+    trimmed.startsWith('http://') || trimmed.startsWith('https://')
+      ? trimmed
+      : `${BASE_URL}${trimmed.startsWith('/') ? trimmed : `/${trimmed}`}`;
+  // XML sitemaps require ampersands in URLs to be escaped or avoided
+  return full.replace(/&(?!(amp;|lt;|gt;|quot;|apos;))/g, '&amp;');
+}
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
   const [products, articles, categories] = await Promise.all([
@@ -17,66 +28,51 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     listActiveCategories(),
   ]);
 
-  const mainEntries: MetadataRoute.Sitemap = [
-    {
-      url: `${BASE_URL}/en`,
-      lastModified: now,
-      changeFrequency: 'daily',
-      priority: 1.0,
-    },
-    {
-      url: `${BASE_URL}/en/products`,
-      lastModified: now,
-      changeFrequency: 'daily',
-      priority: 0.9,
-    },
-    {
-      url: `${BASE_URL}/en/guides`,
-      lastModified: now,
-      changeFrequency: 'daily',
-      priority: 0.88,
-    },
-    {
-      url: `${BASE_URL}/en/tools`,
-      lastModified: now,
-      changeFrequency: 'weekly',
-      priority: 0.9,
-    },
-    {
-      url: `${BASE_URL}/ar`,
-      lastModified: now,
-      changeFrequency: 'daily',
-      priority: 0.95,
-    },
-    {
-      url: `${BASE_URL}/ar/products`,
-      lastModified: now,
-      changeFrequency: 'daily',
-      priority: 0.9,
-    },
-    {
-      url: `${BASE_URL}/ar/guides`,
-      lastModified: now,
-      changeFrequency: 'daily',
-      priority: 0.88,
-    },
-    {
-      url: `${BASE_URL}/ar/tools`,
-      lastModified: now,
-      changeFrequency: 'weekly',
-      priority: 0.9,
-    },
-  ];
+  const heroImageUrl = `${BASE_URL}/images/hero-desktop.jpg`;
+  const mainPaths = ['', '/products', '/categories', '/guides', '/tools'] as const;
 
-  const staticPages = ['about', 'contact', 'privacy-policy', 'terms'] as const;
+  const mainEntries: MetadataRoute.Sitemap = LOCALES.flatMap((locale) =>
+    mainPaths.map((pathSuffix) => {
+      const arUrl = `${BASE_URL}/ar${pathSuffix}`;
+      const enUrl = `${BASE_URL}/en${pathSuffix}`;
+      const isHome = pathSuffix === '';
+      return {
+        url: locale === 'ar' ? arUrl : enUrl,
+        lastModified: now,
+        changeFrequency: pathSuffix === '/tools' ? ('weekly' as const) : ('daily' as const),
+        priority: isHome ? 1.0 : 0.9,
+        ...(isHome ? { images: [heroImageUrl] } : {}),
+        alternates: {
+          languages: {
+            ar: arUrl,
+            en: enUrl,
+            'x-default': enUrl,
+          },
+        },
+      };
+    })
+  );
+
+  const staticPages = ['about', 'contact', 'privacy-policy', 'terms', 'report'] as const;
   const localizedStaticEntries: MetadataRoute.Sitemap = LOCALES.flatMap(
     (locale) =>
-      staticPages.map((page) => ({
-        url: `${BASE_URL}/${locale}/${page}`,
-        lastModified: new Date(),
-        changeFrequency: 'monthly' as const,
-        priority: 0.7,
-      }))
+      staticPages.map((page) => {
+        const arUrl = `${BASE_URL}/ar/${page}`;
+        const enUrl = `${BASE_URL}/en/${page}`;
+        return {
+          url: locale === 'ar' ? arUrl : enUrl,
+          lastModified: now,
+          changeFrequency: 'monthly' as const,
+          priority: 0.7,
+          alternates: {
+            languages: {
+              ar: arUrl,
+              en: enUrl,
+              'x-default': enUrl,
+            },
+          },
+        };
+      })
   );
 
   const rootTransparencyPages = [
@@ -93,50 +89,97 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })
   );
 
-  const enProductEntries: MetadataRoute.Sitemap = products.map((product) => ({
-    url: `${BASE_URL}/en/products/${encodeURIComponent(product.slug)}`,
-    lastModified: new Date(product.updatedAt || product.createdAt || now),
-    changeFrequency: 'weekly',
-    priority: 0.85,
-  }));
+  const productEntries: MetadataRoute.Sitemap = LOCALES.flatMap((locale) =>
+    products.map((product) => {
+      const encoded = encodeURIComponent(product.slug);
+      const arUrl = `${BASE_URL}/ar/products/${encoded}`;
+      const enUrl = `${BASE_URL}/en/products/${encoded}`;
+      const productImages = Array.isArray(product.images)
+        ? product.images
+            .map((img) => toAbsoluteImageUrl(img?.url))
+            .filter((u): u is string => Boolean(u))
+        : [];
 
-  const arProductEntries: MetadataRoute.Sitemap = products.map((product) => ({
-    url: `${BASE_URL}/ar/products/${encodeURIComponent(product.slug)}`,
-    lastModified: new Date(product.updatedAt || product.createdAt || now),
-    changeFrequency: 'weekly',
-    priority: 0.85,
-  }));
+      return {
+        url: locale === 'ar' ? arUrl : enUrl,
+        lastModified: new Date(product.updatedAt || product.createdAt || now),
+        changeFrequency: 'weekly' as const,
+        priority: 0.85,
+        ...(productImages.length > 0 ? { images: productImages } : {}),
+        alternates: {
+          languages: {
+            ar: arUrl,
+            en: enUrl,
+            'x-default': enUrl,
+          },
+        },
+      };
+    })
+  );
 
-  const enArticleEntries: MetadataRoute.Sitemap = articles.map((article) => ({
-    url: `${BASE_URL}/en/guides/${encodeURIComponent(article.slug)}`,
-    lastModified: new Date(article.updatedAt || article.publishedAt || now),
-    changeFrequency: 'weekly',
-    priority: 0.85,
-  }));
+  const articleEntries: MetadataRoute.Sitemap = LOCALES.flatMap((locale) =>
+    articles.map((article) => {
+      const encoded = encodeURIComponent(article.slug);
+      const arUrl = `${BASE_URL}/ar/guides/${encoded}`;
+      const enUrl = `${BASE_URL}/en/guides/${encoded}`;
+      const coverUrl = toAbsoluteImageUrl(article.coverImage);
 
-  const arArticleEntries: MetadataRoute.Sitemap = articles.map((article) => ({
-    url: `${BASE_URL}/ar/guides/${encodeURIComponent(article.slug)}`,
-    lastModified: new Date(article.updatedAt || article.publishedAt || now),
-    changeFrequency: 'weekly',
-    priority: 0.85,
-  }));
+      return {
+        url: locale === 'ar' ? arUrl : enUrl,
+        lastModified: new Date(article.updatedAt || article.publishedAt || now),
+        changeFrequency: 'weekly' as const,
+        priority: 0.85,
+        ...(coverUrl ? { images: [coverUrl] } : {}),
+        alternates: {
+          languages: {
+            ar: arUrl,
+            en: enUrl,
+            'x-default': enUrl,
+          },
+        },
+      };
+    })
+  );
 
   const categoryEntries: MetadataRoute.Sitemap = LOCALES.flatMap((locale) =>
-    categories.map((cat) => ({
-      url: `${BASE_URL}/${locale}/categories/${encodeURIComponent(cat.slug)}`,
-      lastModified: now,
-      changeFrequency: 'weekly' as const,
-      priority: 0.85,
-    }))
+    categories.map((cat) => {
+      const encoded = encodeURIComponent(cat.slug);
+      const arUrl = `${BASE_URL}/ar/categories/${encoded}`;
+      const enUrl = `${BASE_URL}/en/categories/${encoded}`;
+      return {
+        url: locale === 'ar' ? arUrl : enUrl,
+        lastModified: now,
+        changeFrequency: 'weekly' as const,
+        priority: 0.85,
+        alternates: {
+          languages: {
+            ar: arUrl,
+            en: enUrl,
+            'x-default': enUrl,
+          },
+        },
+      };
+    })
   );
 
   const toolEntries: MetadataRoute.Sitemap = LOCALES.flatMap((locale) =>
-    TOOLS_DATA.map((tool) => ({
-      url: `${BASE_URL}/${locale}/tools/${tool.slug}`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly' as const,
-      priority: 0.85,
-    }))
+    TOOLS_DATA.map((tool) => {
+      const arUrl = `${BASE_URL}/ar/tools/${tool.slug}`;
+      const enUrl = `${BASE_URL}/en/tools/${tool.slug}`;
+      return {
+        url: locale === 'ar' ? arUrl : enUrl,
+        lastModified: now,
+        changeFrequency: 'monthly' as const,
+        priority: 0.85,
+        alternates: {
+          languages: {
+            ar: arUrl,
+            en: enUrl,
+            'x-default': enUrl,
+          },
+        },
+      };
+    })
   );
 
   return [
@@ -144,10 +187,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...localizedStaticEntries,
     ...transparencyEntries,
     ...categoryEntries,
-    ...enProductEntries,
-    ...arProductEntries,
-    ...enArticleEntries,
-    ...arArticleEntries,
+    ...productEntries,
+    ...articleEntries,
     ...toolEntries,
   ];
 }

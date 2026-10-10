@@ -249,10 +249,11 @@ export function AmazonImportSection() {
             type="search"
             value={keyword}
             onChange={(e) => setKeyword(e.target.value)}
+            dir="auto"
             placeholder={
               isAr
-                ? 'أدخل كلمة مفتاحية (مثال: Wireless Headphones أو Coffee Maker)...'
-                : 'Enter keyword (e.g., Wireless Headphones, Coffee Maker)...'
+                ? 'ابحث عن منتج (مثال: Headphones)...'
+                : 'Search Amazon products (e.g., Headphones)...'
             }
             className={styles.keywordInput}
             aria-label={isAr ? 'كلمة البحث في Amazon' : 'Amazon search keyword'}

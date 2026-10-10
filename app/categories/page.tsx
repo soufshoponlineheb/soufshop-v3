@@ -1,7 +1,9 @@
 import type { Metadata } from 'next';
-import LocalizedAboutPage, {
+import CategoriesIndexPage, {
   generateMetadata as baseGenerateMetadata,
-} from '@/app/[locale]/about/page';
+} from '@/app/[locale]/categories/page';
+
+export const dynamic = 'force-dynamic';
 
 export async function generateMetadata(): Promise<Metadata> {
   return baseGenerateMetadata({
@@ -9,8 +11,8 @@ export async function generateMetadata(): Promise<Metadata> {
   });
 }
 
-export default async function AboutPage() {
-  return LocalizedAboutPage({
+export default async function RootCategoriesPage() {
+  return CategoriesIndexPage({
     params: Promise.resolve({ locale: 'ar' }),
   });
 }

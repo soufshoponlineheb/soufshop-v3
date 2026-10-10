@@ -4,19 +4,72 @@ import type { NextRequest } from 'next/server';
 
 export const runtime = 'edge';
 
+const ALLOWED_OG_IMAGE_HOSTS = new Set([
+  'res.cloudinary.com',
+  'm.media-amazon.com',
+  'images-na.ssl-images-amazon.com',
+  'images-eu.ssl-images-amazon.com',
+  'f.nooncdn.com',
+  'img.kwcdn.com',
+  'aqurivo.store',
+  'www.aqurivo.store',
+  'aqurivo.com',
+  'www.aqurivo.com',
+]);
+
+function cleanOgText(input: string | null, maxLen: number, fallback = ''): string {
+  if (!input) return fallback;
+  return input
+    .replace(/<[^>]*>/g, '')
+    .replace(/[\u0000-\u001F\u007F]/g, '')
+    .trim()
+    .slice(0, maxLen) || fallback;
+}
+
+function getSafeOgImageUrl(rawUrl: string | null, requestHost: string): string {
+  if (!rawUrl) return '';
+  const trimmed = rawUrl.trim();
+  if (trimmed.length > 1024) return '';
+
+  try {
+    const parsed = new URL(trimmed);
+    if (parsed.protocol !== 'https:') return '';
+
+    const host = parsed.hostname.toLowerCase();
+    // Block localhost, loopback, link-local metadata (169.254.169.254), and private LAN IPs
+    if (
+      host === 'localhost' ||
+      host.endsWith('.local') ||
+      host.endsWith('.internal') ||
+      /^(127\.|10\.|192\.168\.|169\.254\.|0\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)/.test(host) ||
+      host.startsWith('[')
+    ) {
+      return '';
+    }
+
+    if (ALLOWED_OG_IMAGE_HOSTS.has(host) || host === requestHost.toLowerCase()) {
+      return parsed.toString();
+    }
+    return '';
+  } catch {
+    return '';
+  }
+}
+
 export async function GET(req: NextRequest) {
-  const { searchParams } = new URL(req.url);
-  const title =
-    searchParams.get('title')?.trim() ||
-    'AQURIVO | مراجعات المنتجات ومقارنة الأسعار قبل الشراء';
-  const price = searchParams.get('price')?.trim() || '';
-  const source = searchParams.get('source')?.trim() || 'AQURIVO';
-  const rating = searchParams.get('rating')?.trim() || '';
-  const category = searchParams.get('category')?.trim() || '';
-  const subtitle = searchParams.get('subtitle')?.trim() || '';
-  const rawImage = searchParams.get('image')?.trim() || '';
-  const hasExternalImage =
-    rawImage.startsWith('https://') || rawImage.startsWith('http://');
+  const { searchParams, hostname } = new URL(req.url);
+  const title = cleanOgText(
+    searchParams.get('title'),
+    120,
+    'AQURIVO | مراجعات المنتجات ومقارنة الأسعار قبل الشراء'
+  );
+  const price = cleanOgText(searchParams.get('price'), 32);
+  const source = cleanOgText(searchParams.get('source'), 40, 'AQURIVO');
+  const rating = cleanOgText(searchParams.get('rating'), 10);
+  const category = cleanOgText(searchParams.get('category'), 40);
+  const subtitle = cleanOgText(searchParams.get('subtitle'), 140);
+  const rawImage = getSafeOgImageUrl(searchParams.get('image'), hostname);
+  const hasExternalImage = Boolean(rawImage);
 
   return new ImageResponse(
     (

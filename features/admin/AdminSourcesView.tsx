@@ -207,7 +207,7 @@ export function AdminSourcesView({
         <h2 className={styles.cardTitle}>
           {isAr ? 'المتاجر الشريكة المعتمدة' : 'Configured Partner Stores'}
         </h2>
-        <div className={styles.tableWrap}>
+        <div className={`${styles.tableWrap} ${styles.desktopTableOnly}`}>
           <table className={styles.table}>
             <thead>
               <tr>
@@ -250,6 +250,74 @@ export function AdminSourcesView({
               ))}
             </tbody>
           </table>
+        </div>
+
+        <div className={styles.mobileAdminCards}>
+          {sources.map((s) => (
+            <div key={s.id} className={styles.mobileItemCard}>
+              <div className={styles.mobileCardHeaderRow}>
+                <div className={styles.mobileItemInfo}>
+                  <span className={styles.mobileItemTitle}>{t(s.name)}</span>
+                  <span className={styles.mobileItemSlug}>{s.websiteUrl}</span>
+                </div>
+                <span
+                  className={
+                    s.isActive !== false ? styles.badgeSuccess : styles.badgeNeutral
+                  }
+                >
+                  {s.isActive !== false
+                    ? isAr
+                      ? 'نشط'
+                      : 'Active'
+                    : isAr
+                      ? 'غير نشط'
+                      : 'Inactive'}
+                </span>
+              </div>
+
+              {t(s.disclosureText) && (
+                <p className={styles.mobileCardBodyText}>{t(s.disclosureText)}</p>
+              )}
+
+              <div className={styles.mobileItemMetaRow}>
+                <span className={styles.mobileMetaPill}>
+                  <span className={styles.mobileMetaLabel}>
+                    {isAr ? 'سياسة السعر:' : 'Price Policy:'}
+                  </span>
+                  <span className={styles.mobileMetaValue}>
+                    {s.defaultPricePolicy === 'show_with_timestamp'
+                      ? isAr
+                        ? 'عرض السعر مع التاريخ'
+                        : 'Show With Timestamp'
+                      : isAr
+                        ? 'فحص السعر الحي'
+                        : 'Check Live on Store'}
+                  </span>
+                </span>
+              </div>
+
+              <div className={styles.mobileItemActions}>
+                <div className={styles.mobileActionButtonsGroup}>
+                  <button
+                    type="button"
+                    onClick={() => handleEdit(s)}
+                    className={styles.topBarBtn}
+                  >
+                    <Edit3 size={14} />
+                    <span>{isAr ? 'تعديل' : 'Edit'}</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setDeleteTarget(s)}
+                    className={styles.topBarBtn}
+                  >
+                    <Trash2 size={14} />
+                    <span>{isAr ? 'حذف' : 'Delete'}</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       </section>
 

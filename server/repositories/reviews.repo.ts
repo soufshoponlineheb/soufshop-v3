@@ -1,5 +1,6 @@
 import 'server-only';
 import { getAdminDb, getCloudFallbackDb } from '@/server/config/firebase-admin';
+import { sanitizePlainText } from '@/server/validators';
 
 export interface ReviewItem {
   id: string;
@@ -34,7 +35,8 @@ export async function getReviewsByProductSlug(slug: string): Promise<ReviewsSumm
     distribution: { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 },
   };
 
-  if (!slug) return emptyResult;
+  const cleanSlug = sanitizePlainText(slug, 140);
+  if (!cleanSlug) return emptyResult;
 
   const db = getAdminDb();
   if (!db) return emptyResult;
@@ -43,7 +45,7 @@ export async function getReviewsByProductSlug(slug: string): Promise<ReviewsSumm
     try {
       const snap = await client
         .collection(COLLECTION)
-        .where('productSlug', '==', slug)
+        .where('productSlug', '==', cleanSlug)
         .get();
 
       const items: ReviewItem[] = [];
@@ -57,10 +59,10 @@ export async function getReviewsByProductSlug(slug: string): Promise<ReviewsSumm
         const ratingVal = Math.max(1, Math.min(5, Math.round(Number(data.rating) || 5)));
         const item: ReviewItem = {
           id: doc.id,
-          productSlug: String(data.productSlug || slug),
-          userName: String(data.userName || '').trim() || 'زائر',
+          productSlug: sanitizePlainText(data.productSlug || cleanSlug, 140),
+          userName: sanitizePlainText(data.userName, 80) || 'زائر',
           rating: ratingVal,
-          comment: String(data.comment || '').trim(),
+          comment: sanitizePlainText(data.comment, 300),
           createdAt: String(data.createdAt || new Date().toISOString()),
           approved: true,
         };
@@ -100,9 +102,9 @@ export async function createReview(input: {
   if (!db) throw new Error('Database unavailable');
 
   const rating = Math.max(1, Math.min(5, Math.round(Number(input.rating) || 5)));
-  const userName = (input.userName || '').trim().slice(0, 80);
-  const comment = (input.comment || '').trim().slice(0, 300);
-  const productSlug = (input.productSlug || '').trim();
+  const userName = sanitizePlainText(input.userName, 80);
+  const comment = sanitizePlainText(input.comment, 300);
+  const productSlug = sanitizePlainText(input.productSlug, 140);
 
   if (!userName) {
     throw new Error('User name is required');
@@ -117,7 +119,7 @@ export async function createReview(input: {
     rating,
     comment,
     createdAt: new Date().toISOString(),
-    approved: true, // Default: true as requested
+    approved: true,
   };
 
   const docRef = await db.collection(COLLECTION).add(reviewDoc);

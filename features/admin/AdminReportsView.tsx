@@ -352,206 +352,381 @@ export function AdminReportsView({
               : 'No reports matching the selected filters.'}
           </p>
         ) : (
-          <div className={shellStyles.tableWrap}>
-            <table className={shellStyles.table}>
-              <thead>
-                <tr>
-                  <th>{isAr ? 'النوع والسبب' : 'Type & Reason'}</th>
-                  <th>{isAr ? 'المنتج' : 'Product'}</th>
-                  <th>{isAr ? 'البريد الإلكتروني' : 'Email'}</th>
-                  <th>{isAr ? 'وصف المشكلة' : 'Description'}</th>
-                  <th>{isAr ? 'التاريخ' : 'Date'}</th>
-                  <th>{isAr ? 'الحالة' : 'Status'}</th>
-                  <th>{isAr ? 'تغيير الحالة' : 'Change Status'}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredReports.map((report) => {
-                  const warnKey = (
-                    report.productSlug ||
-                    report.productName ||
-                    ''
-                  )
-                    .trim()
-                    .toLowerCase();
-                  const warnStats = warnKey ? productWarnings[warnKey] : undefined;
-                  const showWarning = Boolean(warnStats?.hasWarning);
-                  const nextStatus = getNextStatus(report.status);
+          <>
+            <div className={`${shellStyles.tableWrap} ${shellStyles.desktopTableOnly}`}>
+              <table className={shellStyles.table}>
+                <thead>
+                  <tr>
+                    <th>{isAr ? 'النوع والسبب' : 'Type & Reason'}</th>
+                    <th>{isAr ? 'المنتج' : 'Product'}</th>
+                    <th>{isAr ? 'البريد الإلكتروني' : 'Email'}</th>
+                    <th>{isAr ? 'وصف المشكلة' : 'Description'}</th>
+                    <th>{isAr ? 'التاريخ' : 'Date'}</th>
+                    <th>{isAr ? 'الحالة' : 'Status'}</th>
+                    <th>{isAr ? 'تغيير الحالة' : 'Change Status'}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredReports.map((report) => {
+                    const warnKey = (
+                      report.productSlug ||
+                      report.productName ||
+                      ''
+                    )
+                      .trim()
+                      .toLowerCase();
+                    const warnStats = warnKey ? productWarnings[warnKey] : undefined;
+                    const showWarning = Boolean(warnStats?.hasWarning);
+                    const nextStatus = getNextStatus(report.status);
 
-                  return (
-                    <tr key={report.id}>
-                      <td>
-                        <span
-                          className={
-                            report.type === 'order_issue'
-                              ? styles.typeBadgeOrder
-                              : styles.typeBadgeProduct
-                          }
-                        >
-                          {report.type === 'order_issue'
-                            ? isAr
-                              ? 'مشكلة في طلبي'
-                              : 'Order Issue'
-                            : isAr
-                              ? 'مشكلة منتج'
-                              : 'Product Issue'}
-                        </span>
-                        <div className={styles.reasonText}>
-                          {getReasonLabel(report.reason, isAr)}
-                        </div>
-                        {report.orderRef && (
-                          <div className={styles.orderRefLine}>
-                            {isAr ? 'رقم الطلب: ' : 'Order Ref: '}
-                            {report.orderRef}
-                          </div>
-                        )}
-                      </td>
-
-                      <td>
-                        <div className={styles.productCell}>
-                          <div className={styles.productTitleRow}>
-                            <span className={styles.productName}>
-                              {report.productName ||
-                                report.productSlug ||
-                                (isAr ? 'بلاغ عام (الفوتر)' : 'General (Footer)')}
-                            </span>
-
-                            {showWarning && (
-                              <span
-                                className={styles.warningBadge}
-                                title={
-                                  isAr
-                                    ? `تكرر بلاغ الرابط لا يعمل أو غير متوفر (${warnStats?.totalCriticalCount} مرات)`
-                                    : `Repeated broken link or unavailable report (${warnStats?.totalCriticalCount}x)`
-                                }
-                              >
-                                <AlertTriangle size={12} aria-hidden="true" />
-                                <span>
-                                  {isAr
-                                    ? `تحذير (${warnStats?.totalCriticalCount}+ بلاغات)`
-                                    : `Warning (${warnStats?.totalCriticalCount}+)`}
-                                </span>
-                              </span>
-                            )}
-                          </div>
-
-                          {report.productSlug && (
-                            <Link
-                              href={`/${locale}/products/${encodeURIComponent(
-                                report.productSlug
-                              )}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className={styles.productLink}
-                            >
-                              <span>
-                                {isAr ? 'فتح صفحة المنتج' : 'Open Product Page'}
-                              </span>
-                              <ExternalLink size={12} aria-hidden="true" />
-                            </Link>
-                          )}
-                        </div>
-                      </td>
-
-                      <td>
-                        <div className={styles.emailCell}>
-                          <span className={styles.emailAddress}>
-                            {report.email}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() =>
-                              handleCopyEmail(report.id, report.email)
-                            }
-                            className={styles.copyBtn}
-                          >
-                            {copiedId === report.id ? (
-                              <>
-                                <Check size={12} aria-hidden="true" />
-                                <span>{isAr ? 'تم النسخ' : 'Copied'}</span>
-                              </>
-                            ) : (
-                              <>
-                                <Copy size={12} aria-hidden="true" />
-                                <span>{isAr ? 'نسخ البريد' : 'Copy Email'}</span>
-                              </>
-                            )}
-                          </button>
-                        </div>
-                      </td>
-
-                      <td>
-                        <p className={styles.messageText}>{report.message}</p>
-                      </td>
-
-                      <td className="tabularNums">
-                        {formatCalendarDate(report.createdAt, locale)}
-                      </td>
-
-                      <td>
-                        <div className={styles.statusCell}>
+                    return (
+                      <tr key={report.id}>
+                        <td>
                           <span
                             className={
-                              report.status === 'new'
-                                ? styles.statusBadgeNew
-                                : report.status === 'in_progress'
-                                  ? styles.statusBadgeProgress
-                                  : styles.statusBadgeResolved
+                              report.type === 'order_issue'
+                                ? styles.typeBadgeOrder
+                                : styles.typeBadgeProduct
                             }
                           >
-                            {getStatusLabel(report.status, isAr)}
+                            {report.type === 'order_issue'
+                              ? isAr
+                                ? 'مشكلة في طلبي'
+                                : 'Order Issue'
+                              : isAr
+                                ? 'مشكلة منتج'
+                                : 'Product Issue'}
                           </span>
-                        </div>
-                      </td>
-
-                      <td>
-                        <div className={styles.actionsCell}>
-                          <div className={styles.statusSwitchPills}>
-                            {(
-                              ['new', 'in_progress', 'resolved'] as ReportStatus[]
-                            ).map((st) => {
-                              const isCurrent = report.status === st;
-                              return (
-                                <button
-                                  key={st}
-                                  type="button"
-                                  disabled={busyId === report.id || isCurrent}
-                                  onClick={() => handleStatusChange(report, st)}
-                                  className={`${styles.statusPillBtn} ${
-                                    isCurrent
-                                      ? st === 'new'
-                                        ? styles.statusPillActiveGold
-                                        : styles.statusPillActiveTeal
-                                      : ''
-                                  }`}
-                                >
-                                  {getStatusLabel(st, isAr)}
-                                </button>
-                              );
-                            })}
+                          <div className={styles.reasonText}>
+                            {getReasonLabel(report.reason, isAr)}
                           </div>
+                          {report.orderRef && (
+                            <div className={styles.orderRefLine}>
+                              {isAr ? 'رقم الطلب: ' : 'Order Ref: '}
+                              {report.orderRef}
+                            </div>
+                          )}
+                        </td>
 
-                          <button
-                            type="button"
-                            disabled={busyId === report.id}
-                            onClick={() =>
-                              handleStatusChange(report, nextStatus)
-                            }
-                            className={styles.statusBtn}
-                          >
-                            <RefreshCw size={12} aria-hidden="true" />
-                            <span>
-                              {isAr ? 'تبديل الحالة' : 'Next Status'}
+                        <td>
+                          <div className={styles.productCell}>
+                            <div className={styles.productTitleRow}>
+                              <span className={styles.productName}>
+                                {report.productName ||
+                                  report.productSlug ||
+                                  (isAr ? 'بلاغ عام (الفوتر)' : 'General (Footer)')}
+                              </span>
+
+                              {showWarning && (
+                                <span
+                                  className={styles.warningBadge}
+                                  title={
+                                    isAr
+                                      ? `تكرر بلاغ الرابط لا يعمل أو غير متوفر (${warnStats?.totalCriticalCount} مرات)`
+                                      : `Repeated broken link or unavailable report (${warnStats?.totalCriticalCount}x)`
+                                  }
+                                >
+                                  <AlertTriangle size={12} aria-hidden="true" />
+                                  <span>
+                                    {isAr
+                                      ? `تحذير (${warnStats?.totalCriticalCount}+ بلاغات)`
+                                      : `Warning (${warnStats?.totalCriticalCount}+)`}
+                                  </span>
+                                </span>
+                              )}
+                            </div>
+
+                            {report.productSlug && (
+                              <Link
+                                href={`/${locale}/products/${encodeURIComponent(
+                                  report.productSlug
+                                )}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className={styles.productLink}
+                              >
+                                <span>
+                                  {isAr ? 'فتح صفحة المنتج' : 'Open Product Page'}
+                                </span>
+                                <ExternalLink size={12} aria-hidden="true" />
+                              </Link>
+                            )}
+                          </div>
+                        </td>
+
+                        <td>
+                          <div className={styles.emailCell}>
+                            <span className={styles.emailAddress}>
+                              {report.email}
                             </span>
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+                            <button
+                              type="button"
+                              onClick={() =>
+                                handleCopyEmail(report.id, report.email)
+                              }
+                              className={styles.copyBtn}
+                            >
+                              {copiedId === report.id ? (
+                                <>
+                                  <Check size={12} aria-hidden="true" />
+                                  <span>{isAr ? 'تم النسخ' : 'Copied'}</span>
+                                </>
+                              ) : (
+                                <>
+                                  <Copy size={12} aria-hidden="true" />
+                                  <span>{isAr ? 'نسخ البريد' : 'Copy Email'}</span>
+                                </>
+                              )}
+                            </button>
+                          </div>
+                        </td>
+
+                        <td>
+                          <p className={styles.messageText}>{report.message}</p>
+                        </td>
+
+                        <td className="tabularNums">
+                          {formatCalendarDate(report.createdAt, locale)}
+                        </td>
+
+                        <td>
+                          <div className={styles.statusCell}>
+                            <span
+                              className={
+                                report.status === 'new'
+                                  ? styles.statusBadgeNew
+                                  : report.status === 'in_progress'
+                                    ? styles.statusBadgeProgress
+                                    : styles.statusBadgeResolved
+                              }
+                            >
+                              {getStatusLabel(report.status, isAr)}
+                            </span>
+                          </div>
+                        </td>
+
+                        <td>
+                          <div className={styles.actionsCell}>
+                            <div className={styles.statusSwitchPills}>
+                              {(
+                                ['new', 'in_progress', 'resolved'] as ReportStatus[]
+                              ).map((st) => {
+                                const isCurrent = report.status === st;
+                                return (
+                                  <button
+                                    key={st}
+                                    type="button"
+                                    disabled={busyId === report.id || isCurrent}
+                                    onClick={() => handleStatusChange(report, st)}
+                                    className={`${styles.statusPillBtn} ${
+                                      isCurrent
+                                        ? st === 'new'
+                                          ? styles.statusPillActiveGold
+                                          : styles.statusPillActiveTeal
+                                        : ''
+                                    }`}
+                                  >
+                                    {getStatusLabel(st, isAr)}
+                                  </button>
+                                );
+                              })}
+                            </div>
+
+                            <button
+                              type="button"
+                              disabled={busyId === report.id}
+                              onClick={() =>
+                                handleStatusChange(report, nextStatus)
+                              }
+                              className={styles.statusBtn}
+                            >
+                              <RefreshCw size={12} aria-hidden="true" />
+                              <span>
+                                {isAr ? 'تبديل الحالة' : 'Next Status'}
+                              </span>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            <div className={shellStyles.mobileAdminCards}>
+              {filteredReports.map((report) => {
+                const warnKey = (
+                  report.productSlug ||
+                  report.productName ||
+                  ''
+                )
+                  .trim()
+                  .toLowerCase();
+                const warnStats = warnKey ? productWarnings[warnKey] : undefined;
+                const showWarning = Boolean(warnStats?.hasWarning);
+                const nextStatus = getNextStatus(report.status);
+
+                return (
+                  <div key={report.id} className={shellStyles.mobileItemCard}>
+                    <div className={shellStyles.mobileCardHeaderRow}>
+                      <span
+                        className={
+                          report.type === 'order_issue'
+                            ? styles.typeBadgeOrder
+                            : styles.typeBadgeProduct
+                        }
+                      >
+                        {report.type === 'order_issue'
+                          ? isAr
+                            ? 'مشكلة في طلبي'
+                            : 'Order Issue'
+                          : isAr
+                            ? 'مشكلة منتج'
+                            : 'Product Issue'}
+                      </span>
+
+                      <span
+                        className={
+                          report.status === 'new'
+                            ? styles.statusBadgeNew
+                            : report.status === 'in_progress'
+                              ? styles.statusBadgeProgress
+                              : styles.statusBadgeResolved
+                        }
+                      >
+                        {getStatusLabel(report.status, isAr)}
+                      </span>
+                    </div>
+
+                    <div className={shellStyles.mobileItemInfo}>
+                      <div className={styles.productTitleRow}>
+                        <span className={shellStyles.mobileItemTitle}>
+                          {report.productName ||
+                            report.productSlug ||
+                            (isAr ? 'بلاغ عام (الفوتر)' : 'General (Footer)')}
+                        </span>
+                        {showWarning && (
+                          <span className={styles.warningBadge}>
+                            <AlertTriangle size={12} aria-hidden="true" />
+                            <span>
+                              {isAr
+                                ? `تحذير (${warnStats?.totalCriticalCount}+ بلاغات)`
+                                : `Warning (${warnStats?.totalCriticalCount}+)`}
+                            </span>
+                          </span>
+                        )}
+                      </div>
+
+                      {report.productSlug && (
+                        <Link
+                          href={`/${locale}/products/${encodeURIComponent(
+                            report.productSlug
+                          )}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={styles.productLink}
+                        >
+                          <span>
+                            {isAr ? 'فتح صفحة المنتج' : 'Open Product Page'}
+                          </span>
+                          <ExternalLink size={12} aria-hidden="true" />
+                        </Link>
+                      )}
+                    </div>
+
+                    <div className={shellStyles.mobileItemInfo}>
+                      <span className={styles.reasonText}>
+                        {isAr ? 'السبب: ' : 'Reason: '}
+                        {getReasonLabel(report.reason, isAr)}
+                      </span>
+                      {report.orderRef && (
+                        <span className={styles.orderRefLine}>
+                          {isAr ? 'رقم الطلب: ' : 'Order Ref: '}
+                          {report.orderRef}
+                        </span>
+                      )}
+                      {report.message && (
+                        <p className={shellStyles.mobileCardBodyText}>
+                          {report.message}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className={shellStyles.mobileItemMetaRow}>
+                      <div className={shellStyles.mobileCardHeaderRow} style={{ width: '100%' }}>
+                        <span className={shellStyles.mobileItemSlug} style={{ fontSize: '12.5px', fontWeight: 600, color: 'var(--color-text-primary)' }}>
+                          {report.email}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => handleCopyEmail(report.id, report.email)}
+                          className={styles.copyBtn}
+                        >
+                          {copiedId === report.id ? (
+                            <>
+                              <Check size={12} aria-hidden="true" />
+                              <span>{isAr ? 'تم النسخ' : 'Copied'}</span>
+                            </>
+                          ) : (
+                            <>
+                              <Copy size={12} aria-hidden="true" />
+                              <span>{isAr ? 'نسخ البريد' : 'Copy Email'}</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
+                      <span className={shellStyles.mobileMetaPill}>
+                        <span className={shellStyles.mobileMetaLabel}>
+                          {isAr ? 'التاريخ:' : 'Date:'}
+                        </span>
+                        <span className={`${shellStyles.mobileMetaValue} tabularNums`}>
+                          {formatCalendarDate(report.createdAt, locale)}
+                        </span>
+                      </span>
+                    </div>
+
+                    <div className={shellStyles.mobileItemActions}>
+                      <div className={styles.statusSwitchPills}>
+                        {(
+                          ['new', 'in_progress', 'resolved'] as ReportStatus[]
+                        ).map((st) => {
+                          const isCurrent = report.status === st;
+                          return (
+                            <button
+                              key={st}
+                              type="button"
+                              disabled={busyId === report.id || isCurrent}
+                              onClick={() => handleStatusChange(report, st)}
+                              className={`${styles.statusPillBtn} ${
+                                isCurrent
+                                  ? st === 'new'
+                                    ? styles.statusPillActiveGold
+                                    : styles.statusPillActiveTeal
+                                  : ''
+                              }`}
+                            >
+                              {getStatusLabel(st, isAr)}
+                            </button>
+                          );
+                        })}
+                      </div>
+
+                      <button
+                        type="button"
+                        disabled={busyId === report.id}
+                        onClick={() => handleStatusChange(report, nextStatus)}
+                        className={styles.statusBtn}
+                      >
+                        <RefreshCw size={12} aria-hidden="true" />
+                        <span>{isAr ? 'تبديل الحالة' : 'Next Status'}</span>
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </>
         )}
       </section>
     </>

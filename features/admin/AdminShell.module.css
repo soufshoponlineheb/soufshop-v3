@@ -405,6 +405,16 @@
   text-align: start;
 }
 
+.compactTable {
+  min-inline-size: 0;
+  width: 100%;
+}
+
+.compactTable th:last-child,
+.compactTable td:last-child {
+  text-align: end;
+}
+
 .table th {
   padding: var(--space-3) var(--space-4);
   font-size: var(--text-xs);
@@ -438,6 +448,37 @@
   .mobileAdminCards {
     display: none;
   }
+}
+
+.mobileCardHeaderRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  min-inline-size: 0;
+}
+
+.mobileCardBodyText {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  line-height: 1.55;
+  margin: 0;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.mobileCategoryIcon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-sm);
+  background-color: var(--color-bg-subtle);
+  border: 1px solid var(--color-border-hairline);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
 }
 
 .mobileItemCard {

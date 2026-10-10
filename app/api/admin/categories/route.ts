@@ -10,6 +10,9 @@ import { sanitizePlainText, ValidationError } from '@/server/validators';
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
+  const guard = await requireAdminApi();
+  if (!guard.authorized) return guard.response;
+
   try {
     const categories = await listAllCategoriesAdmin();
     return NextResponse.json({ categories });

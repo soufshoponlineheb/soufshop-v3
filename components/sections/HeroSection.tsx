@@ -229,16 +229,31 @@ export function HeroSection({
       {/* 1. Full-width Hero with Responsive Mobile & Desktop Studio Image + Overlay */}
       <div className={`${styles.hero} ${styles.heroBanner}`}>
         <picture className={styles.heroPicture} aria-hidden="true">
+          {!backgroundImageUrl && (
+            <>
+              <source
+                media="(min-width: 768px)"
+                srcSet="/images/hero-desktop.webp"
+                type="image/webp"
+              />
+              <source
+                media="(max-width: 767px)"
+                srcSet="/images/hero-mobile.webp"
+                type="image/webp"
+              />
+            </>
+          )}
           <source
             media="(min-width: 768px)"
             srcSet={backgroundImageUrl || '/images/hero-desktop.jpg'}
           />
           <img
-            src={backgroundImageUrl || '/images/hero-mobile.jpg'}
+            src={backgroundImageUrl || '/images/hero-mobile.webp'}
             alt=""
             className={styles.heroBgImage}
             fetchPriority="high"
-            decoding="async"
+            loading="eager"
+            decoding="sync"
             referrerPolicy="no-referrer"
           />
         </picture>
@@ -256,10 +271,10 @@ export function HeroSection({
 
           {/* Primary & Secondary CTA Buttons */}
           <div className={styles.heroCtaWrap}>
-            <Link href={`/${locale}/products`} className={styles.heroPrimaryCta}>
+            <Link href={`/${locale}/products`} prefetch={true} className={styles.heroPrimaryCta}>
               {messages.hero.primaryCta}
             </Link>
-            <Link href={`/${locale}/tools`} className={styles.heroSecondaryCta}>
+            <Link href={`/${locale}/tools`} prefetch={true} className={styles.heroSecondaryCta}>
               {messages.hero.secondaryCta}
             </Link>
           </div>

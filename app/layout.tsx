@@ -164,9 +164,28 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       suppressHydrationWarning
     >
       <head>
+        <link
+          rel="preload"
+          as="image"
+          href="/images/hero-desktop.webp"
+          media="(min-width: 768px)"
+          type="image/webp"
+        />
+        <link
+          rel="preload"
+          as="image"
+          href="/images/hero-mobile.webp"
+          media="(max-width: 767px)"
+          type="image/webp"
+        />
         <script
           dangerouslySetInnerHTML={{
             __html: `(function(){try{var s=localStorage.getItem('soufshop_theme');var d=s==='dark'||(!s&&window.matchMedia('(prefers-color-scheme: dark)').matches);var c=d?'dark':'light';document.documentElement.classList.add(c);document.documentElement.setAttribute('data-theme',c);}catch(e){}})();`,
+          }}
+        />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){ function start(){ function go(){ try{ new trustedOriginApp({ hash: "237e642ec8564ee228212e4b7c580019" }); }catch(e){} } if (typeof trustedOriginApp === "undefined" && !document.querySelector('script[src*="/trusted-origin.js"]')){ var s = document.createElement("script"); s.src = "https://trustedorigin.org/api/assets/js/trusted-origin.js"; document.head.appendChild(s); } var n = 0, t = setInterval(function(){ if (typeof trustedOriginApp !== "undefined"){ clearInterval(t); go(); } else if (++n > 100){ clearInterval(t); } }, 100); } if (document.readyState === "loading"){ document.addEventListener("DOMContentLoaded", start); } else { start(); } })();`,
           }}
         />
       </head>

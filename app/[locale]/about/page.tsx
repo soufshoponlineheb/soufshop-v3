@@ -28,10 +28,28 @@ export async function generateMetadata({
     ? 'Learn how AQURIVO independently researches, evaluates, and compares products across global stores with full transparency.'
     : 'تعرف على منصة AQURIVO ومنهجيتنا المستقلة في فحص ومقارنة أفضل المنتجات العالمية وتوجيهك للشراء المباشر بأمان وشفافية.';
 
+  const ogImageUrl = `${SITE_URL}/images/hero-desktop.jpg`;
+
   return {
     metadataBase: new URL(SITE_URL),
     title,
     description,
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+        'max-video-preview': -1,
+      },
+    },
+    other: {
+      thumbnail: ogImageUrl,
+      'og:image:secure_url': ogImageUrl,
+      'og:image:type': 'image/jpeg',
+    },
     alternates: {
       canonical: canonicalUrl,
       languages: {
@@ -46,12 +64,26 @@ export async function generateMetadata({
       url: canonicalUrl,
       siteName: 'AQURIVO',
       locale: isEn ? 'en_US' : 'ar_SA',
+      alternateLocale: isEn ? ['ar_SA'] : ['en_US'],
       type: 'website',
+      images: [
+        {
+          url: ogImageUrl,
+          secureUrl: ogImageUrl,
+          width: 1200,
+          height: 675,
+          type: 'image/jpeg',
+          alt: title,
+        },
+      ],
     },
     twitter: {
       card: 'summary_large_image',
+      site: '@aqurivo',
+      creator: '@aqurivo',
       title,
       description,
+      images: [{ url: ogImageUrl, alt: title }],
     },
   };
 }

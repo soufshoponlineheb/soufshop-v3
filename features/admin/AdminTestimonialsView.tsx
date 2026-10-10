@@ -20,7 +20,7 @@ export function AdminTestimonialsView({
   initialTestimonials: Testimonial[];
 }) {
   const { locale } = useI18n();
-  const { user, authLoading } = useSaved();
+  const { user, authLoading, csrfToken } = useSaved();
   const { showToast } = useToast();
   const isAr = locale === 'ar';
 
@@ -54,7 +54,7 @@ export function AdminTestimonialsView({
   const handleApprove = async (item: Testimonial) => {
     setBusyId(item.id);
     try {
-      await approveTestimonial(item.id);
+      await approveTestimonial(item.id, csrfToken || undefined);
       setTestimonials((prev) =>
         prev.map((t) => (t.id === item.id ? { ...t, approved: true } : t))
       );
@@ -75,7 +75,7 @@ export function AdminTestimonialsView({
   const handleDelete = async (item: Testimonial) => {
     setBusyId(item.id);
     try {
-      await deleteTestimonial(item.id);
+      await deleteTestimonial(item.id, csrfToken || undefined);
       setTestimonials((prev) => prev.filter((t) => t.id !== item.id));
       showToast(isAr ? 'تم حذف الشهادة.' : 'Testimonial deleted.', 'info');
     } catch {
@@ -121,62 +121,111 @@ export function AdminTestimonialsView({
               : 'No pending testimonials waiting for review.'}
           </p>
         ) : (
-          <div className={styles.tableWrap}>
-            <table className={styles.table}>
-              <thead>
-                <tr>
-                  <th>{isAr ? 'الاسم' : 'Name'}</th>
-                  <th>{isAr ? 'التقييم' : 'Rating'}</th>
-                  <th>{isAr ? 'نص الشهادة' : 'Review Text'}</th>
-                  <th>{isAr ? 'التاريخ' : 'Date'}</th>
-                  <th>{isAr ? 'إجراءات' : 'Actions'}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {pendingList.map((item) => (
-                  <tr key={item.id}>
-                    <td>
-                      <strong>{item.name}</strong>
-                    </td>
-                    <td>
-                      <span style={{ color: '#F5A623', fontWeight: 700 }}>
-                        {'★'.repeat(item.rating)}
-                        {'☆'.repeat(Math.max(0, 5 - item.rating))}
-                      </span>
-                    </td>
-                    <td>{item.text}</td>
-                    <td className="tabularNums">
-                      {formatCalendarDate(item.createdAt, locale)}
-                    </td>
-                    <td>
-                      <div className={styles.rowActions}>
-                        <button
-                          type="button"
-                          disabled={busyId === item.id}
-                          onClick={() => handleApprove(item)}
-                          className={`${styles.iconBtn} ${styles.statusPublished}`}
-                          title={isAr ? 'موافقة ونشر (✓)' : 'Approve (✓)'}
-                          aria-label={isAr ? 'موافقة ونشر' : 'Approve'}
-                        >
-                          <Check size={16} aria-hidden="true" />
-                        </button>
-                        <button
-                          type="button"
-                          disabled={busyId === item.id}
-                          onClick={() => handleDelete(item)}
-                          className={`${styles.iconBtn} ${styles.iconBtnDanger}`}
-                          title={isAr ? 'حذف (✗)' : 'Delete (✗)'}
-                          aria-label={isAr ? 'حذف' : 'Delete'}
-                        >
-                          <Trash2 size={16} aria-hidden="true" />
-                        </button>
-                      </div>
-                    </td>
+          <>
+            <div className={`${styles.tableWrap} ${styles.desktopTableOnly}`}>
+              <table className={styles.table}>
+                <thead>
+                  <tr>
+                    <th>{isAr ? 'الاسم' : 'Name'}</th>
+                    <th>{isAr ? 'التقييم' : 'Rating'}</th>
+                    <th>{isAr ? 'نص الشهادة' : 'Review Text'}</th>
+                    <th>{isAr ? 'التاريخ' : 'Date'}</th>
+                    <th>{isAr ? 'إجراءات' : 'Actions'}</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {pendingList.map((item) => (
+                    <tr key={item.id}>
+                      <td>
+                        <strong>{item.name}</strong>
+                      </td>
+                      <td>
+                        <span style={{ color: '#F5A623', fontWeight: 700 }}>
+                          {'★'.repeat(item.rating)}
+                          {'☆'.repeat(Math.max(0, 5 - item.rating))}
+                        </span>
+                      </td>
+                      <td>{item.text}</td>
+                      <td className="tabularNums">
+                        {formatCalendarDate(item.createdAt, locale)}
+                      </td>
+                      <td>
+                        <div className={styles.rowActions}>
+                          <button
+                            type="button"
+                            disabled={busyId === item.id}
+                            onClick={() => handleApprove(item)}
+                            className={`${styles.iconBtn} ${styles.statusPublished}`}
+                            title={isAr ? 'موافقة ونشر (✓)' : 'Approve (✓)'}
+                            aria-label={isAr ? 'موافقة ونشر' : 'Approve'}
+                          >
+                            <Check size={16} aria-hidden="true" />
+                          </button>
+                          <button
+                            type="button"
+                            disabled={busyId === item.id}
+                            onClick={() => handleDelete(item)}
+                            className={`${styles.iconBtn} ${styles.iconBtnDanger}`}
+                            title={isAr ? 'حذف (✗)' : 'Delete (✗)'}
+                            aria-label={isAr ? 'حذف' : 'Delete'}
+                          >
+                            <Trash2 size={16} aria-hidden="true" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className={styles.mobileAdminCards}>
+              {pendingList.map((item) => (
+                <div key={item.id} className={styles.mobileItemCard}>
+                  <div className={styles.mobileCardHeaderRow}>
+                    <span className={styles.mobileItemTitle}>{item.name}</span>
+                    <span style={{ color: '#F5A623', fontWeight: 700 }}>
+                      {'★'.repeat(item.rating)}
+                      {'☆'.repeat(Math.max(0, 5 - item.rating))}
+                    </span>
+                  </div>
+                  <p className={styles.mobileCardBodyText}>{item.text}</p>
+                  <div className={styles.mobileItemMetaRow}>
+                    <span className={styles.mobileMetaPill}>
+                      <span className={styles.mobileMetaLabel}>
+                        {isAr ? 'التاريخ:' : 'Date:'}
+                      </span>
+                      <span className={`${styles.mobileMetaValue} tabularNums`}>
+                        {formatCalendarDate(item.createdAt, locale)}
+                      </span>
+                    </span>
+                  </div>
+                  <div className={styles.mobileItemActions}>
+                    <div className={styles.mobileActionButtonsGroup}>
+                      <button
+                        type="button"
+                        disabled={busyId === item.id}
+                        onClick={() => handleApprove(item)}
+                        className={styles.topBarBtn}
+                      >
+                        <Check size={15} aria-hidden="true" />
+                        <span>{isAr ? 'موافقة ونشر' : 'Approve'}</span>
+                      </button>
+                      <button
+                        type="button"
+                        disabled={busyId === item.id}
+                        onClick={() => handleDelete(item)}
+                        className={styles.topBarBtn}
+                      >
+                        <Trash2 size={15} aria-hidden="true" />
+                        <span>{isAr ? 'حذف' : 'Delete'}</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         )}
       </section>
 
@@ -188,7 +237,7 @@ export function AdminTestimonialsView({
               ? `الشهادات المنشورة (${approvedList.length})`
               : `Approved Testimonials (${approvedList.length})`}
           </h2>
-          <div className={styles.tableWrap}>
+          <div className={`${styles.tableWrap} ${styles.desktopTableOnly}`}>
             <table className={styles.table}>
               <thead>
                 <tr>
@@ -230,6 +279,41 @@ export function AdminTestimonialsView({
                 ))}
               </tbody>
             </table>
+          </div>
+
+          <div className={styles.mobileAdminCards}>
+            {approvedList.map((item) => (
+              <div key={item.id} className={styles.mobileItemCard}>
+                <div className={styles.mobileCardHeaderRow}>
+                  <span className={styles.mobileItemTitle}>{item.name}</span>
+                  <span style={{ color: '#F5A623', fontWeight: 700 }}>
+                    {'★'.repeat(item.rating)}
+                  </span>
+                </div>
+                <p className={styles.mobileCardBodyText}>{item.text}</p>
+                <div className={styles.mobileItemMetaRow}>
+                  <span className={styles.mobileMetaPill}>
+                    <span className={styles.mobileMetaLabel}>
+                      {isAr ? 'التاريخ:' : 'Date:'}
+                    </span>
+                    <span className={`${styles.mobileMetaValue} tabularNums`}>
+                      {formatCalendarDate(item.createdAt, locale)}
+                    </span>
+                  </span>
+                </div>
+                <div className={styles.mobileItemActions}>
+                  <button
+                    type="button"
+                    disabled={busyId === item.id}
+                    onClick={() => handleDelete(item)}
+                    className={styles.topBarBtn}
+                  >
+                    <Trash2 size={15} aria-hidden="true" />
+                    <span>{isAr ? 'حذف الشهادة' : 'Delete'}</span>
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
         </section>
       )}

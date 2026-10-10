@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
-import { getAdminDb, setServerFirebaseIdToken } from '@/server/config/firebase-admin';
+import { getAdminDb } from '@/server/config/firebase-admin';
 import { requireAdminApi, verifyCsrfRequest } from '@/server/middleware/security';
 import {
   createOrUpdateProductAdmin,
@@ -9,15 +9,7 @@ import {
 } from '@/server/repositories/products.repo';
 import { sanitizePlainText, ValidationError } from '@/server/validators';
 
-function captureFirebaseTokenFromRequest(req: NextRequest): void {
-  const token = req.headers.get('x-firebase-id-token')?.trim();
-  if (token) {
-    setServerFirebaseIdToken(token);
-  }
-}
-
 export async function POST(req: NextRequest) {
-  captureFirebaseTokenFromRequest(req);
   const guard = await requireAdminApi();
   if (!guard.authorized) return guard.response;
 
@@ -45,7 +37,6 @@ export async function POST(req: NextRequest) {
 }
 
 export async function PATCH(req: NextRequest) {
-  captureFirebaseTokenFromRequest(req);
   const guard = await requireAdminApi();
   if (!guard.authorized) return guard.response;
 
@@ -97,7 +88,6 @@ export async function PATCH(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
-  captureFirebaseTokenFromRequest(req);
   const guard = await requireAdminApi();
   if (!guard.authorized) return guard.response;
 

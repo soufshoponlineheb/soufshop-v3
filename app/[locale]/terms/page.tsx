@@ -26,10 +26,28 @@ export async function generateMetadata({
     ? 'Terms of use for browsing AQURIVO and purchasing products through partner stores.'
     : 'شروط الاستخدام لتصفح منصة AQURIVO والتسوق بأمان.';
 
+  const ogImageUrl = `${SITE_URL}/images/hero-desktop.jpg`;
+
   return {
     metadataBase: new URL(SITE_URL),
     title,
     description,
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+        'max-video-preview': -1,
+      },
+    },
+    other: {
+      thumbnail: ogImageUrl,
+      'og:image:secure_url': ogImageUrl,
+      'og:image:type': 'image/jpeg',
+    },
     alternates: {
       canonical: canonicalUrl,
       languages: {
@@ -44,12 +62,26 @@ export async function generateMetadata({
       url: canonicalUrl,
       siteName: 'AQURIVO',
       locale: isEn ? 'en_US' : 'ar_SA',
+      alternateLocale: isEn ? ['ar_SA'] : ['en_US'],
       type: 'website',
+      images: [
+        {
+          url: ogImageUrl,
+          secureUrl: ogImageUrl,
+          width: 1200,
+          height: 675,
+          type: 'image/jpeg',
+          alt: title,
+        },
+      ],
     },
     twitter: {
       card: 'summary_large_image',
+      site: '@aqurivo',
+      creator: '@aqurivo',
       title,
       description,
+      images: [{ url: ogImageUrl, alt: title }],
     },
   };
 }

@@ -50,22 +50,42 @@ service cloud.firestore {
       allow list, create, update, delete: if isAdmin();
     }
 
-    // 6. User Profiles: Owner can read/write own profile; verified admins can read/manage.
+    // 6. User Profiles: Owner can read/write own profile (cannot escalate role to admin); verified admins can read/manage.
     match /users/{userId} {
       allow get: if (isSignedInVerified() && isValidId(userId) && request.auth.uid == userId) || isAdmin();
-      allow create, update: if (isSignedInVerified() && isValidId(userId) && request.auth.uid == userId) || isAdmin();
+      allow create, update: if (
+        isSignedInVerified() &&
+        isValidId(userId) &&
+        request.auth.uid == userId &&
+        (!('role' in request.resource.data) || request.resource.data.role == 'visitor')
+      ) || isAdmin();
       allow list, delete: if isAdmin();
     }
 
-    // 7. Contact Messages: Visitors can create messages; admins can read/update/delete.
+    // 7. Contact Messages: Visitors can create bounded messages; admins can read/update/delete.
     match /messages/{messageId} {
-      allow create: if true;
+      allow create: if isValidId(messageId) &&
+        request.resource.data.senderName is string &&
+        request.resource.data.senderName.size() >= 2 &&
+        request.resource.data.senderName.size() <= 100 &&
+        request.resource.data.senderEmail is string &&
+        request.resource.data.senderEmail.size() >= 3 &&
+        request.resource.data.senderEmail.size() <= 160 &&
+        request.resource.data.subject is string &&
+        request.resource.data.subject.size() >= 2 &&
+        request.resource.data.subject.size() <= 160 &&
+        request.resource.data.message is string &&
+        request.resource.data.message.size() >= 10 &&
+        request.resource.data.message.size() <= 3000;
       allow read, update, delete: if isAdmin();
     }
 
-    // 8. Click Analytics: Server/Visitor click logging + admin analytics read.
+    // 8. Click Analytics: Server/Visitor click logging with bounded fields + admin analytics read.
     match /clicks/{clickId} {
-      allow create: if true;
+      allow create: if isValidId(clickId) &&
+        request.resource.data.productSlug is string &&
+        request.resource.data.productSlug.size() >= 1 &&
+        request.resource.data.productSlug.size() <= 160;
       allow read, update, delete: if isAdmin();
     }
 
@@ -90,7 +110,7 @@ service cloud.firestore {
       allow update, delete: if isAdmin();
     }
 
-    // 11. Product Reviews: Public can read approved reviews and create valid reviews; admins can manage.
+    // 11. Product Reviews: Public can read approved reviews and create valid bounded reviews; admins can manage.
     match /reviews/{reviewId} {
       allow get, list: if resource.data.approved == true || isAdmin();
       allow create: if request.resource.data.userName is string &&
@@ -100,7 +120,9 @@ service cloud.firestore {
         request.resource.data.rating >= 1 &&
         request.resource.data.rating <= 5 &&
         request.resource.data.productSlug is string &&
-        request.resource.data.productSlug.size() >= 1;
+        request.resource.data.productSlug.size() >= 1 &&
+        request.resource.data.productSlug.size() <= 160 &&
+        (!('comment' in request.resource.data) || (request.resource.data.comment is string && request.resource.data.comment.size() <= 300));
       allow update, delete: if isAdmin();
     }
 

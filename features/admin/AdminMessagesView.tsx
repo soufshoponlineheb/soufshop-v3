@@ -82,81 +82,156 @@ export function AdminMessagesView({
             {isAr ? 'صندوق الرسائل فارغ حالياً.' : 'No messages received yet.'}
           </p>
         ) : (
-          <div className={styles.tableWrap}>
-            <table className={styles.table}>
-              <thead>
-                <tr>
-                  <th>{isAr ? 'المرسل' : 'Sender'}</th>
-                  <th>{isAr ? 'الموضوع والرسالة' : 'Subject & Message'}</th>
-                  <th>{isAr ? 'التاريخ' : 'Date'}</th>
-                  <th>{isAr ? 'الحالة' : 'Status'}</th>
-                  <th>{isAr ? 'إجراءات' : 'Actions'}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {messages.map((msg) => (
-                  <tr key={msg.id}>
-                    <td>
-                      <strong>{msg.senderName}</strong>
-                      <div className={styles.kpiLabel}>{msg.senderEmail}</div>
-                    </td>
-                    <td>
-                      <strong>{msg.subject}</strong>
-                      <p className={styles.pageSubtitle}>{msg.message}</p>
-                    </td>
-                    <td className="tabularNums">
-                      {formatCalendarDate(msg.createdAt, locale)}
-                    </td>
-                    <td>
-                      <span
-                        className={msg.isRead ? styles.badgeNeutral : styles.badgeWarning}
-                      >
-                        {msg.isRead
-                          ? isAr
-                            ? 'مقروءة'
-                            : 'Read'
-                          : isAr
-                            ? 'جديدة'
-                            : 'Unread'}
-                      </span>
-                    </td>
-                    <td>
-                      <div className={styles.actionRow}>
-                        <button
-                          type="button"
-                          onClick={() => handleToggleRead(msg)}
-                          className={styles.topBarBtn}
-                        >
-                          {msg.isRead ? (
-                            <MailOpen size={14} />
-                          ) : (
-                            <CheckCircle2 size={14} />
-                          )}
-                          <span>
-                            {msg.isRead
-                              ? isAr
-                                ? 'وسم كغير مقروءة'
-                                : 'Mark Unread'
-                              : isAr
-                                ? 'وسم كمقروءة'
-                                : 'Mark Read'}
-                          </span>
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setDeleteTarget(msg)}
-                          className={styles.topBarBtn}
-                        >
-                          <Trash2 size={14} />
-                          <span>{isAr ? 'حذف' : 'Delete'}</span>
-                        </button>
-                      </div>
-                    </td>
+          <>
+            <div className={`${styles.tableWrap} ${styles.desktopTableOnly}`}>
+              <table className={styles.table}>
+                <thead>
+                  <tr>
+                    <th>{isAr ? 'المرسل' : 'Sender'}</th>
+                    <th>{isAr ? 'الموضوع والرسالة' : 'Subject & Message'}</th>
+                    <th>{isAr ? 'التاريخ' : 'Date'}</th>
+                    <th>{isAr ? 'الحالة' : 'Status'}</th>
+                    <th>{isAr ? 'إجراءات' : 'Actions'}</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {messages.map((msg) => (
+                    <tr key={msg.id}>
+                      <td>
+                        <strong>{msg.senderName}</strong>
+                        <div className={styles.kpiLabel}>{msg.senderEmail}</div>
+                      </td>
+                      <td>
+                        <strong>{msg.subject}</strong>
+                        <p className={styles.pageSubtitle}>{msg.message}</p>
+                      </td>
+                      <td className="tabularNums">
+                        {formatCalendarDate(msg.createdAt, locale)}
+                      </td>
+                      <td>
+                        <span
+                          className={msg.isRead ? styles.badgeNeutral : styles.badgeWarning}
+                        >
+                          {msg.isRead
+                            ? isAr
+                              ? 'مقروءة'
+                              : 'Read'
+                            : isAr
+                              ? 'جديدة'
+                              : 'Unread'}
+                        </span>
+                      </td>
+                      <td>
+                        <div className={styles.actionRow}>
+                          <button
+                            type="button"
+                            onClick={() => handleToggleRead(msg)}
+                            className={styles.topBarBtn}
+                          >
+                            {msg.isRead ? (
+                              <MailOpen size={14} />
+                            ) : (
+                              <CheckCircle2 size={14} />
+                            )}
+                            <span>
+                              {msg.isRead
+                                ? isAr
+                                  ? 'وسم كغير مقروءة'
+                                  : 'Mark Unread'
+                                : isAr
+                                  ? 'وسم كمقروءة'
+                                  : 'Mark Read'}
+                            </span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setDeleteTarget(msg)}
+                            className={styles.topBarBtn}
+                          >
+                            <Trash2 size={14} />
+                            <span>{isAr ? 'حذف' : 'Delete'}</span>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className={styles.mobileAdminCards}>
+              {messages.map((msg) => (
+                <div key={msg.id} className={styles.mobileItemCard}>
+                  <div className={styles.mobileCardHeaderRow}>
+                    <div className={styles.mobileItemInfo}>
+                      <span className={styles.mobileItemTitle}>{msg.senderName}</span>
+                      <span className={styles.mobileItemSlug}>{msg.senderEmail}</span>
+                    </div>
+                    <span
+                      className={msg.isRead ? styles.badgeNeutral : styles.badgeWarning}
+                    >
+                      {msg.isRead
+                        ? isAr
+                          ? 'مقروءة'
+                          : 'Read'
+                        : isAr
+                          ? 'جديدة'
+                          : 'Unread'}
+                    </span>
+                  </div>
+
+                  <div className={styles.mobileItemInfo}>
+                    <strong className={styles.mobileItemTitle}>{msg.subject}</strong>
+                    <p className={styles.mobileCardBodyText}>{msg.message}</p>
+                  </div>
+
+                  <div className={styles.mobileItemMetaRow}>
+                    <span className={styles.mobileMetaPill}>
+                      <span className={styles.mobileMetaLabel}>
+                        {isAr ? 'التاريخ:' : 'Date:'}
+                      </span>
+                      <span className={`${styles.mobileMetaValue} tabularNums`}>
+                        {formatCalendarDate(msg.createdAt, locale)}
+                      </span>
+                    </span>
+                  </div>
+
+                  <div className={styles.mobileItemActions}>
+                    <div className={styles.mobileActionButtonsGroup}>
+                      <button
+                        type="button"
+                        onClick={() => handleToggleRead(msg)}
+                        className={styles.topBarBtn}
+                      >
+                        {msg.isRead ? (
+                          <MailOpen size={14} />
+                        ) : (
+                          <CheckCircle2 size={14} />
+                        )}
+                        <span>
+                          {msg.isRead
+                            ? isAr
+                              ? 'وسم كغير مقروءة'
+                              : 'Mark Unread'
+                            : isAr
+                              ? 'وسم كمقروءة'
+                              : 'Mark Read'}
+                        </span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setDeleteTarget(msg)}
+                        className={styles.topBarBtn}
+                      >
+                        <Trash2 size={14} />
+                        <span>{isAr ? 'حذف' : 'Delete'}</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         )}
       </section>
 

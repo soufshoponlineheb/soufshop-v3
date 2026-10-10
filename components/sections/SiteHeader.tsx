@@ -31,28 +31,28 @@ export function SiteHeader({ savedCount: _savedCount }: { savedCount?: number })
 
       <div className={`siteContainer ${styles.headerInner}`}>
         {/* Zone 1: Brand Title (Single Link Element) */}
-        <Link href={`/${locale}`} className={styles.brandLink} aria-label={messages.meta.siteName}>
+        <Link href={`/${locale}`} prefetch={true} className={styles.brandLink} aria-label={messages.meta.siteName}>
           <BrandLogo size="sm" />
         </Link>
 
         {/* Zone 2: Clean Text Navigation Links */}
         <nav className={styles.desktopNav} aria-label="Primary">
-          <Link href={`/${locale}`} className={styles.navLink}>
+          <Link href={`/${locale}`} prefetch={true} className={styles.navLink}>
             {messages.nav.home}
           </Link>
-          <Link href={`/${locale}/products`} className={styles.navLink}>
+          <Link href={`/${locale}/products`} prefetch={true} className={styles.navLink}>
             {messages.nav.products}
           </Link>
-          <Link href={`/${locale}/guides`} className={styles.navLink}>
+          <Link href={`/${locale}/guides`} prefetch={true} className={styles.navLink}>
             {messages.nav.guides}
           </Link>
-          <Link href={`/${locale}/tools`} className={styles.navLink}>
+          <Link href={`/${locale}/tools`} prefetch={true} className={styles.navLink}>
             {locale === 'ar' ? 'الأدوات الذكية' : 'Free Tools'}
           </Link>
-          <Link href={`/${locale}/about`} className={styles.navLink}>
+          <Link href={`/${locale}/about`} prefetch={true} className={styles.navLink}>
             {messages.nav.ourMethod}
           </Link>
-          <Link href={`/${locale}/contact`} className={styles.navLink}>
+          <Link href={`/${locale}/contact`} prefetch={true} className={styles.navLink}>
             {messages.nav.contact}
           </Link>
           {mounted && user?.role === 'admin' && (

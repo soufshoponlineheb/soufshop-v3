@@ -47,8 +47,11 @@ export function getServiceReadiness(): ServiceReadinessStatus {
   // Client is configured via soufshopstore Firebase Web config
   const firebaseClientConfigured = true;
 
-  // Cloudinary signed upload is configured on the server
-  const cloudinaryConfigured = true;
+  // Cloudinary signed upload requires server-side API key and secret in env
+  const cloudinaryConfigured = Boolean(
+    process.env.CLOUDINARY_API_KEY?.trim() &&
+      process.env.CLOUDINARY_API_SECRET?.trim()
+  );
 
   const adminEmailsConfigured = true;
   const securitySaltsConfigured = Boolean(
@@ -151,13 +154,9 @@ export function loadServerEnv(): ServerEnvironment {
     sessionCookieSecret: (process.env.SESSION_COOKIE_SECRET || '').trim(),
     ipHashSalt: (process.env.IP_HASH_SALT || '').trim(),
     cloudinaryCloudName: (
-      process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'ta0z4htj'
+      process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || ''
     ).trim(),
-    cloudinaryApiKey: (
-      process.env.CLOUDINARY_API_KEY || '256963811951357'
-    ).trim(),
-    cloudinaryApiSecret: (
-      process.env.CLOUDINARY_API_SECRET || 'O3ld8tfAThscnykQ4FTuvDLR0ao'
-    ).trim(),
+    cloudinaryApiKey: (process.env.CLOUDINARY_API_KEY || '').trim(),
+    cloudinaryApiSecret: (process.env.CLOUDINARY_API_SECRET || '').trim(),
   };
 }

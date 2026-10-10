@@ -41,20 +41,26 @@ export function sanitizeEmail(input: unknown): string {
 }
 
 /**
- * Sanitizes editorial HTML for buying guides, stripping scripts, event handlers,
- * iframes, objects, and dangerous protocols while preserving clean semantic tags.
+ * Sanitizes editorial HTML for buying guides, stripping scripts, SVG/MathML, styles, forms,
+ * event handlers, iframes, objects, and dangerous protocols while preserving clean semantic tags.
  */
 export function sanitizeEditorialHtml(rawHtml: unknown, maxLength = 50000): string {
   if (typeof rawHtml !== 'string') return '';
   return rawHtml
     .slice(0, maxLength)
-    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+    .replace(/<script\b[\s\S]*?<\/script>/gi, '')
+    .replace(/<script\b[^>]*>/gi, '')
+    .replace(/<style\b[\s\S]*?<\/style>/gi, '')
+    .replace(/<svg\b[\s\S]*?<\/svg>/gi, '')
+    .replace(/<math\b[\s\S]*?<\/math>/gi, '')
+    .replace(/<form\b[\s\S]*?<\/form>/gi, '')
+    .replace(/<(?:object|embed|applet|base|meta|link|frame|frameset)\b[^>]*>[\s\S]*?(?:<\/(?:object|embed|applet|base|meta|link|frame|frameset)>)?/gi, '')
     .replace(/<iframe\b([^>]*)>(?:[\s\S]*?<\/iframe>)?/gi, (_fullMatch, attrs: string) => {
       const srcMatch = String(attrs || '').match(/\bsrc\s*=\s*["']([^"']+)["']/i);
       if (!srcMatch) return '';
       const src = srcMatch[1].trim();
       if (
-        /^https:\/\/(?:www\.)?(?:youtube\.com\/embed\/|youtube-nocookie\.com\/embed\/|player\.vimeo\.com\/video\/)[A-Za-z0-9_-]+/i.test(
+        /^https:\/\/(?:www\.)?(?:youtube\.com\/embed\/|youtube-nocookie\.com\/embed\/|player\.vimeo\.com\/video\/)[A-Za-z0-9_-]+$/i.test(
           src
         )
       ) {
@@ -62,13 +68,13 @@ export function sanitizeEditorialHtml(rawHtml: unknown, maxLength = 50000): stri
       }
       return '';
     })
-    .replace(/<object\b[^<]*(?:(?!<\/object>)<[^<]*)*<\/object>/gi, '')
-    .replace(/<embed\b[^>]*>/gi, '')
-    .replace(/\son[a-z]+\s*=\s*(['"]).*?\1/gi, '')
+    .replace(/\son[a-z]+\s*=\s*(['"])[\s\S]*?\1/gi, '')
     .replace(/\son[a-z]+\s*=\s*[^\s>]+/gi, '')
-    .replace(/javascript:/gi, '')
-    .replace(/vbscript:/gi, '')
-    .replace(/data:text\/html/gi, '')
+    .replace(/\ssrcdoc\s*=\s*(['"])[\s\S]*?\1/gi, '')
+    .replace(/\ssrcdoc\s*=\s*[^\s>]+/gi, '')
+    .replace(/(?:j\s*a\s*v\s*a\s*s\s*c\s*r\s*i\s*p\s*t|v\s*b\s*s\s*c\s*r\s*i\s*p\s*t)\s*:/gi, '')
+    .replace(/&#x?[0-9a-f]+;?/gi, '')
+    .replace(/data\s*:\s*text\/html/gi, '')
     .trim();
 }
 
@@ -113,11 +119,22 @@ export function validateHttpsUrl(input: unknown, fieldName = 'url'): string {
   const withProtocol = /^https?:\/\//i.test(raw) ? raw : `https://${raw}`;
   try {
     const parsed = new URL(withProtocol);
-    if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') {
-      throw new ValidationError('يرجى إدخال رابط يبدأ بـ https://', fieldName);
+    if (parsed.protocol !== 'https:') {
+      throw new ValidationError('يرجى إدخال رابط آمن يبدأ بـ https:// فقط.', fieldName);
+    }
+    const host = parsed.hostname.toLowerCase();
+    if (
+      host === 'localhost' ||
+      host.endsWith('.local') ||
+      host.endsWith('.internal') ||
+      /^(127\.|10\.|192\.168\.|169\.254\.|0\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)/.test(host) ||
+      host.startsWith('[')
+    ) {
+      throw new ValidationError('لا يُسمح بروابط الشبكة المحلية أو الداخلية.', fieldName);
     }
     return parsed.toString();
-  } catch {
+  } catch (err) {
+    if (err instanceof ValidationError) throw err;
     throw new ValidationError('يرجى إدخال رابط ويب صحيح يبدأ بـ https://', fieldName);
   }
 }

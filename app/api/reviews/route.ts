@@ -1,15 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
 import {
+  checkRateLimit,
+  getClientIpFromHeaders,
+  hashClientIpDaily,
+} from '@/server/middleware/security';
+import {
   getReviewsByProductSlug,
   createReview,
 } from '@/server/repositories/reviews.repo';
+import { sanitizePlainText } from '@/server/validators';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
-    const slug = searchParams.get('slug') || searchParams.get('productSlug') || '';
+    const rawSlug = searchParams.get('slug') || searchParams.get('productSlug') || '';
+    const slug = sanitizePlainText(rawSlug, 140);
 
     if (!slug) {
       return NextResponse.json(
@@ -20,32 +27,53 @@ export async function GET(req: NextRequest) {
 
     const data = await getReviewsByProductSlug(slug);
     return NextResponse.json(data, { status: 200 });
-  } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : 'Failed to fetch reviews';
-    return NextResponse.json({ error: message }, { status: 500 });
+  } catch {
+    return NextResponse.json({ error: 'Unable to load product reviews right now.' }, { status: 500 });
   }
 }
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
-    const { productSlug, userName, rating, comment } = body || {};
+    const body = (await req.json()) as Record<string, unknown>;
 
-    if (!productSlug || typeof productSlug !== 'string' || !productSlug.trim()) {
+    // 1. Silent Honeypot check against automated bots
+    const honeypotVal =
+      (typeof body?.websiteUrl === 'string' ? body.websiteUrl : '') ||
+      (typeof body?.honeypot === 'string' ? body.honeypot : '');
+    if (honeypotVal.trim().length > 0) {
+      return NextResponse.json({ success: true, id: 'filtered' }, { status: 201 });
+    }
+
+    // 2. Strict IP Rate Limiting: max 5 reviews per 15 minutes per hashed IP
+    const rawIp = await getClientIpFromHeaders();
+    const ipHash = hashClientIpDaily(rawIp);
+    const rate = checkRateLimit(`reviews_post:${ipHash}`, 5, 15 * 60 * 1000);
+    if (!rate.allowed) {
+      return NextResponse.json(
+        { error: 'لقد أرسلت عدة تقييمات مؤخراً. يرجى الانتظار قليلاً قبل المحاولة مجدداً.' },
+        { status: 429 }
+      );
+    }
+
+    const productSlug = sanitizePlainText(body?.productSlug, 140);
+    const userName = sanitizePlainText(body?.userName, 80);
+    const comment = sanitizePlainText(body?.comment, 300);
+
+    if (!productSlug) {
       return NextResponse.json(
         { error: 'productSlug is required' },
         { status: 400 }
       );
     }
 
-    if (!userName || typeof userName !== 'string' || !userName.trim()) {
+    if (!userName) {
       return NextResponse.json(
         { error: 'userName is required' },
         { status: 400 }
       );
     }
 
-    const numRating = Number(rating);
+    const numRating = Number(body?.rating);
     if (!Number.isFinite(numRating) || numRating < 1 || numRating > 5) {
       return NextResponse.json(
         { error: 'rating must be an integer between 1 and 5' },
@@ -54,15 +82,14 @@ export async function POST(req: NextRequest) {
     }
 
     const id = await createReview({
-      productSlug: productSlug.trim(),
-      userName: userName.trim(),
+      productSlug,
+      userName,
       rating: Math.round(numRating),
-      comment: typeof comment === 'string' ? comment.trim() : '',
+      comment,
     });
 
     return NextResponse.json({ success: true, id }, { status: 201 });
-  } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : 'Failed to submit review';
-    return NextResponse.json({ error: message }, { status: 500 });
+  } catch {
+    return NextResponse.json({ error: 'Unable to submit review right now.' }, { status: 500 });
   }
 }
